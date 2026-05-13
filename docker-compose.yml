@@ -1,0 +1,30 @@
+services:
+  symfony:
+    build: ./apps/symfony
+    container_name: sandbox-symfony
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./apps/symfony:/app
+    networks:
+      - sandbox
+
+  react:
+    build: ./apps/react
+    container_name: sandbox-react
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./apps/react:/app
+      - react_node_modules:/app/node_modules
+    environment:
+      - VITE_API_URL=http://symfony:8000
+    networks:
+      - sandbox
+
+volumes:
+  react_node_modules:
+
+networks:
+  sandbox:
+    driver: bridge
