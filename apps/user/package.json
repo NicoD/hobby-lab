@@ -10,7 +10,8 @@
     "lint": "eslint \"{src,test}/**/*.ts\"",
     "test": "jest",
     "prisma:generate": "prisma generate",
-    "prisma:migrate": "prisma migrate dev"
+    "prisma:migrate": "prisma migrate dev",
+    "cli:create-user": "node --env-file=.env -r ts-node/register src/cli/create-user.ts"
   },
   "dependencies": {
     "@nestjs/common": "^10.0.0",

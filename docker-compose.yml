@@ -57,6 +57,8 @@ services:
   identity-db:
     image: postgres:16-alpine
     container_name: sandbox-identity-db
+    ports:
+      - "5432:5432"
     environment:
       POSTGRES_USER: identity
       POSTGRES_PASSWORD: identity
