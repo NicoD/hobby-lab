@@ -1,0 +1,12 @@
+http:
+  middlewares:
+    forward-auth:
+      forwardAuth:
+        # Traefik forwards every /api/* request here first.
+        # 200 → headers injected into the request to apps/backend.
+        # 401 → request blocked.
+        address: "http://user:3000/validate"
+        trustForwardHeader: true
+        authResponseHeaders:
+          - "X-User-Id"
+          - "X-User-Roles"

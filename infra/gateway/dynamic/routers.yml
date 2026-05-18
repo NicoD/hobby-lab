@@ -1,0 +1,28 @@
+http:
+  routers:
+    # /auth/* → apps/user directly, no ForwardAuth
+    auth:
+      entryPoints:
+        - web
+      rule: "PathPrefix(`/auth`)"
+      service: user
+
+    # /api/* → ForwardAuth (apps/user /validate) → apps/backend
+    api:
+      entryPoints:
+        - web
+      rule: "PathPrefix(`/api`)"
+      middlewares:
+        - forward-auth
+      service: backend
+
+  services:
+    user:
+      loadBalancer:
+        servers:
+          - url: "http://user:3000"
+
+    backend:
+      loadBalancer:
+        servers:
+          - url: "http://backend:8000"
