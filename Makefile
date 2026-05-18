@@ -1,6 +1,7 @@
 PWD := $(shell pwd)
 
-.PHONY: help install symfony-install react-install up down restart logs build \
+.PHONY: help install symfony-install react-install \
+        up down restart logs build \
         shell-symfony shell-react composer npm \
         symfony-test symfony-lint symfony-lint-fix symfony-watch \
         react-test react-lint react-lint-fix react-watch
@@ -8,7 +9,7 @@ PWD := $(shell pwd)
 help:
 	@echo ""
 	@echo "Usage:"
-	@echo "  make install            Install Symfony and React skeletons (first run)"
+	@echo "  make install            Install dependencies and clear caches"
 	@echo "  make up                 Start all containers"
 	@echo "  make down               Stop all containers"
 	@echo "  make restart            Restart all containers"
@@ -37,31 +38,11 @@ help:
 install: symfony-install react-install
 
 symfony-install:
-	@if [ ! -f apps/symfony/composer.json ]; then \
-		echo ">>> Installing Symfony skeleton..."; \
-		docker run --rm \
-			--user $(shell id -u):$(shell id -g) \
-			-v $(PWD)/apps/symfony:/app \
-			-w /app \
-			composer:latest create-project symfony/skeleton . --no-interaction; \
-		echo ">>> Symfony skeleton ready."; \
-	else \
-		echo ">>> Symfony already installed, skipping."; \
-	fi
+	docker compose run --rm symfony composer install
+	docker compose run --rm symfony php bin/console cache:clear
 
 react-install:
-	@if [ ! -f apps/react/package.json ]; then \
-		echo ">>> Installing React/Vite skeleton..."; \
-		docker run --rm \
-			--user $(shell id -u):$(shell id -g) \
-			-e npm_config_cache=/tmp/npm-cache \
-			-v $(PWD)/apps:/apps \
-			-w /apps \
-			node:lts-alpine sh -c "npx --yes create-vite@latest react --template react"; \
-		echo ">>> React skeleton ready."; \
-	else \
-		echo ">>> React already installed, skipping."; \
-	fi
+	docker compose run --rm react npm install
 
 # ── Docker Compose ─────────────────────────────────────────────────────────────
 

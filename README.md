@@ -23,7 +23,7 @@ A minimal client/server sandbox project with a **Symfony 8** backend (PHP 8.4) a
 ## Getting started
 
 ```bash
-# 1. Install both skeletons (first time only)
+# 1. Install dependencies
 make install
 
 # 2. Start all containers
@@ -42,7 +42,7 @@ The React app can reach the Symfony API at `http://symfony:8000` (see `VITE_API_
 
 | Command                       | Description                              |
 |-------------------------------|------------------------------------------|
-| `make install`                | Install Symfony and React skeletons      |
+| `make install`                | Install dependencies and clear caches    |
 | `make up`                     | Start all containers (detached)          |
 | `make down`                   | Stop and remove containers               |
 | `make restart`                | Restart all containers                   |
