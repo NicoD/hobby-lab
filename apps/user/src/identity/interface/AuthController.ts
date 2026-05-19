@@ -4,11 +4,12 @@ import {
   Get,
   Body,
   Req,
+  Res,
   HttpCode,
   HttpStatus,
   UnauthorizedException,
 } from '@nestjs/common';
-import { Request } from 'express';
+import { Request, Response } from 'express';
 import { AuthenticateUserCommand, AuthenticateUserHandler } from '../application/commands/AuthenticateUser';
 import { RegisterUserCommand, RegisterUserHandler } from '../application/commands/RegisterUser';
 import { IdentityJwtService } from '../infrastructure/JwtService';
@@ -54,15 +55,22 @@ export class AuthController {
 
   /** ForwardAuth endpoint called by Traefik to validate every inbound request. */
   @Get('validate')
-  async validate(@Req() req: Request) {
+  async validate(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
     const authHeader = req.headers['authorization'];
     if (!authHeader?.startsWith('Bearer ')) {
       throw new UnauthorizedException();
     }
 
     const token = authHeader.slice(7);
-    const payload = await this.jwtService.verifyAccessToken(token);
+    let payload: Awaited<ReturnType<IdentityJwtService['verifyAccessToken']>>;
+    try {
+      payload = await this.jwtService.verifyAccessToken(token);
+    } catch {
+      throw new UnauthorizedException();
+    }
 
-    return { sub: payload.sub, roles: payload.roles };
+    // Traefik reads these response headers and injects them into the forwarded request.
+    res.setHeader('X-User-Id', payload.sub);
+    res.setHeader('X-User-Roles', payload.roles.join(','));
   }
 }
