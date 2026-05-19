@@ -4,7 +4,6 @@ import * as argon2 from 'argon2';
 import { randomUUID } from 'crypto';
 import { USER_REPOSITORY, UserRepository } from '../../domain/UserRepository';
 import { User } from '../../domain/User';
-import { Profile } from '../../domain/Profile';
 
 export class RegisterUserCommand {
   @IsEmail()
@@ -13,12 +12,6 @@ export class RegisterUserCommand {
   @IsString()
   @MinLength(8)
   password: string;
-
-  @IsString()
-  firstName: string;
-
-  @IsString()
-  lastName: string;
 }
 
 @Injectable()
@@ -34,12 +27,10 @@ export class RegisterUserHandler {
     }
 
     const passwordHash = await argon2.hash(command.password);
-    const profile = new Profile(command.firstName, command.lastName, null);
     const user = User.create({
       id: randomUUID(),
       email: command.email,
       passwordHash,
-      profile,
     });
 
     await this.users.save(user);

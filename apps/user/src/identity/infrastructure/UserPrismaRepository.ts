@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { UserRepository } from '../domain/UserRepository';
 import { User } from '../domain/User';
-import { Profile } from '../domain/Profile';
 import { Role } from '../domain/Role';
 import { Token } from '../domain/Token';
 import { PrismaService } from './PrismaService';
@@ -33,18 +32,12 @@ export class UserPrismaRepository implements UserRepository {
         id: user.id,
         email: user.email,
         passwordHash: user.passwordHash,
-        firstName: user.profile.firstName,
-        lastName: user.profile.lastName,
-        avatar: user.profile.avatar,
         roles: user.roles,
         createdAt: user.createdAt,
       },
       update: {
         email: user.email,
         passwordHash: user.passwordHash,
-        firstName: user.profile.firstName,
-        lastName: user.profile.lastName,
-        avatar: user.profile.avatar,
         roles: user.roles,
       },
     });
@@ -55,7 +48,6 @@ export class UserPrismaRepository implements UserRepository {
       id: row.id,
       email: row.email,
       passwordHash: row.passwordHash,
-      profile: new Profile(row.firstName, row.lastName, row.avatar),
       roles: row.roles as Role[],
       tokens: (row.tokens ?? []).map(
         (t: any) =>

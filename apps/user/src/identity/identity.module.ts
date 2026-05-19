@@ -6,7 +6,6 @@ import { UserPrismaRepository } from './infrastructure/UserPrismaRepository';
 import { IdentityJwtService } from './infrastructure/JwtService';
 import { RegisterUserHandler } from './application/commands/RegisterUser';
 import { AuthenticateUserHandler } from './application/commands/AuthenticateUser';
-import { UpdateProfileHandler } from './application/commands/UpdateProfile';
 import { GetUserByIdHandler } from './application/queries/GetUserById';
 import { AuthController } from './interface/AuthController';
 
@@ -25,7 +24,6 @@ import { AuthController } from './interface/AuthController';
     { provide: USER_REPOSITORY, useClass: UserPrismaRepository },
     RegisterUserHandler,
     AuthenticateUserHandler,
-    UpdateProfileHandler,
     GetUserByIdHandler,
   ],
   exports: [],

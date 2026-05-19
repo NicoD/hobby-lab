@@ -24,10 +24,10 @@ function askPassword(question: string): Promise<string> {
         stdin.removeListener('data', onData);
         process.stdout.write('\n');
         resolve(value);
-      } else if (chunk === '') {
+      } else if (chunk === '') {
         process.stdout.write('\n');
         process.exit(130);
-      } else if (chunk === '') {
+      } else if (chunk === '') {
         if (value.length > 0) {
           value = value.slice(0, -1);
           process.stdout.write('\b \b');
@@ -62,12 +62,7 @@ async function main() {
     process.exit(1);
   }
 
-  const rl2 = readline.createInterface({ input: process.stdin, output: process.stdout });
-  const firstName = (await ask(rl2, 'First name: ')).trim();
-  const lastName = (await ask(rl2, 'Last name: ')).trim();
-  rl2.close();
-
-  const command = Object.assign(new RegisterUserCommand(), { email, password, firstName, lastName });
+  const command = Object.assign(new RegisterUserCommand(), { email, password });
 
   try {
     const { id } = await handler.execute(command);
