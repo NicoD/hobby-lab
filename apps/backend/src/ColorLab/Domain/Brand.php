@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\ColorLab\Domain;
 
 use App\ColorLab\Domain\ValueObject\BrandHandle;
+use App\Shared\Domain\ValueObject\UserId;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
@@ -18,12 +19,17 @@ class Brand
     #[ORM\Column(type: 'string', length: 255)]
     public private(set) string $name;
 
+    #[ORM\Column(type: 'user_id')]
+    public private(set) UserId $ownedBy;
+
     public function __construct(
         BrandHandle $handle,
         string $name,
+        UserId $ownedBy,
     ) {
-        $this->name = $name;
         $this->handle = $handle;
+        $this->name = $name;
+        $this->ownedBy = $ownedBy;
     }
 
 

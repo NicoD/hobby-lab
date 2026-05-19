@@ -1,0 +1,15 @@
+security:
+    # No local user database — identity lives exclusively in apps/user.
+    # GatewayAuthenticator builds the user from X-User-Id / X-User-Roles headers.
+    providers:
+        gateway:
+            memory: ~
+
+    firewalls:
+        main:
+            stateless: true
+            custom_authenticators:
+                - App\Shared\Infrastructure\Security\GatewayAuthenticator
+
+    access_control:
+        - { path: ^/, roles: IS_AUTHENTICATED_FULLY }

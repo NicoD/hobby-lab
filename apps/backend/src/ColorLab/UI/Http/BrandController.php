@@ -30,7 +30,11 @@ final class BrandController extends AbstractController
     public function create(Request $request, CreateBrandCommandHandler $handler): JsonResponse
     {
         $data = $request->toArray();
-        $handler(new CreateBrandCommand($data['handle'], $data['name']));
+        $handler(new CreateBrandCommand(
+            $data['handle'],
+            $data['name'],
+            $request->headers->get('X-User-Id'),
+        ));
 
         return $this->json(null, Response::HTTP_CREATED);
     }

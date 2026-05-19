@@ -7,6 +7,7 @@ namespace App\ColorLab\Application\Brand\Command\CreateBrand;
 use App\ColorLab\Domain\Brand;
 use App\ColorLab\Domain\Repository\BrandRepository;
 use App\ColorLab\Domain\ValueObject\BrandHandle;
+use App\Shared\Domain\ValueObject\UserId;
 
 final class CreateBrandCommandHandler
 {
@@ -17,6 +18,7 @@ final class CreateBrandCommandHandler
         $brand = new Brand(
             BrandHandle::fromString($command->handle),
             $command->name,
+            UserId::fromString($command->ownedBy),
         );
 
         $this->brands->save($brand);

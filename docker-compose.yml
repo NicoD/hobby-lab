@@ -14,8 +14,7 @@ services:
   backend:
     build: ./apps/backend
     container_name: sandbox-backend
-    ports:
-      - "8000:8000"
+    # no ports exposed — only reachable via Traefik on the internal network
     volumes:
       - ./apps/backend:/app
     environment:
@@ -55,8 +54,7 @@ services:
   user:
     build: ./apps/user
     container_name: sandbox-user
-    ports:
-      - "3000:3000"
+    # no ports exposed — only reachable via Traefik on the internal network
     volumes:
       - ./apps/user:/app
       - user_node_modules:/app/node_modules

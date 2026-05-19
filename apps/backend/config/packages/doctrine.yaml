@@ -5,6 +5,7 @@ doctrine:
         types:
             color_id: App\ColorLab\Infrastructure\Doctrine\Type\ColorIdType
             brand_handle: App\ColorLab\Infrastructure\Doctrine\Type\BrandHandleType
+            user_id: App\Shared\Infrastructure\Doctrine\Type\UserIdType
 
     orm:
         naming_strategy: doctrine.orm.naming_strategy.underscore_number_aware
