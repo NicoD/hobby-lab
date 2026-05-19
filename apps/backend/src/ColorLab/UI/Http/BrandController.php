@@ -17,7 +17,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 
-#[Route('/brands', name: 'brand_')]
+#[Route('/color-lab/brands', name: 'brand_')]
 final class BrandController extends AbstractController
 {
     #[Route('', name: 'list', methods: ['GET'])]

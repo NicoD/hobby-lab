@@ -21,11 +21,14 @@ Use **Traefik** as the API Gateway via the **ForwardAuth** pattern.
 
 ```
 Traefik
-  ├── /auth/*  → apps/user directly (no ForwardAuth)
-  └── /api/*   → ForwardAuth to apps/user (/validate)
-                      │ 200 OK: headers injected, request forwarded to apps/backend
-                      │ 401:    request blocked
+  ├── /auth/*        → apps/user directly (no ForwardAuth)
+  ├── /color-lab/*   → ForwardAuth → stripPrefix(/color-lab) → apps/backend
+  └── /mini-lab/*    → ForwardAuth → stripPrefix(/mini-lab)  → apps/backend  (example)
 ```
+
+Each domain in `apps/backend` gets its own router in Traefik. This makes the bounded-context separation visible at the URL level (`/color-lab/brands`) while keeping Symfony routes clean (`/brands` — the prefix is stripped by a `stripPrefix` middleware before the request reaches Symfony).
+
+To add a new domain: add a `strip-{domain}` middleware in `middlewares.yml` and a matching router in `routers.yml`.
 
 Traefik injects the following headers into the request to Symfony:
 - `X-User-Id`: JWT `sub` claim

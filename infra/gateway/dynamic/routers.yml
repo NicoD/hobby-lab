@@ -7,14 +7,26 @@ http:
       rule: "PathPrefix(`/auth`)"
       service: user
 
-    # /api/* → ForwardAuth (apps/user /validate) → apps/backend
-    api:
+    # One router per domain in apps/backend.
+    # Traefik routes by prefix; Symfony sees the full path (/color-lab/brands)
+    # and owns the routing inside each bounded context.
+    # To add a domain: duplicate the block and update rule + name.
+
+    color-lab:
       entryPoints:
         - web
-      rule: "PathPrefix(`/api`)"
+      rule: "PathPrefix(`/color-lab`)"
       middlewares:
         - forward-auth
       service: backend
+
+    # mini-lab:
+    #   entryPoints:
+    #     - web
+    #   rule: "PathPrefix(`/mini-lab`)"
+    #   middlewares:
+    #     - forward-auth
+    #   service: backend
 
   services:
     user:
