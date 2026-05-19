@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Shared\Infrastructure\Doctrine\Type;
 
+use App\Shared\Domain\ValueObject\AbstractHandle;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Types\Type;
-use App\Shared\Domain\ValueObject\AbstractHandle;
 
 abstract class AbstractHandleType extends Type
 {
@@ -24,17 +24,17 @@ abstract class AbstractHandleType extends Type
             return (string) $value;
         }
 
-        return $value;
+        return is_string($value) ? $value : null;
     }
 
     public function convertToPHPValue(mixed $value, AbstractPlatform $platform): mixed
     {
-        if ($value === null) {
+        if (!is_string($value)) {
             return null;
         }
 
         $class = $this->getClass();
 
-        return $class::fromString((string) $value);
+        return $class::fromString($value);
     }
 }

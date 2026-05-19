@@ -3,7 +3,8 @@ doctrine:
         url: '%env(DATABASE_URL)%'
         server_version: '16'
         types:
-            ingredient_id: App\ColorLab\Infrastructure\Doctrine\Type\IngredientIdType
+            color_id: App\ColorLab\Infrastructure\Doctrine\Type\ColorIdType
+            brand_handle: App\ColorLab\Infrastructure\Doctrine\Type\BrandHandleType
 
     orm:
         naming_strategy: doctrine.orm.naming_strategy.underscore_number_aware

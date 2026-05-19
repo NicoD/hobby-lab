@@ -14,21 +14,17 @@ class Color
 {
     #[ORM\Id]
     #[ORM\Column(type: 'color_id')]
-    private ColorId $id;
+    public private(set) ColorId $id;
 
     #[ORM\Column(type: 'string', length: 255)]
-    public string $name {
-        get => $this->name;
-    }
+    public private(set) string $name;
 
     #[ORM\Column(type: 'brand_handle')]
-    public BrandHandle $brandHandle {
-        get => $this->brandHandle;
-    }
+    public private(set) BrandHandle $brandHandle;
 
     public function __construct(
         string $name,
-        BrandHandle $brand
+        BrandHandle $brandHandle,
     ) {
         $this->id = ColorId::create();
         $this->name = $name;

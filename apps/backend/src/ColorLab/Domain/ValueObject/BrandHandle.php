@@ -6,4 +6,6 @@ namespace App\ColorLab\Domain\ValueObject;
 
 use App\Shared\Domain\ValueObject\AbstractHandle;
 
-final readonly class BrandHandle extends AbstractHandle {}
+final readonly class BrandHandle extends AbstractHandle
+{
+}
