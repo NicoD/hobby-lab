@@ -37,15 +37,13 @@ apps/user/
     └── identity/                  ← domain (NestJS module)
         ├── domain/
         │   ├── User.ts            ← root aggregate
-        │   ├── Profile.ts         ← value object (PII)
         │   ├── Role.ts            ← value object
         │   ├── Token.ts           ← entity (refresh tokens)
         │   └── UserRepository.ts  ← interface
         ├── application/
         │   ├── commands/
         │   │   ├── RegisterUser.ts
-        │   │   ├── AuthenticateUser.ts
-        │   │   └── UpdateProfile.ts
+        │   │   └── AuthenticateUser.ts
         │   └── queries/
         │       └── GetUserById.ts
         ├── infrastructure/
@@ -67,19 +65,22 @@ apps/user/
 | Repository | Native repository pattern |
 | DI Container | Built-in DI container |
 
-### Sandbox: simplified authentication
+### Sandbox: registration and authentication
 
-To validate the architecture without implementing a full system, credentials are stored in the database (a single test user). The goal is to validate the JWT flow and ForwardAuth, not a complete registration system.
+Registration is fully implemented (`POST /auth/register`). The goal is to validate the JWT flow and ForwardAuth with real users created via the CLI (`npm run cli:create-user`) or the API.
+
+Refresh token rotation and logout (`/auth/refresh`, `/auth/logout`) are stubbed — the `Token` entity and the Prisma schema are in place but the persistence logic is not yet wired.
 
 ### Exposed endpoints
 
-| Method | Route | Auth required | Description |
-|---|---|---|---|
-| `POST` | `/auth/login` | No | Returns access token (JWT) + refresh token |
-| `POST` | `/auth/refresh` | Refresh token | Renews the access token |
-| `POST` | `/auth/logout` | Access token | Invalidates the refresh token |
-| `GET` | `/auth/jwks` | No | RS256 public key in JWKS format |
-| `GET` | `/validate` | No (internal) | ForwardAuth endpoint for Traefik |
+| Method | Route | Auth required | Status | Description |
+|---|---|---|---|---|
+| `POST` | `/auth/register` | No | Implemented | Creates a new user account |
+| `POST` | `/auth/login` | No | Implemented | Returns access token (JWT, 15 min) + refresh token |
+| `POST` | `/auth/refresh` | Refresh token | Stubbed | Renews the access token |
+| `POST` | `/auth/logout` | Access token | Stubbed | Invalidates the refresh token |
+| `GET` | `/auth/jwks` | No | Stubbed | RS256 public key in JWKS format |
+| `GET` | `/validate` | No (internal) | Implemented | ForwardAuth endpoint for Traefik |
 
 ### GDPR consequences
 

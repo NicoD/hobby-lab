@@ -59,11 +59,12 @@ Browser (React)
   "email": "user@example.com",
   "roles": ["ROLE_USER"],
   "iat": 1700000000,
-  "exp": 1700003600
+  "exp": 1700000900
 }
 ```
 
 - Algorithm: **RS256** (asymmetric key)
+- Access token lifetime: **15 minutes**
 - Public key exposed by `apps/user` via `GET /auth/jwks`
 - Symfony validates locally — no network call to `apps/user` per business request
 
@@ -78,10 +79,11 @@ Browser (React)
 
 | Method | Route | Description |
 |---|---|---|
+| `POST` | `/auth/register` | Creates a new user account |
 | `POST` | `/auth/login` | Authentication, returns access + refresh token |
-| `POST` | `/auth/refresh` | Renews the access token |
-| `POST` | `/auth/logout` | Invalidates the refresh token |
-| `GET` | `/auth/jwks` | RS256 public key (JWKS format) |
+| `POST` | `/auth/refresh` | Renews the access token *(stubbed)* |
+| `POST` | `/auth/logout` | Invalidates the refresh token *(stubbed)* |
+| `GET` | `/auth/jwks` | RS256 public key (JWKS format) *(stubbed)* |
 | `GET` | `/validate` | ForwardAuth endpoint for Traefik |
 
 ## Related ADRs

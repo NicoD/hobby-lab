@@ -20,17 +20,20 @@ apps/backend/src/
     Domain/
     Application/
     Infrastructure/
-    Interface/
+    UI/
+      Http/
   Order/           ← order domain
     Domain/
     Application/
     Infrastructure/
-    Interface/
-  Catalog/         ← catalog domain (example)
+    UI/
+      Http/
+  Shared/          ← cross-domain infrastructure (no business logic)
     Domain/
-    Application/
+      ValueObject/
     Infrastructure/
-    Interface/
+      Doctrine/
+      Security/
 ```
 
 ### Naming convention
@@ -55,7 +58,7 @@ Domains are named in **PascalCase** (PHP/Symfony convention). Layer folders also
 - External adapters
 - Symfony configuration (services.yaml, doctrine mappings)
 
-**Interface/**: entry points
+**UI/Http/**: entry points
 - API Controllers (JSON)
 - Event listeners
 
@@ -116,6 +119,18 @@ ColorLab dispatches RecipePublished
 ```
 
 Direct cross-namespace calls are never allowed.
+
+### Shared namespace
+
+`App\Shared` holds cross-domain technical building blocks that carry no business logic:
+
+- `Shared\Domain\ValueObject\` — abstract base classes (`AbstractUuid`, `AbstractHandle`) and cross-cutting value objects (`UserId`)
+- `Shared\Infrastructure\Doctrine\Type\` — abstract Doctrine custom types built on those value objects
+- `Shared\Infrastructure\Security\` — `GatewayAuthenticator` and `GatewayUser` (reads `X-User-Id` / `X-User-Roles` headers)
+
+Business domains may depend on `Shared`. `Shared` must never depend on a business domain.
+
+> Deptrac currently enforces isolation at the domain level. The `Shared` layer is not yet declared as a Deptrac layer — add it when a second domain is introduced.
 
 ## Consequences
 

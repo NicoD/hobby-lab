@@ -40,12 +40,14 @@ apps/backend/src/
     Domain/
     Application/
     Infrastructure/
-    Interface/
+    UI/
+      Http/
   Order/               ← domain
     Domain/
     Application/
     Infrastructure/
-    Interface/
+    UI/
+      Http/
 ```
 
 ### Layer conventions
@@ -61,7 +63,7 @@ apps/backend/src/
 **infrastructure/** (or **Infrastructure/**): technical implementations
 - Repository implementations, external adapters, framework config
 
-**interface/** (or **Interface/**): entry points
+**interface/** (NestJS) / **UI/Http/** (Symfony): entry points
 - API Controllers, Event listeners
 
 ### Files inside domain/
