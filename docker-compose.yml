@@ -18,6 +18,24 @@ services:
       - "8000:8000"
     volumes:
       - ./apps/backend:/app
+    environment:
+      - DATABASE_URL=postgresql://backend:backend@sandbox-backend-db:5432/recipe_kitchen
+    depends_on:
+      - backend-db
+    networks:
+      - sandbox
+
+  backend-db:
+    image: postgres:16-alpine
+    container_name: sandbox-backend-db
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_USER: backend
+      POSTGRES_PASSWORD: backend
+      POSTGRES_DB: recipe_kitchen
+    volumes:
+      - backend_db_data:/var/lib/postgresql/data
     networks:
       - sandbox
 
@@ -72,6 +90,7 @@ volumes:
   frontend_node_modules:
   user_node_modules:
   identity_db_data:
+  backend_db_data:
 
 networks:
   sandbox:

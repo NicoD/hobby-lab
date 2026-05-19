@@ -25,7 +25,7 @@ recipe-lab/
 | App | Tech | Role | Type |
 |---|---|---|---|
 | `frontend` | React | End-user interface | Presentation layer |
-| `backend` | Symfony | Business domains (Kitchen, Order...) | Multi-domain DDD |
+| `backend` | Symfony | Business domains (ColorLab, Order...) | Multi-domain DDD |
 | `user` | NestJS | Identity domain (auth + profile) | Microservice |
 | `gateway` | Traefik | Routing, JWT validation | Infrastructure |
 

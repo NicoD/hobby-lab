@@ -36,7 +36,7 @@ apps/user/src/
     interface/
 
 apps/backend/src/
-  Kitchen/             ← domain (PascalCase, PHP convention)
+  ColorLab/             ← domain (PascalCase, PHP convention)
     Domain/
     Application/
     Infrastructure/

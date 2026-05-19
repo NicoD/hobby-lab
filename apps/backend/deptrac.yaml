@@ -1,0 +1,12 @@
+parameters:
+  paths:
+    - ./src
+  exclude_files:
+    - '#^src/Kernel\.php#'
+  layers:
+    - name: ColorLab
+      collectors:
+        - type: directory
+          value: src/ColorLab/.*
+  ruleset:
+    ColorLab: ~

@@ -30,12 +30,16 @@ React → Traefik → apps/user (routes /auth/*)
 
 - Folders named by responsibility, not technology (`frontend`, `backend`, `user`)
 - Bounded Contexts are a strategic concept only — documented, never materialized as folders
-- Domains are materialized as folders under `src/` (e.g. `src/identity/`, `src/Kitchen/`)
+- Domains are materialized as folders under `src/` (e.g. `src/identity/`, `src/ColorLab/`)
 - `apps/user` contains a domain named `identity` (not `user`) to avoid redundancy
 - JWT RS256 — Symfony reads X-User-Id and X-User-Roles injected by Traefik, never touches the JWT directly
 - Domain isolation enforced by Deptrac (Symfony) and closed modules (NestJS) — violation = CI fail
 - Fine-grained authorization via Symfony Voters in the Application layer of each domain
 - Inter-domain communication via Domain Events (Symfony Messenger), never direct cross-namespace imports
+
+## Backend stack
+
+Symfony + Doctrine ORM + PostgreSQL (`doctrine/doctrine-bundle`, `doctrine/orm`). Container: `postgres:16-alpine` on host port 5433.
 
 ## User service stack
 

@@ -1,0 +1,21 @@
+doctrine:
+    dbal:
+        url: '%env(DATABASE_URL)%'
+        server_version: '16'
+        types:
+            ingredient_id: App\ColorLab\Infrastructure\Doctrine\Type\IngredientIdType
+
+    orm:
+        naming_strategy: doctrine.orm.naming_strategy.underscore_number_aware
+        auto_mapping: false
+        mappings:
+            ColorLab:
+                type: attribute
+                dir: '%kernel.project_dir%/src/ColorLab/Domain'
+                prefix: 'App\ColorLab\Domain'
+                is_bundle: false
+
+when@test:
+    doctrine:
+        dbal:
+            dbname_suffix: '_test%env(default::TEST_TOKEN)%'

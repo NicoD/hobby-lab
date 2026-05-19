@@ -6,6 +6,8 @@
 
 `apps/backend` implements the business domains of the project. Multiple domains coexist in the same Symfony service because they share common infrastructure (database, deployment) and are under the same team's responsibility.
 
+Storage uses **Doctrine ORM + PostgreSQL** (`doctrine/doctrine-bundle`, `doctrine/orm`). The backend-db container (`postgres:16-alpine`) is distinct from the identity-db used by `apps/user`.
+
 ## Decision
 
 ### Domain structure
@@ -14,7 +16,7 @@ Each domain is a **PHP namespace** under `src/`. A domain cannot directly import
 
 ```
 apps/backend/src/
-  Kitchen/         ← kitchen domain
+  ColorLab/         ← kitchen domain
     Domain/
     Application/
     Infrastructure/
@@ -72,7 +74,7 @@ These headers are injected into Symfony's `Security Token` via a custom `TokenAu
 **Fine-grained** (action on a specific aggregate) → Symfony Voters in the Application layer
 
 ```php
-// Application/Security/RecipeVoter.php (inside Kitchen/)
+// Application/Security/RecipeVoter.php (inside ColorLab/)
 class RecipeVoter extends Voter
 {
     protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token): bool
@@ -92,15 +94,15 @@ Deptrac is configured from day one to forbid cross-domain imports. A violation b
 ```yaml
 # deptrac.yaml (example)
 layers:
-  - name: Kitchen
+  - name: ColorLab
     collectors:
-      - { type: directory, value: src/Kitchen }
+      - { type: directory, value: src/ColorLab }
   - name: Order
     collectors:
       - { type: directory, value: src/Order }
 
 ruleset:
-  Kitchen: []    # Kitchen imports no other domain
+  ColorLab: []    # ColorLab imports no other domain
   Order:   []
 ```
 
@@ -109,7 +111,7 @@ ruleset:
 Domains do not call each other directly. Communication goes through **Domain Events** (Symfony Messenger event bus):
 
 ```
-Kitchen dispatches RecipePublished
+ColorLab dispatches RecipePublished
   → Order listens to RecipePublished (if needed)
 ```
 
