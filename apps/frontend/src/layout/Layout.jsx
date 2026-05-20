@@ -1,4 +1,4 @@
-import { Link, Outlet } from 'react-router-dom'
+import { Link, NavLink, Outlet } from 'react-router-dom'
 import { ErrorBoundary } from 'react-error-boundary'
 import { useAuth } from '../context/AuthContext'
 
@@ -14,8 +14,10 @@ function ColorLabCircleIcon({ className }) {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" className={className} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
       <path strokeLinecap="round" strokeLinejoin="round" d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-      <rect x="10" y="4.5" width="4" height="3.5" fill="currentColor" stroke="none" />
-      <path fill="currentColor" stroke="none" d="M12 8 C7.5 9.5 7 14.5 12 20 C17 14.5 16.5 9.5 12 8 Z" />
+      <g transform="rotate(135, 12, 12)">
+        <rect x="10" y="4.5" width="4" height="3.5" fill="currentColor" stroke="none" />
+        <path fill="currentColor" stroke="none" d="M12 8 C7.5 9.5 7 14.5 12 20 C17 14.5 16.5 9.5 12 8 Z" />
+      </g>
     </svg>
   )
 }
@@ -43,12 +45,12 @@ export default function Layout({ children }) {
         <nav className="flex items-center gap-6">
           {user ? (
             <>
-              <Link to="/color-lab" title="Color lab" className="text-gray-400 hover:text-gray-700 transition-colors">
+              <NavLink to="/color-lab" title="Color lab" className={({ isActive }) => isActive ? 'text-indigo-600' : 'text-gray-400 hover:text-gray-700 transition-colors'}>
                 <ColorLabCircleIcon className="w-7 h-7" />
-              </Link>
-              <Link to="/mini-lab" title="Mini lab" className="text-gray-400 hover:text-gray-700 transition-colors">
+              </NavLink>
+              <NavLink to="/mini-lab" title="Mini lab" className={({ isActive }) => isActive ? 'text-indigo-600' : 'text-gray-400 hover:text-gray-700 transition-colors'}>
                 <MiniLabCircleIcon className="w-7 h-7" />
-              </Link>
+              </NavLink>
             </>) : <></>
           }
         </nav>
