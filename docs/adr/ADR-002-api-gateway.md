@@ -20,12 +20,19 @@ Use **Traefik** as the API Gateway via the **ForwardAuth** pattern.
 ### Sandbox (Docker Compose)
 
 ```
-Traefik
-  ├── /auth/*        → apps/user directly (no ForwardAuth)
-  └── /color-lab/*   → ForwardAuth → apps/backend (full path preserved)
+Traefik                                                  :8000
+  ├── /api/auth/*        → strip /api → apps/user (no ForwardAuth)
+  ├── /api/color-lab/*   → strip /api → ForwardAuth → apps/backend
+  └── /*                 → apps/frontend (Vite dev server :5173)
 ```
 
-Each domain in `apps/backend` gets its own router in Traefik. The prefix is **not stripped** — Symfony receives the full path (e.g. `/color-lab/brands`) and owns the routing internally. Routes in Symfony controllers include the domain prefix (`#[Route('/color-lab/brands')]`).
+**Traefik is the single entry point for all traffic** — including the React frontend. The Vite dev server is not exposed directly; the browser always goes through Traefik on port 8000. This matches the production topology where a static file server sits behind the same gateway.
+
+All API routes are prefixed with `/api` in the browser to avoid conflicts with frontend routes (e.g. the React route `/auth` and the API route `/auth/login` would otherwise collide). Traefik strips the `/api` prefix via the `strip-api-prefix` middleware before forwarding — backend services are completely unaware of this prefix.
+
+In development, Vite's built-in proxy is not used. Traefik handles all routing before requests reach Vite.
+
+Each domain in `apps/backend` gets its own router in Traefik. After prefix stripping, Symfony receives the full domain path (e.g. `/color-lab/brands`) and owns the routing internally. Routes in Symfony controllers include the domain prefix (`#[Route('/color-lab/brands')]`).
 
 To add a new domain: add a router in `routers.yml` with the `forward-auth` middleware.
 

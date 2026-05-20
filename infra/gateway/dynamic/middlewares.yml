@@ -11,3 +11,8 @@ http:
           - "X-User-Id"
           - "X-User-Roles"
 
+    strip-api-prefix:
+      stripPrefix:
+        prefixes:
+          - "/api"
+

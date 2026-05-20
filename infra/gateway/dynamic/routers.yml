@@ -1,32 +1,44 @@
 http:
   routers:
-    # /auth/* → apps/user directly, no ForwardAuth
+    # /api/auth/* → apps/user directly, no ForwardAuth
+    # strip-api-prefix removes /api before forwarding → user sees /auth/*
     auth:
       entryPoints:
         - web
-      rule: "PathPrefix(`/auth`)"
+      rule: "PathPrefix(`/api/auth`)"
+      middlewares:
+        - strip-api-prefix
       service: user
 
     # One router per domain in apps/backend.
-    # Traefik routes by prefix; Symfony sees the full path (/color-lab/brands)
-    # and owns the routing inside each bounded context.
+    # Traefik routes by prefix; strip-api-prefix removes /api before forwarding.
+    # Symfony sees the full domain path (/color-lab/brands) and owns routing internally.
     # To add a domain: duplicate the block and update rule + name.
 
     color-lab:
       entryPoints:
         - web
-      rule: "PathPrefix(`/color-lab`)"
+      rule: "PathPrefix(`/api/color-lab`)"
       middlewares:
+        - strip-api-prefix
         - forward-auth
       service: backend
 
     # mini-lab:
     #   entryPoints:
     #     - web
-    #   rule: "PathPrefix(`/mini-lab`)"
+    #   rule: "PathPrefix(`/api/mini-lab`)"
     #   middlewares:
+    #     - strip-api-prefix
     #     - forward-auth
     #   service: backend
+
+    frontend:
+      entryPoints:
+        - web
+      rule: "PathPrefix(`/`)"
+      priority: 1
+      service: frontend
 
   services:
     user:
@@ -38,3 +50,8 @@ http:
       loadBalancer:
         servers:
           - url: "http://backend:8000"
+
+    frontend:
+      loadBalancer:
+        servers:
+          - url: "http://frontend:5173"

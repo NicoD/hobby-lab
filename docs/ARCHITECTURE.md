@@ -29,24 +29,62 @@ recipe-lab/
 | `user` | NestJS | Identity domain (auth + profile) | Microservice |
 | `gateway` | Traefik | Routing, JWT validation | Infrastructure |
 
+## Global architecture
+
+```
+ Browser
+    │
+    │ :8000 (all traffic — single entry point)
+    ▼
+ Traefik  ─────────────────────────────────────────────────────────────────┐
+    │                                                                       │
+    │  PathPrefix(/)              ──────────────────────────►  frontend     │
+    │                                    dev: Vite :5173                    │
+    │                                    prod: nginx (static build)         │
+    │                                                                       │
+    │  PathPrefix(/api/auth)      ── strip /api ──────────►  user :3000     │
+    │                                    NestJS — identity domain           │
+    │                                    issues RS256-signed JWT            │
+    │                                              │                        │
+    │                                         identity-db                   │
+    │                                                                       │
+    │  PathPrefix(/api/color-lab) ── strip /api ──► ForwardAuth             │
+    │  PathPrefix(/api/mini-lab)  ── strip /api ──► ForwardAuth             │
+    │                                                   │                   │
+    │                                    200 OK + X-User-Id + X-User-Roles  │
+    │                                                   │                   │
+    │                                                   ▼                   │
+    │                                              backend :8000             │
+    │                                              Symfony — business domains│
+    │                                                   │                   │
+    │                                              backend-db                │
+    └───────────────────────────────────────────────────────────────────────┘
+
+  All API calls are prefixed with /api in the browser.
+  Traefik strips /api before forwarding — backend services are unaware of the prefix.
+```
+
 ## Request flow
 
 ```
 Browser (React)
       │
       ▼
-   Traefik (gateway)
+   Traefik (gateway)                               :8000 — single entry point
       │
-      ├─ /auth/*  ──────────────────────────→  apps/user  (NestJS)
-      │                                              ↓
-      │                                        issues RS256-signed JWT
+      ├─ PathPrefix(/)           ──────────────────────→  apps/frontend  (Vite / nginx)
       │
-      └─ /api/*   ──→  ForwardAuth ──→  apps/user (/validate)
-                              │ 200 OK + injected headers
-                              ▼
-                         apps/backend  (Symfony)
-                              ↓
-                         X-User-Id, X-User-Roles available
+      ├─ PathPrefix(/api/auth)   ── strip /api ────────→  apps/user  (NestJS)
+      │                                                         ↓
+      │                                                   issues RS256-signed JWT
+      │
+      ├─ PathPrefix(/api/color-lab) ── strip /api ─→  ForwardAuth ─→  apps/user (/validate)
+      └─ PathPrefix(/api/mini-lab)  ── strip /api ─→  ForwardAuth ─→  apps/user (/validate)
+                                                            │ 200 OK + injected headers
+                                                            ▼
+                                                       apps/backend  (Symfony)
+                                                            ↓
+                                                       X-User-Id, X-User-Roles available
 ```
 
 ## Contracts between services
