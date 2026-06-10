@@ -10,7 +10,6 @@ import ColorLabLayout from './layout/ColorLabLayout'
 import MiniLab from './pages/MiniLab'
 import RouterError from './components/RouterError'
 import ColorLabPaint from './pages/ColorLab/Paint'
-import ColorLabBrush from './pages/ColorLab/Brush'
 
 function HomeRedirect() {
   const { user } = useAuth()
