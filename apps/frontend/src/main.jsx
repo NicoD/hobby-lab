@@ -6,9 +6,11 @@ import { AuthProvider, useAuth } from './context/AuthContext'
 import Layout from './layout/Layout'
 import Login from './pages/Login'
 import Profile from './pages/Profile'
-import ColorLab from './pages/ColorLab'
+import ColorLabLayout from './layout/ColorLabLayout'
 import MiniLab from './pages/MiniLab'
 import RouterError from './components/RouterError'
+import ColorLabPaint from './pages/ColorLab/Paint'
+import ColorLabBrush from './pages/ColorLab/Brush'
 
 function HomeRedirect() {
   const { user } = useAuth()
@@ -24,7 +26,14 @@ const router = createBrowserRouter([
       { index: true, element: <HomeRedirect /> },
       { path: 'login', element: <Login /> },
       { path: 'profile', element: <Profile /> },
-      { path: 'color-lab', element: <ColorLab /> },
+      {
+        path: 'color-lab',
+        element: <ColorLabLayout />,
+        children: [
+          { index: true, element: <Navigate to="paint" replace /> },
+          { path: 'paint', element: <ColorLabPaint /> },
+        ]
+      },
       { path: 'mini-lab', element: <MiniLab /> },
     ]
   },

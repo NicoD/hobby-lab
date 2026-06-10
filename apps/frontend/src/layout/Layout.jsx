@@ -36,7 +36,7 @@ function MiniLabCircleIcon({ className }) {
   )
 }
 
-export default function Layout({ children }) {
+export default function Layout() {
   const { user } = useAuth()
 
   return (
