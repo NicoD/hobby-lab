@@ -10,6 +10,7 @@ import Profile from './pages/Profile'
 import ColorLabLayout from './layout/ColorLabLayout'
 import MiniLab from './pages/MiniLab'
 import RouterError from './components/RouterError'
+import RequireAuth from './components/RequireAuth'
 import ColorLabPaint from './pages/ColorLab/Paint'
 
 function HomeRedirect() {
@@ -25,16 +26,21 @@ const router = createBrowserRouter([
     children: [
       { index: true, element: <HomeRedirect /> },
       { path: 'login', element: <Login /> },
-      { path: 'profile', element: <Profile /> },
       {
-        path: 'color-lab',
-        element: <ColorLabLayout />,
+        element: <RequireAuth />,
         children: [
-          { index: true, element: <Navigate to="paint" replace /> },
-          { path: 'paint', element: <ColorLabPaint /> },
+          { path: 'profile', element: <Profile /> },
+          {
+            path: 'color-lab',
+            element: <ColorLabLayout />,
+            children: [
+              { index: true, element: <Navigate to="paint" replace /> },
+              { path: 'paint', element: <ColorLabPaint /> },
+            ]
+          },
+          { path: 'mini-lab', element: <MiniLab /> },
         ]
       },
-      { path: 'mini-lab', element: <MiniLab /> },
     ]
   },
 ])

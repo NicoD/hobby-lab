@@ -16,3 +16,11 @@ http:
         prefixes:
           - "/api"
 
+    # Per-source-IP throttle on /api/auth/* to slow down credential
+    # brute-force. Sustained 1 req/s; bursts of 10 absorb normal app
+    # usage (page-load refresh, parallel tabs).
+    auth-rate-limit:
+      rateLimit:
+        average: 1
+        burst: 10
+

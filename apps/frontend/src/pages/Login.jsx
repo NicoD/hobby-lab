@@ -1,16 +1,20 @@
 import { useState } from 'react'
-import { useNavigate, Navigate } from 'react-router-dom'
+import { useNavigate, Navigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 
 export default function Login() {
   const { user, login } = useAuth()
   const navigate = useNavigate()
+  const location = useLocation()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState(null)
   const [loading, setLoading] = useState(false)
 
-  if (user) return <Navigate to="/" replace />
+  // Where RequireAuth bounced the user from, if anywhere.
+  const from = location.state?.from?.pathname ?? '/'
+
+  if (user) return <Navigate to={from} replace />
 
   async function handleSubmit(e) {
     e.preventDefault()
@@ -18,7 +22,7 @@ export default function Login() {
     setLoading(true)
     try {
       await login(email, password)
-      navigate('/', { replace: true })
+      navigate(from, { replace: true })
     } catch (err) {
       setError(err.message)
     } finally {

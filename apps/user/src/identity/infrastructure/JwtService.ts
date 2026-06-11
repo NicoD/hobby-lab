@@ -1,9 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { randomUUID } from 'crypto';
-import * as argon2 from 'argon2';
+import { createHash, randomUUID } from 'crypto';
 import { User } from '../domain/User';
-import { AuthTokens } from '../application/commands/AuthenticateUser';
 
 export interface JwtPayload {
   sub: string;
@@ -11,11 +9,17 @@ export interface JwtPayload {
   roles: string[];
 }
 
+export interface IssuedTokens {
+  accessToken: string;
+  rawRefreshToken: string;
+  hashedRefreshToken: string;
+}
+
 @Injectable()
 export class IdentityJwtService {
   constructor(private readonly jwt: JwtService) {}
 
-  async issueTokens(user: User): Promise<AuthTokens> {
+  async issueTokens(user: User): Promise<IssuedTokens> {
     const payload: JwtPayload = {
       sub: user.id,
       email: user.email,
@@ -26,14 +30,10 @@ export class IdentityJwtService {
       expiresIn: '15m',
     });
 
-    const rawRefresh = randomUUID();
-    const refreshToken = await argon2.hash(rawRefresh);
+    const rawRefreshToken = randomUUID();
+    const hashedRefreshToken = createHash('sha256').update(rawRefreshToken).digest('hex');
 
-    // The raw refresh token is returned to the client; the hash is persisted.
-    // Swap refreshToken for rawRefresh in the response so the client holds the plain value.
-    void refreshToken;
-
-    return { accessToken, refreshToken: rawRefresh };
+    return { accessToken, rawRefreshToken, hashedRefreshToken };
   }
 
   async verifyAccessToken(token: string): Promise<JwtPayload> {

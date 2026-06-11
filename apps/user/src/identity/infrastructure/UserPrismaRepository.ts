@@ -5,6 +5,7 @@ import { Role } from '../domain/Role';
 import { Token } from '../domain/Token';
 import { PrismaService } from './PrismaService';
 
+
 @Injectable()
 export class UserPrismaRepository implements UserRepository {
   constructor(private readonly prisma: PrismaService) {}
@@ -40,6 +41,37 @@ export class UserPrismaRepository implements UserRepository {
         passwordHash: user.passwordHash,
         roles: user.roles,
       },
+    });
+  }
+
+  async saveToken(token: Token): Promise<void> {
+    await this.prisma.token.create({
+      data: {
+        id: token.id,
+        userId: token.userId,
+        hashedToken: token.hashedToken,
+        expiresAt: token.expiresAt,
+      },
+    });
+  }
+
+  async findTokenByHash(hash: string): Promise<Token | null> {
+    const row = await this.prisma.token.findFirst({ where: { hashedToken: hash } });
+    if (!row) return null;
+    return new Token(row.id, row.userId, row.hashedToken, row.expiresAt, row.revokedAt);
+  }
+
+  async revokeToken(id: string): Promise<void> {
+    await this.prisma.token.update({
+      where: { id },
+      data: { revokedAt: new Date() },
+    });
+  }
+
+  async revokeAllTokensForUser(userId: string): Promise<void> {
+    await this.prisma.token.updateMany({
+      where: { userId, revokedAt: null },
+      data: { revokedAt: new Date() },
     });
   }
 
