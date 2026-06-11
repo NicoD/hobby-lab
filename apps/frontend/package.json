@@ -13,6 +13,7 @@
     "test:watch": "jest --watchAll"
   },
   "dependencies": {
+    "@tanstack/react-query": "^5.101.0",
     "react": "^19.2.5",
     "react-dom": "^19.2.5",
     "react-error-boundary": "^6.1.1",

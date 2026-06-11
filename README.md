@@ -30,13 +30,14 @@ make install
 make up
 ```
 
-| Service  | URL                   |
-|----------|-----------------------|
-| Symfony  | http://localhost:8000 |
-| React    | http://localhost:5173 |
+| Service           | URL                    | Note                             |
+|-------------------|------------------------|----------------------------------|
+| Gateway (Traefik) | http://localhost:8000  | Single entry point — all traffic |
+| Traefik dashboard | http://localhost:8080  | Sandbox only                     |
+| Symfony (direct)  | http://localhost:8001  | Dev only — bypasses gateway      |
+| React (Vite dev)  | http://localhost:5173  | Dev only — bypasses gateway      |
 
 The two containers run on the same Docker network (`sandbox`).  
-The React app can reach the Symfony API at `http://symfony:8000` (see `VITE_API_URL` in `docker-compose.yml`).
 
 ## Commands
 
