@@ -5,37 +5,36 @@ metadata:
   type: project
 ---
 
-DDD conventions validated with the user. See [[project-architecture]] for global context.
+## Layers
 
-**Why:** Prevent domain pollution and keep boundaries coherent over time.
-
-**How to apply:** Apply these rules systematically when scaffolding or adding code.
-
-## Core principle
-
-Bounded Contexts are a **strategic concept only** — documented in ADRs and context maps, never materialized as folders. Domains are what gets materialized in code.
+```
+domain/         → pure domain objects, no framework dependency
+application/    → commands, queries, handlers, read models
+infrastructure/ → Doctrine, adapters
+UI/             → controllers, listeners
+```
 
 ## Rules
 
-- Domains named by concept (PascalCase in Symfony, camelCase in NestJS)
-- `domain/` folders are flat by default — subfolder per aggregate only when 5+ related classes
-- No direct cross-domain imports — communication via Domain Events only
-- Deptrac configured before the first domain in Symfony (violation = CI fail)
-- NestJS modules are closed by default (`@Module({ exports: [] })`)
-- PII only in `apps/user` — never in `apps/backend`
-- `apps/backend` never validates a JWT — it reads X-User-Id and X-User-Roles from headers
+- Bounded Contexts: strategic concept only — never materialized as folders
+- Domains named by concept: PascalCase (Symfony), camelCase (NestJS)
+- `domain/` flat by default — subfolder only when 5+ related classes
+- No cross-domain imports — Domain Events only
+- PII only in `apps/user`; `apps/backend` reads X-User-Id / X-User-Roles, never a JWT
+- Deptrac configured before first domain (violation = CI fail)
+- NestJS modules closed by default (`@Module({ exports: [] })`)
+- Never extract a domain in anticipation
 
-## Signal to extract a domain into a new service
+## Entity construction
 
-- Domain needs independent deployment
-- Different team takes ownership
-- Significantly different scaling requirements
+Constructor = creation factory (generates IDs, enforces invariants). Doctrine reconstitutes via reflection — no `from()` factory needed on entities.
 
-Never extract in anticipation.
+`Brand` uses handle as primary key (no `BrandId`). UUID-identity entities use `SomeId::create()`.
 
-## Layers
+## Value Objects
 
-domain/ → pure domain objects (no framework dependency)
-application/ → commands, queries, handlers, DTOs
-infrastructure/ → implementations (Doctrine, Prisma, adapters)
-interface/ → controllers, listeners
+Default: `new MyVo($value)` directly. Static factory only when semantically meaningful (`create()`, `inCents()`) — never `from()` or `of()`.
+
+## Doctrine types
+
+Each VO mapped by Doctrine gets a type in `Infrastructure/Doctrine/Type/`. The type calls `new MyVo($value)` — the VO exposes nothing for this.
