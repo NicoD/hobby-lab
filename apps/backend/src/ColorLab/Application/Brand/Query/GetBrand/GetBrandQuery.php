@@ -6,5 +6,7 @@ namespace App\ColorLab\Application\Brand\Query\GetBrand;
 
 final readonly class GetBrandQuery
 {
-    public function __construct(public string $handle) {}
+    public function __construct(public string $handle)
+    {
+    }
 }

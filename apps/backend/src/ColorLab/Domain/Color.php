@@ -26,14 +26,25 @@ class Color
     #[ORM\Column(type: 'user_id')]
     public private(set) UserId $ownedBy;
 
-    public function __construct(
+    private function __construct(
+        ColorId $id,
         string $name,
         BrandHandle $brandHandle,
         UserId $ownedBy,
     ) {
-        $this->id = ColorId::create();
+        $this->id = $id;
         $this->name = $name;
         $this->brandHandle = $brandHandle;
         $this->ownedBy = $ownedBy;
+    }
+
+    public static function create(string $name, UserId $ownedBy): self
+    {
+        return new self(
+            ColorId::create(),
+            $name,
+            BrandHandle::create($name),
+            $ownedBy,
+        );
     }
 }

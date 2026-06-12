@@ -26,19 +26,32 @@ final class DoctrineBrandReadRepository extends ServiceEntityRepository implemen
     public function list(): array
     {
         return array_map(
-            static fn(Brand $brand) => new BrandListItemView($brand->handle->handle, $brand->name),
+            static fn (Brand $brand) => new BrandListItemView(
+                (string) $brand->handle,
+                $brand->name,
+                array_map(
+                    static fn ($range) => ['handle' => (string) $range->handle, 'name' => $range->name],
+                    $brand->ranges
+                )
+            ),
             $this->findAll(),
         );
     }
 
     public function findByHandle(string $handle): ?BrandView
     {
-        $brand = $this->find(BrandHandle::fromString($handle));
+        $brand = $this->find(new BrandHandle($handle));
 
         if (null === $brand) {
             return null;
         }
 
-        return new BrandView($brand->handle->handle, $brand->name);
+        return new BrandView(
+            (string) $brand->handle,
+            $brand->name,
+            array_map(
+                static fn ($range) => ['handle' => (string) $range->handle, 'name' => $range->name],
+                $brand->ranges
+            ));
     }
 }

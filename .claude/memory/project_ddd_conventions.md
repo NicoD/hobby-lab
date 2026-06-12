@@ -27,9 +27,11 @@ UI/             → controllers, listeners
 
 ## Entity construction
 
-Constructor = creation factory (generates IDs, enforces invariants). Doctrine reconstitutes via reflection — no `from()` factory needed on entities.
+Private constructor = pure instantiation (no IO, no generation). Doctrine reconstitutes via `newInstanceWithoutConstructor()` — constructor is bypassed.
 
-`Brand` uses handle as primary key (no `BrandId`). UUID-identity entities use `SomeId::create()`.
+Static `create()` = named factory for production code. Generates IDs/handles, may receive domain services via parameters. Callers use `Entity::create(...)`, never `new Entity(...)`.
+
+Handle uniqueness: aggregate-scoped uniqueness enforced by the aggregate root. Global uniqueness enforced by a Domain Service before `create()` + DB `UNIQUE` constraint as safety net.
 
 ## Value Objects
 

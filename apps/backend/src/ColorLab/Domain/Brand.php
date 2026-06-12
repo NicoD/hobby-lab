@@ -22,15 +22,35 @@ class Brand
     #[ORM\Column(type: 'user_id')]
     public private(set) UserId $ownedBy;
 
-    public function __construct(
+    /** @var list<Range> */
+    #[ORM\Column(type: 'range_collection')]
+    public private(set) array $ranges;
+
+    /**
+     * @param list<Range> $ranges
+     */
+    private function __construct(
         BrandHandle $handle,
         string $name,
         UserId $ownedBy,
+        array $ranges,
     ) {
         $this->handle = $handle;
         $this->name = $name;
         $this->ownedBy = $ownedBy;
+        $this->ranges = $ranges;
     }
 
-
+    /**
+     * @param list<Range> $ranges
+     */
+    public static function create(string $name, UserId $ownedBy, array $ranges): self
+    {
+        return new self(
+            BrandHandle::create($name),
+            $name,
+            $ownedBy,
+            $ranges,
+        );
+    }
 }

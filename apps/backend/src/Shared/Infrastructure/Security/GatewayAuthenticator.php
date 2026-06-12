@@ -16,7 +16,7 @@ use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPasspor
 
 final class GatewayAuthenticator extends AbstractAuthenticator
 {
-    public function supports(Request $request): ?bool
+    public function supports(Request $request): bool
     {
         return $request->headers->has('X-User-Id');
     }
@@ -24,12 +24,17 @@ final class GatewayAuthenticator extends AbstractAuthenticator
     public function authenticate(Request $request): Passport
     {
         $userId = $request->headers->get('X-User-Id');
+
+        if (null === $userId || '' === $userId) {
+            throw new AuthenticationException('Missing X-User-Id header');
+        }
+
         $roles = array_values(array_filter(
             explode(',', $request->headers->get('X-User-Roles', ''))
         ));
 
         return new SelfValidatingPassport(
-            new UserBadge($userId, fn() => new GatewayUser($userId, $roles))
+            new UserBadge($userId, static fn () => new GatewayUser($userId, $roles))
         );
     }
 

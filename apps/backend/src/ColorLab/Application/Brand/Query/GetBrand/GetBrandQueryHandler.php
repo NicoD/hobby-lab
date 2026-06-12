@@ -9,7 +9,9 @@ use App\ColorLab\Application\Brand\ReadModel\BrandView;
 
 final class GetBrandQueryHandler
 {
-    public function __construct(private readonly BrandReadRepository $brands) {}
+    public function __construct(private readonly BrandReadRepository $brands)
+    {
+    }
 
     public function __invoke(GetBrandQuery $query): ?BrandView
     {

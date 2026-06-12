@@ -6,19 +6,20 @@ namespace App\ColorLab\Application\Brand\Command\CreateBrand;
 
 use App\ColorLab\Domain\Brand;
 use App\ColorLab\Domain\Repository\BrandRepository;
-use App\ColorLab\Domain\ValueObject\BrandHandle;
 use App\Shared\Domain\ValueObject\UserId;
 
 final class CreateBrandCommandHandler
 {
-    public function __construct(private readonly BrandRepository $brands) {}
+    public function __construct(private readonly BrandRepository $brands)
+    {
+    }
 
     public function __invoke(CreateBrandCommand $command): void
     {
-        $brand = new Brand(
-            BrandHandle::fromString($command->handle),
+        $brand = Brand::create(
             $command->name,
-            UserId::fromString($command->ownedBy),
+            new UserId($command->ownedBy),
+            [],
         );
 
         $this->brands->save($brand);

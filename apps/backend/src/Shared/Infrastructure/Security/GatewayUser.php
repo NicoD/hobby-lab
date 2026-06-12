@@ -12,11 +12,15 @@ use Symfony\Component\Security\Core\User\UserInterface;
  */
 final readonly class GatewayUser implements UserInterface
 {
-    /** @param list<string> $roles */
+    /**
+     * @param non-empty-string $userId
+     * @param list<string>     $roles
+     */
     public function __construct(
         private string $userId,
         private array $roles,
-    ) {}
+    ) {
+    }
 
     public function getUserIdentifier(): string
     {
@@ -29,5 +33,7 @@ final readonly class GatewayUser implements UserInterface
         return $this->roles ?: ['ROLE_USER'];
     }
 
-    public function eraseCredentials(): void {}
+    public function eraseCredentials(): void
+    {
+    }
 }

@@ -15,7 +15,7 @@ abstract class AbstractHandleType extends Type
 
     public function getSQLDeclaration(array $column, AbstractPlatform $platform): string
     {
-        return 'text';
+        return $platform->getClobTypeDeclarationSQL($column);
     }
 
     public function convertToDatabaseValue(mixed $value, AbstractPlatform $platform): ?string
@@ -24,17 +24,17 @@ abstract class AbstractHandleType extends Type
             return (string) $value;
         }
 
-        return is_string($value) ? $value : null;
+        return \is_string($value) ? $value : null;
     }
 
     public function convertToPHPValue(mixed $value, AbstractPlatform $platform): mixed
     {
-        if (!is_string($value)) {
+        if (!\is_string($value)) {
             return null;
         }
 
         $class = $this->getClass();
 
-        return $class::fromString($value);
+        return new $class($value);
     }
 }

@@ -9,7 +9,9 @@ use App\ColorLab\Application\Brand\ReadModel\BrandReadRepository;
 
 final class ListBrandsQueryHandler
 {
-    public function __construct(private readonly BrandReadRepository $brands) {}
+    public function __construct(private readonly BrandReadRepository $brands)
+    {
+    }
 
     /** @return BrandListItemView[] */
     public function __invoke(ListBrandsQuery $query): array
