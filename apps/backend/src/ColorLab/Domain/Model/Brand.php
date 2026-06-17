@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace App\ColorLab\Domain\Model;
 
 use App\Shared\Domain\Model\UserId;
+use App\Shared\Domain\Service\HandleExistenceChecker;
+use App\Shared\Domain\Service\HandleGenerator;
+use App\Shared\Domain\Service\HandleGeneratorFactory;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
@@ -25,31 +28,44 @@ class Brand
     #[ORM\Column(type: 'range_collection')]
     public private(set) array $ranges;
 
-    /**
-     * @param list<Range> $ranges
-     */
     private function __construct(
         BrandHandle $handle,
         string $name,
         UserId $ownedBy,
-        array $ranges,
     ) {
         $this->handle = $handle;
         $this->name = $name;
         $this->ownedBy = $ownedBy;
-        $this->ranges = $ranges;
+        $this->ranges = [];
     }
 
-    /**
-     * @param list<Range> $ranges
-     */
-    public static function create(string $name, UserId $ownedBy, array $ranges): self
+    public function addRange(string $name, HandleGeneratorFactory $handleGeneratorFactory): void
+    {
+        $existingHandles = array_map(static fn (Range $r) => (string) $r->handle, $this->ranges);
+
+        $handleGenerator = $handleGeneratorFactory->create(
+            new class($existingHandles)implements HandleExistenceChecker {
+                /** @param list<string> $handles */
+                public function __construct(private array $handles)
+                {
+                }
+
+                public function handleExists(string $handle): bool
+                {
+                    return \in_array($handle, $this->handles, true);
+                }
+            }
+        );
+
+        $this->ranges[] = Range::create($name, $handleGenerator);
+    }
+
+    public static function create(string $name, UserId $ownedBy, HandleGenerator $handleGenerator): self
     {
         return new self(
-            BrandHandle::create($name),
+            new BrandHandle($handleGenerator->generate($name)),
             $name,
             $ownedBy,
-            $ranges,
         );
     }
 }

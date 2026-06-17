@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\ColorLab\Domain\Model;
 
 use App\Shared\Domain\Model\UserId;
+use App\Shared\Domain\Service\HandleGenerator;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
@@ -18,8 +19,8 @@ class Color
     #[ORM\Column(type: 'string', length: 255)]
     public private(set) string $name;
 
-    #[ORM\Column(type: 'brand_handle')]
-    public private(set) BrandHandle $brandHandle;
+    #[ORM\Column(type: 'color_handle')]
+    public private(set) ColorHandle $colorHandle;
 
     #[ORM\Column(type: 'user_id')]
     public private(set) UserId $ownedBy;
@@ -27,21 +28,21 @@ class Color
     private function __construct(
         ColorId $id,
         string $name,
-        BrandHandle $brandHandle,
+        ColorHandle $colorHandle,
         UserId $ownedBy,
     ) {
         $this->id = $id;
         $this->name = $name;
-        $this->brandHandle = $brandHandle;
+        $this->colorHandle = $colorHandle;
         $this->ownedBy = $ownedBy;
     }
 
-    public static function create(string $name, UserId $ownedBy): self
+    public static function create(string $name, UserId $ownedBy, HandleGenerator $handleGenerator): self
     {
         return new self(
             ColorId::create(),
             $name,
-            BrandHandle::create($name),
+            new ColorHandle($handleGenerator->generate($name)),
             $ownedBy,
         );
     }

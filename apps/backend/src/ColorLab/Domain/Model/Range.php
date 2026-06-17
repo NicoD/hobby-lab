@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\ColorLab\Domain\Model;
 
+use App\Shared\Domain\Service\HandleGenerator;
+
 final readonly class Range
 {
     public RangeHandle $handle;
@@ -15,8 +17,11 @@ final readonly class Range
         $this->name = $name;
     }
 
-    public static function create(string $name): self
+    public static function create(string $name, HandleGenerator $handleGenerator): self
     {
-        return new self(RangeHandle::create($name), $name);
+        return new self(
+            new RangeHandle($handleGenerator->generate($name)),
+            $name
+        );
     }
 }
