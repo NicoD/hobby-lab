@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\ColorLab\Infrastructure\Doctrine\Repository;
 
-use App\ColorLab\Domain\Brand;
+use App\ColorLab\Domain\Model\Brand;
+use App\ColorLab\Domain\Model\BrandHandle;
 use App\ColorLab\Domain\Repository\BrandRepository;
-use App\ColorLab\Domain\ValueObject\BrandHandle;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 

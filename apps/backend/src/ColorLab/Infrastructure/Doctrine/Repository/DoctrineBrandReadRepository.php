@@ -7,8 +7,8 @@ namespace App\ColorLab\Infrastructure\Doctrine\Repository;
 use App\ColorLab\Application\Brand\ReadModel\BrandListItemView;
 use App\ColorLab\Application\Brand\ReadModel\BrandReadRepository;
 use App\ColorLab\Application\Brand\ReadModel\BrandView;
-use App\ColorLab\Domain\Brand;
-use App\ColorLab\Domain\ValueObject\BrandHandle;
+use App\ColorLab\Domain\Model\Brand;
+use App\ColorLab\Domain\Model\BrandHandle;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 

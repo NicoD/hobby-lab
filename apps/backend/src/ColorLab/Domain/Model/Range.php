@@ -2,9 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\ColorLab\Domain;
-
-use App\ColorLab\Domain\ValueObject\RangeHandle;
+namespace App\ColorLab\Domain\Model;
 
 final readonly class Range
 {

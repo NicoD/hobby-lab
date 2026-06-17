@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\ColorLab\Domain\Repository;
 
-use App\ColorLab\Domain\Brand;
-use App\ColorLab\Domain\ValueObject\BrandHandle;
+use App\ColorLab\Domain\Model\Brand;
+use App\ColorLab\Domain\Model\BrandHandle;
 
 interface BrandRepository
 {

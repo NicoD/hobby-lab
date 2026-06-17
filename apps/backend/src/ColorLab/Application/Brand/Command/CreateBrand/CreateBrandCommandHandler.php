@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\ColorLab\Application\Brand\Command\CreateBrand;
 
-use App\ColorLab\Domain\Brand;
+use App\ColorLab\Domain\Model\Brand;
 use App\ColorLab\Domain\Repository\BrandRepository;
-use App\Shared\Domain\ValueObject\UserId;
+use App\Shared\Domain\Model\UserId;
 
 final class CreateBrandCommandHandler
 {

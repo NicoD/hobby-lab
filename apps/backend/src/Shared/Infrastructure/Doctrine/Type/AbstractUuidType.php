@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Shared\Infrastructure\Doctrine\Type;
 
-use App\Shared\Domain\ValueObject\AbstractUuid;
+use App\Shared\Domain\Model\AbstractUuid;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Types\Type;
 

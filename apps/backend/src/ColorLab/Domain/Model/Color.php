@@ -2,11 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\ColorLab\Domain;
+namespace App\ColorLab\Domain\Model;
 
-use App\ColorLab\Domain\ValueObject\BrandHandle;
-use App\ColorLab\Domain\ValueObject\ColorId;
-use App\Shared\Domain\ValueObject\UserId;
+use App\Shared\Domain\Model\UserId;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]

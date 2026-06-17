@@ -14,11 +14,23 @@ infrastructure/ → Doctrine, adapters
 UI/             → controllers, listeners
 ```
 
+## Domain/ internal organisation
+
+```
+Domain/
+  Model/        → entities, aggregate roots, value objects
+  Repository/   → repository interfaces
+  Event/        → domain events (when introduced)
+  Service/      → domain services (when introduced)
+```
+
+All entities, aggregate roots, and value objects live under `Domain/Model/` — no sub-namespace inside `Model/` (VOs and entities are siblings).
+
 ## Rules
 
 - Bounded Contexts: strategic concept only — never materialized as folders
 - Domains named by concept: PascalCase (Symfony), camelCase (NestJS)
-- `domain/` flat by default — subfolder only when 5+ related classes
+- Sub-folders in `Domain/` follow the fixed structure above — never free-form
 - No cross-domain imports — Domain Events only
 - PII only in `apps/user`; `apps/backend` reads X-User-Id / X-User-Roles, never a JWT
 - Deptrac configured before first domain (violation = CI fail)
