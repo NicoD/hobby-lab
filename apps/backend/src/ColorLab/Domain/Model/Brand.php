@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\ColorLab\Domain\Model;
 
 use App\Shared\Domain\Model\UserId;
-use App\Shared\Domain\Service\HandleExistenceChecker;
 use App\Shared\Domain\Service\HandleGenerator;
 use App\Shared\Domain\Service\HandleGeneratorFactory;
 use Doctrine\ORM\Mapping as ORM;
@@ -43,21 +42,12 @@ class Brand
     {
         $existingHandles = array_map(static fn (Range $r) => (string) $r->handle, $this->ranges);
 
-        $handleGenerator = $handleGeneratorFactory->create(
-            new class($existingHandles)implements HandleExistenceChecker {
-                /** @param list<string> $handles */
-                public function __construct(private array $handles)
-                {
-                }
-
-                public function handleExists(string $handle): bool
-                {
-                    return \in_array($handle, $this->handles, true);
-                }
-            }
+        $this->ranges[] = Range::create(
+            $name,
+            $handleGeneratorFactory->create(
+                static fn (string $h) => \in_array($h, $existingHandles, true)
+            ),
         );
-
-        $this->ranges[] = Range::create($name, $handleGenerator);
     }
 
     public static function create(string $name, UserId $ownedBy, HandleGenerator $handleGenerator): self

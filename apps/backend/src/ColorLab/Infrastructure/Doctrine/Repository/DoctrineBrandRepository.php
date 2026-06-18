@@ -30,9 +30,4 @@ final class DoctrineBrandRepository extends ServiceEntityRepository implements B
     {
         return $this->find($handle);
     }
-
-    public function handleExists(string $handle): bool
-    {
-        return false;
-    }
 }
