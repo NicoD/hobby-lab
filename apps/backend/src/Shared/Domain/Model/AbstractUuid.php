@@ -17,6 +17,7 @@ abstract readonly class AbstractUuid implements \Stringable
         return new static(Uuid::v7()->toRfc4122());
     }
 
+    #[\Override]
     final public function __toString(): string
     {
         return $this->uuid;

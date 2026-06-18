@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace App\ColorLab\Domain\Model;
 
+use App\ColorLab\Domain\Event\BrandCreatedEvent;
+use App\Shared\Domain\Event\DomainEventTrait;
+use App\Shared\Domain\Model\AggregateRoot;
 use App\Shared\Domain\Model\UserId;
 use App\Shared\Domain\Service\HandleGenerator;
 use App\Shared\Domain\Service\HandleGeneratorFactory;
@@ -11,8 +14,10 @@ use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
 #[ORM\Table(name: 'brands')]
-class Brand
+class Brand implements AggregateRoot
 {
+    use DomainEventTrait;
+
     #[ORM\Id]
     #[ORM\Column(type: 'brand_handle')]
     public private(set) BrandHandle $handle;
@@ -52,10 +57,14 @@ class Brand
 
     public static function create(string $name, UserId $ownedBy, HandleGenerator $handleGenerator): self
     {
-        return new self(
+        $brand = new self(
             new BrandHandle($handleGenerator->generate($name)),
             $name,
             $ownedBy,
         );
+
+        $brand->raiseDomainEvent(new BrandCreatedEvent($brand->handle, $name, $ownedBy));
+
+        return $brand;
     }
 }

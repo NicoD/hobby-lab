@@ -6,7 +6,7 @@ namespace App\ColorLab\Application\Brand\ReadModel;
 
 interface BrandReadRepository
 {
-    /** @return BrandListItemView[] */
+    /** @return list<BrandListItemView> */
     public function list(): array;
 
     public function findByHandle(string $handle): ?BrandView;

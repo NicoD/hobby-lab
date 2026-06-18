@@ -4,14 +4,18 @@ declare(strict_types=1);
 
 namespace App\ColorLab\Domain\Model;
 
+use App\Shared\Domain\Event\DomainEventTrait;
+use App\Shared\Domain\Model\AggregateRoot;
 use App\Shared\Domain\Model\UserId;
 use App\Shared\Domain\Service\HandleGenerator;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
 #[ORM\Table(name: 'colors')]
-class Color
+class Color implements AggregateRoot
 {
+    use DomainEventTrait;
+
     #[ORM\Id]
     #[ORM\Column(type: 'color_id')]
     public private(set) ColorId $id;

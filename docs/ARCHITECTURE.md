@@ -131,3 +131,4 @@ Browser (React)
 - [ADR-003](adr/ADR-003-ddd-strategy.md) — DDD strategy and domains
 - [ADR-004](adr/ADR-004-user-identity-service.md) — user/identity service (NestJS)
 - [ADR-005](adr/ADR-005-backend-symfony.md) — Symfony multi-domain backend
+- [ADR-007](adr/ADR-007-cross-domain-communication.md) — Cross-domain communication (Domain Events, Integration Events, Outbox, RabbitMQ)

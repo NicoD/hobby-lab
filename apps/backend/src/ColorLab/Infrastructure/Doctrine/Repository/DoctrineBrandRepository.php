@@ -20,12 +20,13 @@ final class DoctrineBrandRepository extends ServiceEntityRepository implements B
         parent::__construct($registry, Brand::class);
     }
 
+    #[\Override]
     public function save(Brand $brand): void
     {
         $this->getEntityManager()->persist($brand);
-        $this->getEntityManager()->flush();
     }
 
+    #[\Override]
     public function findByHandle(BrandHandle $handle): ?Brand
     {
         return $this->find($handle);

@@ -6,135 +6,82 @@
 
 `apps/backend` implements the business domains of the project. Multiple domains coexist in the same Symfony service because they share common infrastructure (database, deployment) and are under the same team's responsibility.
 
-Storage uses **Doctrine ORM + PostgreSQL** (`doctrine/doctrine-bundle`, `doctrine/orm`). The backend-db container (`postgres:16-alpine`) is distinct from the identity-db used by `apps/user`.
+Storage uses Doctrine ORM + PostgreSQL. The backend database is distinct from the identity database used by `apps/user`.
 
 ## Decision
 
 ### Domain structure
 
-Each domain is a **PHP namespace** under `src/`. A domain cannot directly import from another domain.
+Each domain is a PHP namespace under `src/`. A domain cannot directly import from another domain.
 
 ```
 apps/backend/src/
-  ColorLab/         ← kitchen domain
+  ColorLab/         ← business domain (PascalCase)
     Domain/
     Application/
     Infrastructure/
     UI/
       Http/
-  Order/           ← order domain
+  Shared/           ← cross-domain technical building blocks (no business logic)
     Domain/
     Application/
     Infrastructure/
-    UI/
-      Http/
-  Shared/          ← cross-domain infrastructure (no business logic)
-    Domain/
-      ValueObject/
-    Infrastructure/
-      Doctrine/
-      Security/
 ```
 
-### Naming convention
-
-Domains are named in **PascalCase** (PHP/Symfony convention). Layer folders also use PascalCase.
+Domains are named in PascalCase. Layer folders also use PascalCase.
 
 ### Layer conventions
 
-**Domain/**: pure domain objects only (no direct dependency on Symfony or Doctrine)
-- Aggregates, Entities, Value Objects
-- Repository interfaces
-- Domain Events
-- Domain Services
+**Domain/**: pure domain objects — no dependency on Symfony or Doctrine
+- Aggregates, entities, value objects
+- Repository interfaces, domain events, domain services
 
 **Application/**: use-case orchestration
-- Commands + Handlers
-- Queries + Handlers
-- DTOs
+- Commands + Handlers, Queries + Handlers, read models
 
 **Infrastructure/**: technical implementations
-- Doctrine repositories
-- External adapters
-- Symfony configuration (services.yaml, doctrine mappings)
+- Doctrine repositories, event dispatcher adapters, Symfony configuration
 
 **UI/Http/**: entry points
-- API Controllers (JSON)
-- Event listeners
+- JSON API controllers, event listeners
 
-### User identity
+### User identity and authorization
 
-`apps/backend` never validates a JWT. It only receives:
-- `X-User-Id` (UUID, injected by Traefik)
-- `X-User-Roles` (roles, injected by Traefik)
-
-These headers are injected into Symfony's `Security Token` via a custom `TokenAuthenticator`.
-
-### Authorization: two levels
-
-**Coarse-grained** (access to a route) → Symfony Firewall, based on `X-User-Roles`
-
-**Fine-grained** (action on a specific aggregate) → Symfony Voters in the Application layer
-
-```php
-// Application/Security/RecipeVoter.php (inside ColorLab/)
-class RecipeVoter extends Voter
-{
-    protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token): bool
-    {
-        return match($attribute) {
-            'EDIT'    => $subject->isOwnedBy($token->getUserId()),
-            'ARCHIVE' => $token->hasRole('ROLE_ADMIN'),
-        };
-    }
-}
-```
+See ADR-006 — it covers JWT validation, header injection, `GatewayAuthenticator`, and Voter placement.
 
 ### Domain isolation: Deptrac
 
-Deptrac is configured from day one to forbid cross-domain imports. A violation breaks the CI build.
+Deptrac is configured from day one. A cross-domain import breaks the CI build.
 
 ```yaml
-# deptrac.yaml (example)
+# deptrac.yaml
 layers:
   - name: ColorLab
     collectors:
       - { type: directory, value: src/ColorLab }
-  - name: Order
+  - name: Shared
     collectors:
-      - { type: directory, value: src/Order }
+      - { type: directory, value: src/Shared }
 
 ruleset:
-  ColorLab: []    # ColorLab imports no other domain
-  Order:   []
+  ColorLab:
+    - Shared   # business domains may depend on Shared
+  Shared: []   # Shared never depends on a business domain
 ```
 
 ### Inter-domain communication
 
-Domains do not call each other directly. Communication goes through **Domain Events** (Symfony Messenger event bus):
-
-```
-ColorLab dispatches RecipePublished
-  → Order listens to RecipePublished (if needed)
-```
-
-Direct cross-namespace calls are never allowed.
+Domains do not call each other directly. See ADR-007 for the full event strategy (Domain Events vs. Integration Events, Outbox pattern).
 
 ### Shared namespace
 
-`App\Shared` holds cross-domain technical building blocks that carry no business logic:
+`App\Shared` holds cross-domain technical building blocks: abstract base classes (`AbstractUuid`, `AbstractHandle`), cross-cutting value objects (`UserId`), abstract Doctrine types, and security adapters. Business domains may depend on `Shared`. `Shared` must never depend on a business domain.
 
-- `Shared\Domain\ValueObject\` — abstract base classes (`AbstractUuid`, `AbstractHandle`) and cross-cutting value objects (`UserId`)
-- `Shared\Infrastructure\Doctrine\Type\` — abstract Doctrine custom types built on those value objects
-- `Shared\Infrastructure\Security\` — `GatewayAuthenticator` and `GatewayUser` (reads `X-User-Id` / `X-User-Roles` headers)
-
-Business domains may depend on `Shared`. `Shared` must never depend on a business domain.
-
-> Deptrac currently enforces isolation at the domain level. The `Shared` layer is not yet declared as a Deptrac layer — add it when a second domain is introduced.
+For the current detailed structure of all namespaces, see `apps/backend/docs/architecture.md`.
 
 ## Consequences
 
-- Each domain is independently testable
-- A domain can be extracted into a separate service if needed (Domain/ has no Symfony dependency)
-- Deptrac must be installed and configured before writing the first domain
-- `apps/backend` stores no personal data (PII) — that remains in `apps/user`
+- Each domain is independently testable — Domain/ has no Symfony dependency.
+- A domain can be extracted into a separate service without rewriting its core logic.
+- Deptrac must be installed and configured before the first domain class is written.
+- `apps/backend` stores no personal data (PII) — that stays in `apps/user`.

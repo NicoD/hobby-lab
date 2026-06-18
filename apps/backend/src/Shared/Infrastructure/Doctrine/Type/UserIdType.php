@@ -10,6 +10,7 @@ final class UserIdType extends AbstractUuidType
 {
     public const NAME = 'user_id';
 
+    #[\Override]
     protected function getClass(): string
     {
         return UserId::class;

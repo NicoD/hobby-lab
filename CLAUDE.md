@@ -10,7 +10,6 @@ Project memory is versioned in `.claude/memory/`. Read it at the start of any co
 
 - `.claude/memory/MEMORY.md` — index
 - `.claude/memory/project_architecture.md` — overall architecture, stack, key decisions
-- `.claude/memory/project_ddd_conventions.md` — DDD rules, domain conventions, anti-patterns
 
 When learning something new about the project (decisions, conventions, context), update the relevant memory file and keep the index in sync.
 
@@ -32,5 +31,4 @@ All architectural decisions are documented in `docs/adr/`. Before implementing a
 - `apps/backend` never processes a JWT — it reads `X-User-Id` and `X-User-Roles` headers only
 - No direct cross-domain imports — Domain Events only
 - PII stays exclusively in `apps/user`
-- Deptrac must be configured before writing the first domain in Symfony
 - Bounded Contexts are a **strategic concept only** — they are documented, never materialized as folders

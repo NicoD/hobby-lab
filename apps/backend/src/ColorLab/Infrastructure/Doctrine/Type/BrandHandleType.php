@@ -11,6 +11,7 @@ final class BrandHandleType extends AbstractHandleType
 {
     public const NAME = 'brand_handle';
 
+    #[\Override]
     protected function getClass(): string
     {
         return BrandHandle::class;

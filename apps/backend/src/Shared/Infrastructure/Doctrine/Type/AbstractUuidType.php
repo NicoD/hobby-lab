@@ -13,11 +13,13 @@ abstract class AbstractUuidType extends Type
     /** @return class-string<AbstractUuid> */
     abstract protected function getClass(): string;
 
+    #[\Override]
     public function getSQLDeclaration(array $column, AbstractPlatform $platform): string
     {
         return 'UUID';
     }
 
+    #[\Override]
     public function convertToDatabaseValue(mixed $value, AbstractPlatform $platform): ?string
     {
         if ($value instanceof AbstractUuid) {
@@ -27,6 +29,7 @@ abstract class AbstractUuidType extends Type
         return \is_string($value) ? $value : null;
     }
 
+    #[\Override]
     public function convertToPHPValue(mixed $value, AbstractPlatform $platform): mixed
     {
         if (!\is_string($value)) {

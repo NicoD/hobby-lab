@@ -22,7 +22,7 @@ final class DoctrineBrandReadRepository extends ServiceEntityRepository implemen
         parent::__construct($registry, Brand::class);
     }
 
-    /** @return BrandListItemView[] */
+    /** @return list<BrandListItemView> */
     public function list(): array
     {
         return array_map(

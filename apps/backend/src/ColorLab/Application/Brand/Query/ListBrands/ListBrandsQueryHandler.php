@@ -13,7 +13,7 @@ final class ListBrandsQueryHandler
     {
     }
 
-    /** @return BrandListItemView[] */
+    /** @return list<BrandListItemView> */
     public function __invoke(ListBrandsQuery $query): array
     {
         return $this->brands->list();

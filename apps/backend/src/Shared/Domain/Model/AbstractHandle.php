@@ -10,6 +10,7 @@ abstract readonly class AbstractHandle implements \Stringable
     {
     }
 
+    #[\Override]
     final public function __toString(): string
     {
         return $this->handle;
