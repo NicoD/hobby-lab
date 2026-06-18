@@ -3,7 +3,7 @@ PWD := $(shell pwd)
 .PHONY: help install backend-install frontend-install user-install \
         up down restart logs build \
         shell-backend shell-frontend shell-user composer npm npx-user \
-        backend-test backend-lint backend-lint-fix backend-analyse backend-watch \
+        backend-test backend-test-setup backend-lint backend-lint-fix backend-analyse backend-watch \
         frontend-test frontend-lint frontend-lint-fix frontend-watch \
         user-test user-lint user-lint-fix user-watch \
         user-migrate user-migrate-reset user-prisma \
@@ -30,7 +30,8 @@ help:
 	@echo "  make npx-user cmd=...     Run an npx command in user (e.g. make npx-user cmd='prisma studio')"
 	@echo ""
 	@echo "── Backend ───────────────────────────────────────────────────────────────────"
-	@echo "  make backend-test         Run the PHPUnit test suite"
+	@echo "  make backend-test         Set up test DB and run the test suite"
+	@echo "  make backend-test-setup   Create test DB and run pending migrations (idempotent)"
 	@echo "  make backend-lint         Check coding style (PHP CS Fixer, dry-run)"
 	@echo "  make backend-lint-fix     Auto-fix coding style issues"
 	@echo "  make backend-analyse      Run PHPStan static analysis (level max)"
@@ -112,7 +113,11 @@ npx-user:
 
 # ── Backend QA ─────────────────────────────────────────────────────────────────
 
-backend-test:
+backend-test-setup:
+	docker compose exec backend php bin/console doctrine:database:create --env=test --if-not-exists
+	docker compose exec backend php bin/console doctrine:migrations:migrate --env=test --no-interaction
+
+backend-test: backend-test-setup
 	docker compose exec backend php vendor/bin/phpunit
 
 backend-lint:

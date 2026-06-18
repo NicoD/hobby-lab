@@ -18,17 +18,8 @@
     </php>
 
     <testsuites>
-        <testsuite name="Domain">
-            <directory>tests/Domain</directory>
-        </testsuite>
-        <testsuite name="Application">
-            <directory>tests/Application</directory>
-        </testsuite>
-        <testsuite name="Infrastructure">
-            <directory>tests/Infrastructure</directory>
-        </testsuite>
-        <testsuite name="UI">
-            <directory>tests/UI</directory>
+        <testsuite name="ColorLabel">
+            <directory>tests/ColorLab</directory>
         </testsuite>
     </testsuites>
 
