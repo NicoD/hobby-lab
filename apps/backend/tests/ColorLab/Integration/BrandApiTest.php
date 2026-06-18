@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Test\ColorLab\Integration;
 
+use App\ColorLab\Domain\Event\BrandCreatedEvent;
 use Test\ApiTestCase;
 
 class BrandApiTest extends ApiTestCase
@@ -19,6 +20,10 @@ class BrandApiTest extends ApiTestCase
         $this->request('POST', '/color-lab/brands', ['name' => 'Vallejo']);
 
         self::assertResponseStatusCodeSame(201);
+        $this->assertEventDispatched(BrandCreatedEvent::class, static function (BrandCreatedEvent $event): void {
+            self::assertSame('Vallejo', $event->name);
+            self::assertSame('019661b9-a000-7000-8000-000000000001', (string) $event->ownedBy);
+        });
     }
 
     public function testList(): void

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Test;
 
+use App\Shared\Domain\Event\DomainEvent;
+use App\Shared\Infrastructure\Testing\CollectingEventDispatcher;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
@@ -16,6 +18,28 @@ abstract class ApiTestCase extends WebTestCase
     {
         $this->client = self::createClient();
         $this->resetDatabase();
+        $this->eventCollector()->reset();
+    }
+
+    /**
+     * @template T of DomainEvent
+     *
+     * @param class-string<T>        $class
+     * @param callable(T): void|null $assertion
+     */
+    protected function assertEventDispatched(string $class, ?callable $assertion = null): void
+    {
+        $events = $this->eventCollector()->ofType($class);
+        self::assertNotEmpty($events, \sprintf('Expected event %s to be dispatched, but none was collected.', $class));
+
+        if (null !== $assertion) {
+            $assertion($events[0]);
+        }
+    }
+
+    private function eventCollector(): CollectingEventDispatcher
+    {
+        return self::getContainer()->get(CollectingEventDispatcher::class);
     }
 
     protected function setCurrentUserId(string $id): void
