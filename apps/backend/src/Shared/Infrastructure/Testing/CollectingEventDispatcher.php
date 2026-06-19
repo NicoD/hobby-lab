@@ -6,20 +6,19 @@ namespace App\Shared\Infrastructure\Testing;
 
 use App\Shared\Application\Service\DomainEventDispatcher;
 use App\Shared\Domain\Event\DomainEvent;
-use App\Shared\Infrastructure\Event\SymfonyDomainEventDispatcher;
 use Symfony\Component\DependencyInjection\Attribute\AsDecorator;
 use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 use Symfony\Component\DependencyInjection\Attribute\When;
 
 #[When(env: 'test')]
 #[Autoconfigure(public: true)]
-#[AsDecorator(decorates: SymfonyDomainEventDispatcher::class)]
+#[AsDecorator(decorates: DomainEventDispatcher::class)]
 final class CollectingEventDispatcher implements DomainEventDispatcher
 {
     /** @var list<DomainEvent> */
     private array $collected = [];
 
-    public function __construct(private readonly SymfonyDomainEventDispatcher $inner)
+    public function __construct(private readonly DomainEventDispatcher $inner)
     {
     }
 
