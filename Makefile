@@ -7,7 +7,7 @@ PWD := $(shell pwd)
         frontend-test frontend-lint frontend-lint-fix frontend-watch \
         user-test user-lint user-lint-fix user-watch \
         user-migrate user-migrate-reset user-prisma \
-        gateway-logs
+        gateway-logs backend-logs
 
 help:
 	@echo ""
@@ -37,6 +37,7 @@ help:
 	@echo "  make backend-refacto      Apply Rector refactoring rules (interactive)"
 	@echo "  make backend-analyse      Run PHPStan static analysis (level max)"
 	@echo "  make backend-watch        Re-run tests on every PHP file change (Ctrl+C to stop)"
+	@echo "  make backend-logs         Stream backend logs (stderr)"
 	@echo ""
 	@echo "── Frontend ──────────────────────────────────────────────────────────────────"
 	@echo "  make frontend-test        Run the Jest test suite"
@@ -181,3 +182,6 @@ user-prisma:
 
 gateway-logs:
 	docker compose logs -f gateway
+
+backend-logs:
+	docker compose logs -f backend
