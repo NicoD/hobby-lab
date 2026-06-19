@@ -15,7 +15,7 @@ final readonly class Slugifier
         $slug = trim((string) $slug, '-');
 
         if (0 !== $index) {
-            $slug = \sprintf('%s-%d', $slug, $index);
+            return \sprintf('%s-%d', $slug, $index);
         }
 
         return $slug;

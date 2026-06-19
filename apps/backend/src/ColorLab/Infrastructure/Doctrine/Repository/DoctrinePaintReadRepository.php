@@ -27,7 +27,7 @@ final class DoctrinePaintReadRepository extends ServiceEntityRepository implemen
     public function list(): array
     {
         return array_map(
-            static fn (Paint $paint) => new PaintListItemView(
+            static fn (Paint $paint): \App\ColorLab\Application\Paint\ReadModel\PaintListItemView => new PaintListItemView(
                 (string) $paint->id,
                 (string) $paint->paintReferenceId,
                 $paint->purchasedAt?->format('Y-m-d'),

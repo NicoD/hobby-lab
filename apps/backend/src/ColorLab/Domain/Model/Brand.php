@@ -18,39 +18,30 @@ class Brand implements AggregateRoot
 {
     use DomainEventTrait;
 
-    #[ORM\Id]
-    #[ORM\Column(type: 'brand_handle')]
-    public private(set) BrandHandle $handle;
-
-    #[ORM\Column(type: 'string', length: 255)]
-    public private(set) string $name;
-
-    #[ORM\Column(type: 'user_id')]
-    public private(set) UserId $ownedBy;
-
     /** @var list<Range> */
     #[ORM\Column(type: 'range_collection')]
-    public private(set) array $ranges;
+    public private(set) array $ranges = [];
 
     private function __construct(
-        BrandHandle $handle,
-        string $name,
-        UserId $ownedBy,
-    ) {
-        $this->handle = $handle;
-        $this->name = $name;
-        $this->ownedBy = $ownedBy;
-        $this->ranges = [];
+        #[ORM\Id]
+        #[ORM\Column(type: 'brand_handle')]
+        public private(set) BrandHandle $handle,
+        #[ORM\Column(type: 'string', length: 255)]
+        public private(set) string $name,
+        #[ORM\Column(type: 'user_id')]
+        public private(set) UserId $ownedBy
+    )
+    {
     }
 
     public function addRange(string $name, HandleGeneratorFactory $handleGeneratorFactory): void
     {
-        $existingHandles = array_map(static fn (Range $r) => (string) $r->handle, $this->ranges);
+        $existingHandles = array_map(static fn (Range $r): string => (string) $r->handle, $this->ranges);
 
         $this->ranges[] = Range::create(
             $name,
             $handleGeneratorFactory->create(
-                static fn (string $h) => \in_array($h, $existingHandles, true)
+                static fn (string $h): bool => \in_array($h, $existingHandles, true)
             ),
         );
     }

@@ -11,11 +11,13 @@ use Doctrine\DBAL\Types\JsonType;
 
 class RangeCollectionType extends JsonType
 {
+    #[\Override]
     public function getSQLDeclaration(array $column, AbstractPlatform $platform): string
     {
         return 'JSON';
     }
 
+    #[\Override]
     public function convertToDatabaseValue(mixed $value, AbstractPlatform $platform): ?string
     {
         if (!\is_array($value)) {
@@ -23,17 +25,18 @@ class RangeCollectionType extends JsonType
         }
 
         return parent::convertToDatabaseValue(array_map(
-            static fn ($value) => [
+            static fn (\App\ColorLab\Domain\Model\Range $value): array => [
                 'handle' => (string) $value->handle,
-                'name' => (string) $value->name,
+                'name' => $value->name,
             ],
             array_filter(
                 $value,
-                static fn ($v) => $v instanceof Range
+                static fn ($v): bool => $v instanceof Range
             )
         ), $platform);
     }
 
+    #[\Override]
     public function convertToPHPValue(mixed $value, AbstractPlatform $platform): mixed
     {
         $value = parent::convertToPHPValue($value, $platform);

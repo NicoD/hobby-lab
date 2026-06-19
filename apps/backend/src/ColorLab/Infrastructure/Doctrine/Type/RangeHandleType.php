@@ -9,7 +9,7 @@ use App\Shared\Infrastructure\Doctrine\Type\AbstractHandleType;
 
 final class RangeHandleType extends AbstractHandleType
 {
-    public const NAME = 'range_handle';
+    public const string NAME = 'range_handle';
 
     #[\Override]
     protected function getClass(): string

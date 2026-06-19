@@ -8,12 +8,12 @@ use App\Shared\Domain\Event\DomainEvent;
 use App\Shared\Domain\Model\AggregateRoot;
 use Psr\Log\LoggerInterface;
 
-final class TransactionManager
+final readonly class TransactionManager
 {
     public function __construct(
-        private readonly TransactionBoundary $transaction,
-        private readonly DomainEventDispatcher $domainEventDispatcher,
-        private readonly LoggerInterface $logger,
+        private TransactionBoundary $transaction,
+        private DomainEventDispatcher $domainEventDispatcher,
+        private LoggerInterface $logger,
     ) {
     }
 
@@ -40,7 +40,7 @@ final class TransactionManager
             $this->transaction->commit();
         } catch (\Throwable $e) {
             $this->logger->error('Transaction failed in {class}: {message}', [
-                'class' => static::class,
+                'class' => self::class,
                 'message' => $e->getMessage(),
             ]);
 
@@ -61,7 +61,7 @@ final class TransactionManager
     {
         return array_merge(
             ...array_map(
-                static fn (AggregateRoot $a) => array_values(iterator_to_array($a->pullDomainEvents())),
+                static fn (AggregateRoot $a): array => array_values(iterator_to_array($a->pullDomainEvents())),
                 $aggregates,
             ),
         );

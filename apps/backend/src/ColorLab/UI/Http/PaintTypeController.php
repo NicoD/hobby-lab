@@ -18,18 +18,18 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 
-#[Route('/color-lab/paint-types', name: 'paint_type_')]
+#[Route(name: 'paint_type_')]
 final class PaintTypeController extends AbstractController
 {
     use Input;
 
-    #[Route('', name: 'list', methods: ['GET'])]
+    #[Route('/color-lab/paint-types', name: 'paint_type_list', methods: ['GET'])]
     public function list(ListPaintTypesQueryHandler $handler): JsonResponse
     {
         return $this->json($handler(new ListPaintTypesQuery()));
     }
 
-    #[Route('', name: 'create', methods: ['POST'])]
+    #[Route('/color-lab/paint-types', name: 'paint_type_create', methods: ['POST'])]
     public function create(Request $request, CreatePaintTypeCommandHandler $handler): JsonResponse
     {
         $data = $request->toArray();
@@ -41,12 +41,12 @@ final class PaintTypeController extends AbstractController
         return $this->json(null, Response::HTTP_CREATED);
     }
 
-    #[Route('/{handle}', name: 'get', methods: ['GET'])]
+    #[Route('/color-lab/paint-types/{handle}', name: 'paint_type_get', methods: ['GET'])]
     public function get(string $handle, GetPaintTypeQueryHandler $handler): JsonResponse
     {
         $view = $handler(new GetPaintTypeQuery($handle));
 
-        if (null === $view) {
+        if (!$view instanceof \App\ColorLab\Application\PaintType\ReadModel\PaintTypeView) {
             throw new NotFoundHttpException();
         }
 

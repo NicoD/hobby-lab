@@ -18,18 +18,18 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 
-#[Route('/color-lab/paint-references', name: 'paint_reference_')]
+#[Route(name: 'paint_reference_')]
 final class PaintReferenceController extends AbstractController
 {
     use Input;
 
-    #[Route('', name: 'list', methods: ['GET'])]
+    #[Route('/color-lab/paint-references', name: 'paint_reference_list', methods: ['GET'])]
     public function list(ListPaintReferencesQueryHandler $handler): JsonResponse
     {
         return $this->json($handler(new ListPaintReferencesQuery()));
     }
 
-    #[Route('', name: 'create', methods: ['POST'])]
+    #[Route('/color-lab/paint-references', name: 'paint_reference_create', methods: ['POST'])]
     public function create(Request $request, CreatePaintReferenceCommandHandler $handler): JsonResponse
     {
         $data = $request->toArray();
@@ -45,12 +45,12 @@ final class PaintReferenceController extends AbstractController
         return $this->json(null, Response::HTTP_CREATED);
     }
 
-    #[Route('/{handle}', name: 'get', methods: ['GET'])]
+    #[Route('/color-lab/paint-references/{handle}', name: 'paint_reference_get', methods: ['GET'])]
     public function get(string $handle, GetPaintReferenceQueryHandler $handler): JsonResponse
     {
         $view = $handler(new GetPaintReferenceQuery($handle));
 
-        if (null === $view) {
+        if (!$view instanceof \App\ColorLab\Application\PaintReference\ReadModel\PaintReferenceView) {
             throw new NotFoundHttpException();
         }
 

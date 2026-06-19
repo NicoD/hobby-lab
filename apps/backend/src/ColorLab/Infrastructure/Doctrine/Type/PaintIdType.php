@@ -9,7 +9,7 @@ use App\Shared\Infrastructure\Doctrine\Type\AbstractUuidType;
 
 final class PaintIdType extends AbstractUuidType
 {
-    public const NAME = 'paint_id';
+    public const string NAME = 'paint_id';
 
     #[\Override]
     protected function getClass(): string

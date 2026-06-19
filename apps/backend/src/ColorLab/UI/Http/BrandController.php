@@ -18,18 +18,18 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 
-#[Route('/color-lab/brands', name: 'brand_')]
+#[Route(name: 'brand_')]
 final class BrandController extends AbstractController
 {
     use Input;
 
-    #[Route('', name: 'list', methods: ['GET'])]
+    #[Route('/color-lab/brands', name: 'brand_list', methods: ['GET'])]
     public function list(ListBrandsQueryHandler $handler): JsonResponse
     {
         return $this->json($handler(new ListBrandsQuery()));
     }
 
-    #[Route('', name: 'create', methods: ['POST'])]
+    #[Route('/color-lab/brands', name: 'brand_create', methods: ['POST'])]
     public function create(Request $request, CreateBrandCommandHandler $handler): JsonResponse
     {
         $data = $request->toArray();
@@ -41,12 +41,12 @@ final class BrandController extends AbstractController
         return $this->json(null, Response::HTTP_CREATED);
     }
 
-    #[Route('/{handle}', name: 'get', methods: ['GET'])]
+    #[Route('/color-lab/brands/{handle}', name: 'brand_get', methods: ['GET'])]
     public function get(string $handle, GetBrandQueryHandler $handler): JsonResponse
     {
         $view = $handler(new GetBrandQuery($handle));
 
-        if (null === $view) {
+        if (!$view instanceof \App\ColorLab\Application\Brand\ReadModel\BrandView) {
             throw new NotFoundHttpException();
         }
 

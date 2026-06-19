@@ -7,9 +7,9 @@ namespace App\ColorLab\Application\Brand\Query\GetBrand;
 use App\ColorLab\Application\Brand\ReadModel\BrandReadRepository;
 use App\ColorLab\Application\Brand\ReadModel\BrandView;
 
-final class GetBrandQueryHandler
+final readonly class GetBrandQueryHandler
 {
-    public function __construct(private readonly BrandReadRepository $brands)
+    public function __construct(private BrandReadRepository $brands)
     {
     }
 

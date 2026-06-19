@@ -9,9 +9,9 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\Attribute\AsAlias;
 
 #[AsAlias(TransactionBoundary::class)]
-final class DoctrineTransactionBoundary implements TransactionBoundary
+final readonly class DoctrineTransactionBoundary implements TransactionBoundary
 {
-    public function __construct(private readonly EntityManagerInterface $entityManager)
+    public function __construct(private EntityManagerInterface $entityManager)
     {
     }
 

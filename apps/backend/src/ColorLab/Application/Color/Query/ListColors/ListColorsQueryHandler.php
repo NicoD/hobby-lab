@@ -7,14 +7,14 @@ namespace App\ColorLab\Application\Color\Query\ListColors;
 use App\ColorLab\Application\Color\ReadModel\ColorListItemView;
 use App\ColorLab\Application\Color\ReadModel\ColorReadRepository;
 
-final class ListColorsQueryHandler
+final readonly class ListColorsQueryHandler
 {
-    public function __construct(private readonly ColorReadRepository $colors)
+    public function __construct(private ColorReadRepository $colors)
     {
     }
 
     /** @return list<ColorListItemView> */
-    public function __invoke(ListColorsQuery $query): array
+    public function __invoke(): array
     {
         return $this->colors->list();
     }

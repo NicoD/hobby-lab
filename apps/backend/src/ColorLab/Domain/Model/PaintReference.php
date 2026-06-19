@@ -17,49 +17,26 @@ class PaintReference implements AggregateRoot
 {
     use DomainEventTrait;
 
-    #[ORM\Id]
-    #[ORM\Column(type: 'paint_reference_id')]
-    public private(set) PaintReferenceId $id;
-
-    #[ORM\Column(type: 'paint_reference_handle', unique: true)]
-    public private(set) PaintReferenceHandle $handle;
-
-    #[ORM\Column(type: 'string', length: 255)]
-    public private(set) string $name;
-
-    #[ORM\Column(type: 'brand_handle')]
-    public private(set) BrandHandle $brandHandle;
-
-    #[ORM\Column(type: 'range_handle')]
-    public private(set) RangeHandle $rangeHandle;
-
-    #[ORM\Column(type: 'paint_type_handle')]
-    public private(set) PaintTypeHandle $paintTypeHandle;
-
-    #[ORM\Column(type: 'color_handle', nullable: true)]
-    public private(set) ?ColorHandle $colorHandle;
-
-    #[ORM\Column(type: 'user_id')]
-    public private(set) UserId $ownedBy;
-
     private function __construct(
-        PaintReferenceId $id,
-        PaintReferenceHandle $handle,
-        string $name,
-        BrandHandle $brandHandle,
-        RangeHandle $rangeHandle,
-        PaintTypeHandle $paintTypeHandle,
-        ?ColorHandle $colorHandle,
-        UserId $ownedBy,
-    ) {
-        $this->id = $id;
-        $this->handle = $handle;
-        $this->name = $name;
-        $this->brandHandle = $brandHandle;
-        $this->rangeHandle = $rangeHandle;
-        $this->paintTypeHandle = $paintTypeHandle;
-        $this->colorHandle = $colorHandle;
-        $this->ownedBy = $ownedBy;
+        #[ORM\Id]
+        #[ORM\Column(type: 'paint_reference_id')]
+        public private(set) PaintReferenceId $id,
+        #[ORM\Column(type: 'paint_reference_handle', unique: true)]
+        public private(set) PaintReferenceHandle $handle,
+        #[ORM\Column(type: 'string', length: 255)]
+        public private(set) string $name,
+        #[ORM\Column(type: 'brand_handle')]
+        public private(set) BrandHandle $brandHandle,
+        #[ORM\Column(type: 'range_handle')]
+        public private(set) RangeHandle $rangeHandle,
+        #[ORM\Column(type: 'paint_type_handle')]
+        public private(set) PaintTypeHandle $paintTypeHandle,
+        #[ORM\Column(type: 'color_handle', nullable: true)]
+        public private(set) ?ColorHandle $colorHandle,
+        #[ORM\Column(type: 'user_id')]
+        public private(set) UserId $ownedBy
+    )
+    {
     }
 
     public static function create(

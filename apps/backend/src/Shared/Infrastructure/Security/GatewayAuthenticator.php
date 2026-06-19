@@ -21,7 +21,7 @@ final class GatewayAuthenticator extends AbstractAuthenticator
         return $request->headers->has('X-User-Id');
     }
 
-    public function authenticate(Request $request): Passport
+    public function authenticate(Request $request): \Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport
     {
         $userId = $request->headers->get('X-User-Id');
 
@@ -30,11 +30,11 @@ final class GatewayAuthenticator extends AbstractAuthenticator
         }
 
         $roles = array_values(array_filter(
-            explode(',', $request->headers->get('X-User-Roles', ''))
+            explode(',', (string) $request->headers->get('X-User-Roles', ''))
         ));
 
         return new SelfValidatingPassport(
-            new UserBadge($userId, static fn () => new GatewayUser($userId, $roles))
+            new UserBadge($userId, static fn (): \App\Shared\Infrastructure\Security\GatewayUser => new GatewayUser($userId, $roles))
         );
     }
 
@@ -43,7 +43,7 @@ final class GatewayAuthenticator extends AbstractAuthenticator
         return null;
     }
 
-    public function onAuthenticationFailure(Request $request, AuthenticationException $exception): Response
+    public function onAuthenticationFailure(Request $request, AuthenticationException $exception): \Symfony\Component\HttpFoundation\JsonResponse
     {
         return new JsonResponse(['error' => 'Unauthorized'], Response::HTTP_UNAUTHORIZED);
     }

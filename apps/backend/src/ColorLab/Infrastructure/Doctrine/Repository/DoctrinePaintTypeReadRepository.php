@@ -27,7 +27,7 @@ final class DoctrinePaintTypeReadRepository extends ServiceEntityRepository impl
     public function list(): array
     {
         return array_map(
-            static fn (PaintType $pt) => new PaintTypeListItemView(
+            static fn (PaintType $pt): \App\ColorLab\Application\PaintType\ReadModel\PaintTypeListItemView => new PaintTypeListItemView(
                 (string) $pt->handle,
                 $pt->name,
             ),

@@ -9,7 +9,7 @@ use App\Shared\Infrastructure\Doctrine\Type\AbstractHandleType;
 
 final class PaintTypeHandleType extends AbstractHandleType
 {
-    public const NAME = 'paint_type_handle';
+    public const string NAME = 'paint_type_handle';
 
     #[\Override]
     protected function getClass(): string

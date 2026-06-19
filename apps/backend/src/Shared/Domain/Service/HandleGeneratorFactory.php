@@ -15,7 +15,7 @@ final readonly class HandleGeneratorFactory
     /** @param \Closure(string): bool $existenceChecker */
     public function create(\Closure $existenceChecker): HandleGenerator
     {
-        return new class($existenceChecker, $this->slugifier) implements HandleGenerator {
+        return new readonly class($existenceChecker, $this->slugifier) implements HandleGenerator {
             /** @param \Closure(string): bool $existenceChecker */
             public function __construct(private \Closure $existenceChecker, private Slugifier $slugifier)
             {

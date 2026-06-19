@@ -15,24 +15,6 @@ class PaintReferenceApiTest extends ApiTestCase
         $this->setCurrentUserId('019661b9-a000-7000-8000-000000000001');
     }
 
-    private function createPrerequisites(): array
-    {
-        $this->request('POST', '/color-lab/brands', ['name' => 'Vallejo']);
-        $brands = $this->responseJson();
-
-        $this->request('GET', '/color-lab/brands');
-        $brands = $this->responseJson();
-        $brandHandle = $brands[0]['handle'];
-        $rangeHandle = null;
-
-        // Add a range to the brand
-        // (ranges are managed via brand in the domain, so we use brand data directly)
-        // For now use the brand handle and assume a range handle
-        // In a real test we'd add a range via the brand API when available
-
-        return ['brandHandle' => $brandHandle, 'rangeHandle' => 'game-color'];
-    }
-
     public function testCreate(): void
     {
         $this->request('POST', '/color-lab/paint-types', ['name' => 'Standard']);

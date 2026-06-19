@@ -40,7 +40,7 @@ final class CollectingEventDispatcher implements DomainEventDispatcher
     public function ofType(string $class): array
     {
         /* @var list<T> */
-        return array_values(array_filter($this->collected, static fn (DomainEvent $e) => $e instanceof $class));
+        return array_values(array_filter($this->collected, static fn (DomainEvent $e): bool => $e instanceof $class));
     }
 
     public function reset(): void

@@ -8,13 +8,8 @@ use App\Shared\Domain\Service\HandleGenerator;
 
 final readonly class Range
 {
-    public RangeHandle $handle;
-    public string $name;
-
-    private function __construct(RangeHandle $handle, string $name)
+    private function __construct(public RangeHandle $handle, public string $name)
     {
-        $this->handle = $handle;
-        $this->name = $name;
     }
 
     public static function create(string $name, HandleGenerator $handleGenerator): self

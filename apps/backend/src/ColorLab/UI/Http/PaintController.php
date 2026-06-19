@@ -18,18 +18,18 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 
-#[Route('/color-lab/paints', name: 'paint_')]
+#[Route(name: 'paint_')]
 final class PaintController extends AbstractController
 {
     use Input;
 
-    #[Route('', name: 'list', methods: ['GET'])]
+    #[Route('/color-lab/paints', name: 'paint_list', methods: ['GET'])]
     public function list(ListPaintsQueryHandler $handler): JsonResponse
     {
         return $this->json($handler(new ListPaintsQuery()));
     }
 
-    #[Route('', name: 'create', methods: ['POST'])]
+    #[Route('/color-lab/paints', name: 'paint_create', methods: ['POST'])]
     public function create(Request $request, CreatePaintCommandHandler $handler): JsonResponse
     {
         $data = $request->toArray();
@@ -42,12 +42,12 @@ final class PaintController extends AbstractController
         return $this->json(null, Response::HTTP_CREATED);
     }
 
-    #[Route('/{id}', name: 'get', methods: ['GET'])]
+    #[Route('/color-lab/paints/{id}', name: 'paint_get', methods: ['GET'])]
     public function get(string $id, GetPaintQueryHandler $handler): JsonResponse
     {
         $view = $handler(new GetPaintQuery($id));
 
-        if (null === $view) {
+        if (!$view instanceof \App\ColorLab\Application\Paint\ReadModel\PaintView) {
             throw new NotFoundHttpException();
         }
 

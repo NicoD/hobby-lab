@@ -11,12 +11,12 @@ use App\Shared\Application\Service\TransactionManager;
 use App\Shared\Domain\Model\UserId;
 use App\Shared\Domain\Service\HandleGeneratorFactory;
 
-final class CreateColorCommandHandler
+final readonly class CreateColorCommandHandler
 {
     public function __construct(
-        private readonly ColorRepository $colors,
-        private readonly HandleGeneratorFactory $handleGeneratorFactory,
-        private readonly TransactionManager $transactionManager,
+        private ColorRepository $colors,
+        private HandleGeneratorFactory $handleGeneratorFactory,
+        private TransactionManager $transactionManager,
     ) {
     }
 
@@ -27,7 +27,7 @@ final class CreateColorCommandHandler
                 $command->name,
                 new UserId($command->ownedBy),
                 $this->handleGeneratorFactory->create(
-                    fn (string $h) => null !== $this->colors->findByHandle(new ColorHandle($h))
+                    fn (string $h): bool => $this->colors->findByHandle(new ColorHandle($h)) instanceof \App\ColorLab\Domain\Model\Color
                 ),
             );
 

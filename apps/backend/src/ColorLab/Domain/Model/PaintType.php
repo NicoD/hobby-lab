@@ -17,21 +17,16 @@ class PaintType implements AggregateRoot
 {
     use DomainEventTrait;
 
-    #[ORM\Id]
-    #[ORM\Column(type: 'paint_type_handle')]
-    public private(set) PaintTypeHandle $handle;
-
-    #[ORM\Column(type: 'string', length: 255)]
-    public private(set) string $name;
-
-    #[ORM\Column(type: 'user_id')]
-    public private(set) UserId $ownedBy;
-
-    private function __construct(PaintTypeHandle $handle, string $name, UserId $ownedBy)
+    private function __construct(
+        #[ORM\Id]
+        #[ORM\Column(type: 'paint_type_handle')]
+        public private(set) PaintTypeHandle $handle,
+        #[ORM\Column(type: 'string', length: 255)]
+        public private(set) string $name,
+        #[ORM\Column(type: 'user_id')]
+        public private(set) UserId $ownedBy
+    )
     {
-        $this->handle = $handle;
-        $this->name = $name;
-        $this->ownedBy = $ownedBy;
     }
 
     public static function create(string $name, UserId $ownedBy, HandleGenerator $handleGenerator): self

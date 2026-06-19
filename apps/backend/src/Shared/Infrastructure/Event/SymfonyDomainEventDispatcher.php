@@ -8,9 +8,9 @@ use App\Shared\Application\Service\DomainEventDispatcher;
 use App\Shared\Domain\Event\DomainEvent;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-final class SymfonyDomainEventDispatcher implements DomainEventDispatcher
+final readonly class SymfonyDomainEventDispatcher implements DomainEventDispatcher
 {
-    public function __construct(private readonly EventDispatcherInterface $eventDispatcher)
+    public function __construct(private EventDispatcherInterface $eventDispatcher)
     {
     }
 

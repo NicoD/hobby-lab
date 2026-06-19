@@ -26,11 +26,11 @@ final class DoctrineBrandReadRepository extends ServiceEntityRepository implemen
     public function list(): array
     {
         return array_map(
-            static fn (Brand $brand) => new BrandListItemView(
+            static fn (Brand $brand): \App\ColorLab\Application\Brand\ReadModel\BrandListItemView => new BrandListItemView(
                 (string) $brand->handle,
                 $brand->name,
                 array_map(
-                    static fn ($range) => ['handle' => (string) $range->handle, 'name' => $range->name],
+                    static fn (\App\ColorLab\Domain\Model\Range $range): array => ['handle' => (string) $range->handle, 'name' => $range->name],
                     $brand->ranges
                 )
             ),
@@ -50,7 +50,7 @@ final class DoctrineBrandReadRepository extends ServiceEntityRepository implemen
             (string) $brand->handle,
             $brand->name,
             array_map(
-                static fn ($range) => ['handle' => (string) $range->handle, 'name' => $range->name],
+                static fn (\App\ColorLab\Domain\Model\Range $range): array => ['handle' => (string) $range->handle, 'name' => $range->name],
                 $brand->ranges
             ));
     }

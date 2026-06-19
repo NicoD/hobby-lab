@@ -7,9 +7,9 @@ namespace App\ColorLab\Application\Color\Query\GetColor;
 use App\ColorLab\Application\Color\ReadModel\ColorReadRepository;
 use App\ColorLab\Application\Color\ReadModel\ColorView;
 
-final class GetColorQueryHandler
+final readonly class GetColorQueryHandler
 {
-    public function __construct(private readonly ColorReadRepository $colors)
+    public function __construct(private ColorReadRepository $colors)
     {
     }
 

@@ -7,14 +7,14 @@ namespace App\ColorLab\Application\Brand\Query\ListBrands;
 use App\ColorLab\Application\Brand\ReadModel\BrandListItemView;
 use App\ColorLab\Application\Brand\ReadModel\BrandReadRepository;
 
-final class ListBrandsQueryHandler
+final readonly class ListBrandsQueryHandler
 {
-    public function __construct(private readonly BrandReadRepository $brands)
+    public function __construct(private BrandReadRepository $brands)
     {
     }
 
     /** @return list<BrandListItemView> */
-    public function __invoke(ListBrandsQuery $query): array
+    public function __invoke(): array
     {
         return $this->brands->list();
     }

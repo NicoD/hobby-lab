@@ -9,7 +9,7 @@ use App\Shared\Infrastructure\Doctrine\Type\AbstractHandleType;
 
 final class ColorHandleType extends AbstractHandleType
 {
-    public const NAME = 'color_handle';
+    public const string NAME = 'color_handle';
 
     #[\Override]
     protected function getClass(): string

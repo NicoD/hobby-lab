@@ -11,12 +11,12 @@ use App\Shared\Application\Service\TransactionManager;
 use App\Shared\Domain\Model\UserId;
 use App\Shared\Domain\Service\HandleGeneratorFactory;
 
-final class CreatePaintTypeCommandHandler
+final readonly class CreatePaintTypeCommandHandler
 {
     public function __construct(
-        private readonly PaintTypeRepository $paintTypes,
-        private readonly HandleGeneratorFactory $handleGeneratorFactory,
-        private readonly TransactionManager $transactionManager,
+        private PaintTypeRepository $paintTypes,
+        private HandleGeneratorFactory $handleGeneratorFactory,
+        private TransactionManager $transactionManager,
     ) {
     }
 
@@ -27,7 +27,7 @@ final class CreatePaintTypeCommandHandler
                 $command->name,
                 new UserId($command->ownedBy),
                 $this->handleGeneratorFactory->create(
-                    fn (string $h) => null !== $this->paintTypes->findByHandle(new PaintTypeHandle($h))
+                    fn (string $h): bool => $this->paintTypes->findByHandle(new PaintTypeHandle($h)) instanceof \App\ColorLab\Domain\Model\PaintType
                 ),
             );
 

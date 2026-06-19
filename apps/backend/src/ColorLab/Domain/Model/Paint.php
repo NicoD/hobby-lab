@@ -16,29 +16,18 @@ class Paint implements AggregateRoot
 {
     use DomainEventTrait;
 
-    #[ORM\Id]
-    #[ORM\Column(type: 'paint_id')]
-    public private(set) PaintId $id;
-
-    #[ORM\Column(type: 'paint_reference_id')]
-    public private(set) PaintReferenceId $paintReferenceId;
-
-    #[ORM\Column(type: 'user_id')]
-    public private(set) UserId $ownedBy;
-
-    #[ORM\Column(type: 'date_immutable', nullable: true)]
-    public private(set) ?\DateTimeImmutable $purchasedAt;
-
     private function __construct(
-        PaintId $id,
-        PaintReferenceId $paintReferenceId,
-        UserId $ownedBy,
-        ?\DateTimeImmutable $purchasedAt,
-    ) {
-        $this->id = $id;
-        $this->paintReferenceId = $paintReferenceId;
-        $this->ownedBy = $ownedBy;
-        $this->purchasedAt = $purchasedAt;
+        #[ORM\Id]
+        #[ORM\Column(type: 'paint_id')]
+        public private(set) PaintId $id,
+        #[ORM\Column(type: 'paint_reference_id')]
+        public private(set) PaintReferenceId $paintReferenceId,
+        #[ORM\Column(type: 'user_id')]
+        public private(set) UserId $ownedBy,
+        #[ORM\Column(type: 'date_immutable', nullable: true)]
+        public private(set) ?\DateTimeImmutable $purchasedAt
+    )
+    {
     }
 
     public static function create(

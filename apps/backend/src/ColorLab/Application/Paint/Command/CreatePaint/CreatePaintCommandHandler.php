@@ -10,11 +10,11 @@ use App\ColorLab\Domain\Repository\PaintRepository;
 use App\Shared\Application\Service\TransactionManager;
 use App\Shared\Domain\Model\UserId;
 
-final class CreatePaintCommandHandler
+final readonly class CreatePaintCommandHandler
 {
     public function __construct(
-        private readonly PaintRepository $paints,
-        private readonly TransactionManager $transactionManager,
+        private PaintRepository $paints,
+        private TransactionManager $transactionManager,
     ) {
     }
 

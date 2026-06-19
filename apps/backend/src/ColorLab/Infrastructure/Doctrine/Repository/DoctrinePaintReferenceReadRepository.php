@@ -27,14 +27,14 @@ final class DoctrinePaintReferenceReadRepository extends ServiceEntityRepository
     public function list(): array
     {
         return array_map(
-            static fn (PaintReference $ref) => new PaintReferenceListItemView(
+            static fn (PaintReference $ref): \App\ColorLab\Application\PaintReference\ReadModel\PaintReferenceListItemView => new PaintReferenceListItemView(
                 (string) $ref->id,
                 (string) $ref->handle,
                 $ref->name,
                 (string) $ref->brandHandle,
                 (string) $ref->rangeHandle,
                 (string) $ref->paintTypeHandle,
-                null !== $ref->colorHandle ? (string) $ref->colorHandle : null,
+                $ref->colorHandle instanceof \App\ColorLab\Domain\Model\ColorHandle ? (string) $ref->colorHandle : null,
             ),
             $this->findAll(),
         );

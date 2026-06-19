@@ -15,12 +15,12 @@ use App\Shared\Application\Service\TransactionManager;
 use App\Shared\Domain\Model\UserId;
 use App\Shared\Domain\Service\HandleGeneratorFactory;
 
-final class CreatePaintReferenceCommandHandler
+final readonly class CreatePaintReferenceCommandHandler
 {
     public function __construct(
-        private readonly PaintReferenceRepository $paintReferences,
-        private readonly HandleGeneratorFactory $handleGeneratorFactory,
-        private readonly TransactionManager $transactionManager,
+        private PaintReferenceRepository $paintReferences,
+        private HandleGeneratorFactory $handleGeneratorFactory,
+        private TransactionManager $transactionManager,
     ) {
     }
 
@@ -35,7 +35,7 @@ final class CreatePaintReferenceCommandHandler
                 null !== $command->colorHandle ? new ColorHandle($command->colorHandle) : null,
                 new UserId($command->ownedBy),
                 $this->handleGeneratorFactory->create(
-                    fn (string $h) => null !== $this->paintReferences->findByHandle(new PaintReferenceHandle($h))
+                    fn (string $h): bool => $this->paintReferences->findByHandle(new PaintReferenceHandle($h)) instanceof \App\ColorLab\Domain\Model\PaintReference
                 ),
             );
 

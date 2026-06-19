@@ -8,7 +8,7 @@ use App\Shared\Domain\Model\UserId;
 
 final class UserIdType extends AbstractUuidType
 {
-    public const NAME = 'user_id';
+    public const string NAME = 'user_id';
 
     #[\Override]
     protected function getClass(): string

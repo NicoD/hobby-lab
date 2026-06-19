@@ -32,8 +32,4 @@ final readonly class GatewayUser implements UserInterface
     {
         return $this->roles ?: ['ROLE_USER'];
     }
-
-    public function eraseCredentials(): void
-    {
-    }
 }

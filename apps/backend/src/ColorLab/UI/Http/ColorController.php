@@ -18,18 +18,18 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 
-#[Route('/color-lab/colors', name: 'color_')]
+#[Route(name: 'color_')]
 final class ColorController extends AbstractController
 {
     use Input;
 
-    #[Route('', name: 'list', methods: ['GET'])]
+    #[Route('/color-lab/colors', name: 'color_list', methods: ['GET'])]
     public function list(ListColorsQueryHandler $handler): JsonResponse
     {
         return $this->json($handler(new ListColorsQuery()));
     }
 
-    #[Route('', name: 'create', methods: ['POST'])]
+    #[Route('/color-lab/colors', name: 'color_create', methods: ['POST'])]
     public function create(Request $request, CreateColorCommandHandler $handler): JsonResponse
     {
         $data = $request->toArray();
@@ -41,12 +41,12 @@ final class ColorController extends AbstractController
         return $this->json(null, Response::HTTP_CREATED);
     }
 
-    #[Route('/{handle}', name: 'get', methods: ['GET'])]
+    #[Route('/color-lab/colors/{handle}', name: 'color_get', methods: ['GET'])]
     public function get(string $handle, GetColorQueryHandler $handler): JsonResponse
     {
         $view = $handler(new GetColorQuery($handle));
 
-        if (null === $view) {
+        if (!$view instanceof \App\ColorLab\Application\Color\ReadModel\ColorView) {
             throw new NotFoundHttpException();
         }
 

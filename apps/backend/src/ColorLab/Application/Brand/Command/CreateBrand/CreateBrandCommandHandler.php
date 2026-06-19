@@ -11,12 +11,12 @@ use App\Shared\Application\Service\TransactionManager;
 use App\Shared\Domain\Model\UserId;
 use App\Shared\Domain\Service\HandleGeneratorFactory;
 
-final class CreateBrandCommandHandler
+final readonly class CreateBrandCommandHandler
 {
     public function __construct(
-        private readonly BrandRepository $brands,
-        private readonly HandleGeneratorFactory $handleGeneratorFactory,
-        private readonly TransactionManager $transactionManager,
+        private BrandRepository $brands,
+        private HandleGeneratorFactory $handleGeneratorFactory,
+        private TransactionManager $transactionManager,
     ) {
     }
 
@@ -27,7 +27,7 @@ final class CreateBrandCommandHandler
                 $command->name,
                 new UserId($command->ownedBy),
                 $this->handleGeneratorFactory->create(
-                    fn (string $h) => null !== $this->brands->findByHandle(new BrandHandle($h))
+                    fn (string $h): bool => $this->brands->findByHandle(new BrandHandle($h)) instanceof \App\ColorLab\Domain\Model\Brand
                 ),
             );
 

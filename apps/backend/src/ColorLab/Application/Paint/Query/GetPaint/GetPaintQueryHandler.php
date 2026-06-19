@@ -7,9 +7,9 @@ namespace App\ColorLab\Application\Paint\Query\GetPaint;
 use App\ColorLab\Application\Paint\ReadModel\PaintReadRepository;
 use App\ColorLab\Application\Paint\ReadModel\PaintView;
 
-final class GetPaintQueryHandler
+final readonly class GetPaintQueryHandler
 {
-    public function __construct(private readonly PaintReadRepository $paints)
+    public function __construct(private PaintReadRepository $paints)
     {
     }
 

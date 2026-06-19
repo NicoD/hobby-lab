@@ -7,9 +7,9 @@ namespace App\ColorLab\Application\PaintReference\Query\GetPaintReference;
 use App\ColorLab\Application\PaintReference\ReadModel\PaintReferenceReadRepository;
 use App\ColorLab\Application\PaintReference\ReadModel\PaintReferenceView;
 
-final class GetPaintReferenceQueryHandler
+final readonly class GetPaintReferenceQueryHandler
 {
-    public function __construct(private readonly PaintReferenceReadRepository $paintReferences)
+    public function __construct(private PaintReferenceReadRepository $paintReferences)
     {
     }
 

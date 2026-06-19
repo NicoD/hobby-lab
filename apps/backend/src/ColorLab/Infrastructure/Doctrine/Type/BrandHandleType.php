@@ -9,7 +9,7 @@ use App\Shared\Infrastructure\Doctrine\Type\AbstractHandleType;
 
 final class BrandHandleType extends AbstractHandleType
 {
-    public const NAME = 'brand_handle';
+    public const string NAME = 'brand_handle';
 
     #[\Override]
     protected function getClass(): string

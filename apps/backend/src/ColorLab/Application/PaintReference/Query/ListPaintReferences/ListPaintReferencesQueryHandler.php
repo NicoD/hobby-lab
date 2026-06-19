@@ -7,14 +7,14 @@ namespace App\ColorLab\Application\PaintReference\Query\ListPaintReferences;
 use App\ColorLab\Application\PaintReference\ReadModel\PaintReferenceListItemView;
 use App\ColorLab\Application\PaintReference\ReadModel\PaintReferenceReadRepository;
 
-final class ListPaintReferencesQueryHandler
+final readonly class ListPaintReferencesQueryHandler
 {
-    public function __construct(private readonly PaintReferenceReadRepository $paintReferences)
+    public function __construct(private PaintReferenceReadRepository $paintReferences)
     {
     }
 
     /** @return list<PaintReferenceListItemView> */
-    public function __invoke(ListPaintReferencesQuery $query): array
+    public function __invoke(): array
     {
         return $this->paintReferences->list();
     }
