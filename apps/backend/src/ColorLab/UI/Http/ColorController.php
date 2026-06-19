@@ -10,7 +10,6 @@ use App\ColorLab\Application\Color\Query\GetColor\GetColorQuery;
 use App\ColorLab\Application\Color\Query\GetColor\GetColorQueryHandler;
 use App\ColorLab\Application\Color\Query\ListColors\ListColorsQuery;
 use App\ColorLab\Application\Color\Query\ListColors\ListColorsQueryHandler;
-use App\ColorLab\UI\Trait\Input;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -21,8 +20,6 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route(name: 'color_')]
 final class ColorController extends AbstractController
 {
-    use Input;
-
     #[Route('/color-lab/colors', name: 'color_list', methods: ['GET'])]
     public function list(ListColorsQueryHandler $handler): JsonResponse
     {
@@ -32,10 +29,9 @@ final class ColorController extends AbstractController
     #[Route('/color-lab/colors', name: 'color_create', methods: ['POST'])]
     public function create(Request $request, CreateColorCommandHandler $handler): JsonResponse
     {
-        $data = $request->toArray();
         $handler(new CreateColorCommand(
-            $this->asString($data['name']),
-            $this->asString($request->headers->get('X-User-Id')),
+            $request->getPayload()->getString('name'),
+            $request->headers->get('X-User-Id') ?? '',
         ));
 
         return $this->json(null, Response::HTTP_CREATED);

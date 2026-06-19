@@ -10,7 +10,6 @@ use App\ColorLab\Application\Brand\Query\GetBrand\GetBrandQuery;
 use App\ColorLab\Application\Brand\Query\GetBrand\GetBrandQueryHandler;
 use App\ColorLab\Application\Brand\Query\ListBrands\ListBrandsQuery;
 use App\ColorLab\Application\Brand\Query\ListBrands\ListBrandsQueryHandler;
-use App\ColorLab\UI\Trait\Input;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -21,8 +20,6 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route(name: 'brand_')]
 final class BrandController extends AbstractController
 {
-    use Input;
-
     #[Route('/color-lab/brands', name: 'brand_list', methods: ['GET'])]
     public function list(ListBrandsQueryHandler $handler): JsonResponse
     {
@@ -32,10 +29,9 @@ final class BrandController extends AbstractController
     #[Route('/color-lab/brands', name: 'brand_create', methods: ['POST'])]
     public function create(Request $request, CreateBrandCommandHandler $handler): JsonResponse
     {
-        $data = $request->toArray();
         $handler(new CreateBrandCommand(
-            $this->asString($data['name']),
-            $this->asString($request->headers->get('X-User-Id')),
+            $request->getPayload()->getString('name'),
+            $request->headers->get('X-User-Id') ?? '',
         ));
 
         return $this->json(null, Response::HTTP_CREATED);

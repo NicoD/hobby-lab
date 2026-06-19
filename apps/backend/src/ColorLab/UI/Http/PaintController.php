@@ -10,7 +10,6 @@ use App\ColorLab\Application\Paint\Query\GetPaint\GetPaintQuery;
 use App\ColorLab\Application\Paint\Query\GetPaint\GetPaintQueryHandler;
 use App\ColorLab\Application\Paint\Query\ListPaints\ListPaintsQuery;
 use App\ColorLab\Application\Paint\Query\ListPaints\ListPaintsQueryHandler;
-use App\ColorLab\UI\Trait\Input;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -21,8 +20,6 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route(name: 'paint_')]
 final class PaintController extends AbstractController
 {
-    use Input;
-
     #[Route('/color-lab/paints', name: 'paint_list', methods: ['GET'])]
     public function list(ListPaintsQueryHandler $handler): JsonResponse
     {
@@ -32,11 +29,11 @@ final class PaintController extends AbstractController
     #[Route('/color-lab/paints', name: 'paint_create', methods: ['POST'])]
     public function create(Request $request, CreatePaintCommandHandler $handler): JsonResponse
     {
-        $data = $request->toArray();
+        $payload = $request->getPayload();
         $handler(new CreatePaintCommand(
-            $this->asString($data['paintReferenceId']),
-            $this->asString($request->headers->get('X-User-Id')),
-            isset($data['purchasedAt']) ? $this->asString($data['purchasedAt']) : null,
+            $payload->getString('paintReferenceId'),
+            $request->headers->get('X-User-Id') ?? '',
+            $payload->has('purchasedAt') ? $payload->getString('purchasedAt') : null,
         ));
 
         return $this->json(null, Response::HTTP_CREATED);
