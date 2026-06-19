@@ -25,9 +25,8 @@ class Paint implements AggregateRoot
         #[ORM\Column(type: 'user_id')]
         public private(set) UserId $ownedBy,
         #[ORM\Column(type: 'date_immutable', nullable: true)]
-        public private(set) ?\DateTimeImmutable $purchasedAt
-    )
-    {
+        public private(set) ?\DateTimeImmutable $purchasedAt,
+    ) {
     }
 
     public static function create(

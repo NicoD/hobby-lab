@@ -27,7 +27,7 @@ final class DoctrineColorReadRepository extends ServiceEntityRepository implemen
     public function list(): array
     {
         return array_map(
-            static fn (Color $color): \App\ColorLab\Application\Color\ReadModel\ColorListItemView => new ColorListItemView(
+            static fn (Color $color): ColorListItemView => new ColorListItemView(
                 (string) $color->handle,
                 $color->name,
             ),

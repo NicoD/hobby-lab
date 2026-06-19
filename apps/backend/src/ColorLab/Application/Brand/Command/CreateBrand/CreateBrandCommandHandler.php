@@ -27,7 +27,7 @@ final readonly class CreateBrandCommandHandler
                 $command->name,
                 new UserId($command->ownedBy),
                 $this->handleGeneratorFactory->create(
-                    fn (string $h): bool => $this->brands->findByHandle(new BrandHandle($h)) instanceof \App\ColorLab\Domain\Model\Brand
+                    fn (string $h): bool => $this->brands->findByHandle(new BrandHandle($h)) instanceof Brand
                 ),
             );
 

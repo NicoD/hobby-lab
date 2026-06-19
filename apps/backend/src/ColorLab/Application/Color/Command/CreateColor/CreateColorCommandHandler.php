@@ -27,7 +27,7 @@ final readonly class CreateColorCommandHandler
                 $command->name,
                 new UserId($command->ownedBy),
                 $this->handleGeneratorFactory->create(
-                    fn (string $h): bool => $this->colors->findByHandle(new ColorHandle($h)) instanceof \App\ColorLab\Domain\Model\Color
+                    fn (string $h): bool => $this->colors->findByHandle(new ColorHandle($h)) instanceof Color
                 ),
             );
 

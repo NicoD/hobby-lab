@@ -26,7 +26,7 @@ final class DoctrineBrandReadRepository extends ServiceEntityRepository implemen
     public function list(): array
     {
         return array_map(
-            static fn (Brand $brand): \App\ColorLab\Application\Brand\ReadModel\BrandListItemView => new BrandListItemView(
+            static fn (Brand $brand): BrandListItemView => new BrandListItemView(
                 (string) $brand->handle,
                 $brand->name,
                 array_map(

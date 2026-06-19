@@ -27,7 +27,7 @@ final readonly class CreatePaintTypeCommandHandler
                 $command->name,
                 new UserId($command->ownedBy),
                 $this->handleGeneratorFactory->create(
-                    fn (string $h): bool => $this->paintTypes->findByHandle(new PaintTypeHandle($h)) instanceof \App\ColorLab\Domain\Model\PaintType
+                    fn (string $h): bool => $this->paintTypes->findByHandle(new PaintTypeHandle($h)) instanceof PaintType
                 ),
             );
 

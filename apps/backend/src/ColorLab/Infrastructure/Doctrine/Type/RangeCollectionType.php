@@ -25,7 +25,7 @@ class RangeCollectionType extends JsonType
         }
 
         return parent::convertToDatabaseValue(array_map(
-            static fn (\App\ColorLab\Domain\Model\Range $value): array => [
+            static fn (Range $value): array => [
                 'handle' => (string) $value->handle,
                 'name' => $value->name,
             ],

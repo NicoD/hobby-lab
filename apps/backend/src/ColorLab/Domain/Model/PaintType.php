@@ -24,9 +24,8 @@ class PaintType implements AggregateRoot
         #[ORM\Column(type: 'string', length: 255)]
         public private(set) string $name,
         #[ORM\Column(type: 'user_id')]
-        public private(set) UserId $ownedBy
-    )
-    {
+        public private(set) UserId $ownedBy,
+    ) {
     }
 
     public static function create(string $name, UserId $ownedBy, HandleGenerator $handleGenerator): self

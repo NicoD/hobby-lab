@@ -29,9 +29,8 @@ class Brand implements AggregateRoot
         #[ORM\Column(type: 'string', length: 255)]
         public private(set) string $name,
         #[ORM\Column(type: 'user_id')]
-        public private(set) UserId $ownedBy
-    )
-    {
+        public private(set) UserId $ownedBy,
+    ) {
     }
 
     public function addRange(string $name, HandleGeneratorFactory $handleGeneratorFactory): void

@@ -34,9 +34,8 @@ class PaintReference implements AggregateRoot
         #[ORM\Column(type: 'color_handle', nullable: true)]
         public private(set) ?ColorHandle $colorHandle,
         #[ORM\Column(type: 'user_id')]
-        public private(set) UserId $ownedBy
-    )
-    {
+        public private(set) UserId $ownedBy,
+    ) {
     }
 
     public static function create(

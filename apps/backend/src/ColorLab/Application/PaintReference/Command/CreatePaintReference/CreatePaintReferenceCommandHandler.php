@@ -35,7 +35,7 @@ final readonly class CreatePaintReferenceCommandHandler
                 null !== $command->colorHandle ? new ColorHandle($command->colorHandle) : null,
                 new UserId($command->ownedBy),
                 $this->handleGeneratorFactory->create(
-                    fn (string $h): bool => $this->paintReferences->findByHandle(new PaintReferenceHandle($h)) instanceof \App\ColorLab\Domain\Model\PaintReference
+                    fn (string $h): bool => $this->paintReferences->findByHandle(new PaintReferenceHandle($h)) instanceof PaintReference
                 ),
             );
 
