@@ -1,3 +1,4 @@
+import FormAddPaint from "../../components/ColorLab/FormAddPaint";
 import ListWrapper from "../../components/ListWrapper";
 import Modal from "../../components/Modal";
 import useModal from "../../hooks/useModal";
@@ -25,7 +26,7 @@ export default function Paint() {
         TODO
         </ListWrapper>
         <Modal title="Ajouter" isOpen={addModal.isOpen} close={addModal.close}>
-            TODO
+            <FormAddPaint />
         </Modal>
     </>
   )
