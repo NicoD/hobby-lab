@@ -3,10 +3,59 @@ parameters:
     - ./src
   exclude_files:
     - '#^src/Kernel\.php#'
+
   layers:
-    - name: ColorLab
+    # ── Shared ────────────────────────────────────────────────────────────────
+    - name: Shared.Domain
       collectors:
-        - type: directory
-          value: src/ColorLab/.*
+        - { type: directory, value: 'src/Shared/Domain/.*' }
+
+    - name: Shared.Application
+      collectors:
+        - { type: directory, value: 'src/Shared/Application/.*' }
+
+    - name: Shared.Infrastructure
+      collectors:
+        - { type: directory, value: 'src/Shared/Infrastructure/.*' }
+
+    # ── ColorLab ──────────────────────────────────────────────────────────────
+    - name: ColorLab.Domain
+      collectors:
+        - { type: directory, value: 'src/ColorLab/Domain/.*' }
+
+    - name: ColorLab.Application
+      collectors:
+        - { type: directory, value: 'src/ColorLab/Application/.*' }
+
+    - name: ColorLab.Infrastructure
+      collectors:
+        - { type: directory, value: 'src/ColorLab/Infrastructure/.*' }
+
+    - name: ColorLab.UI
+      collectors:
+        - { type: directory, value: 'src/ColorLab/UI/.*' }
+
   ruleset:
-    ColorLab: ~
+    # Shared — never depends on a business domain
+    Shared.Domain: []
+    Shared.Application:
+      - Shared.Domain
+    Shared.Infrastructure:
+      - Shared.Domain
+      - Shared.Application
+
+    # ColorLab — strict inward dependency direction
+    ColorLab.Domain:
+      - Shared.Domain
+    ColorLab.Application:
+      - ColorLab.Domain
+      - Shared.Domain
+      - Shared.Application
+    ColorLab.Infrastructure:
+      - ColorLab.Domain
+      - ColorLab.Application
+      - Shared.Domain
+      - Shared.Application
+      - Shared.Infrastructure
+    ColorLab.UI:
+      - ColorLab.Application
