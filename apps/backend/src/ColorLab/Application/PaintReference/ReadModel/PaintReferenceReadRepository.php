@@ -7,7 +7,7 @@ namespace App\ColorLab\Application\PaintReference\ReadModel;
 interface PaintReferenceReadRepository
 {
     /** @return list<PaintReferenceListItemView> */
-    public function list(): array;
+    public function list(PaintReferenceCriteria $criteria): array;
 
     public function findByHandle(string $handle): ?PaintReferenceView;
 }

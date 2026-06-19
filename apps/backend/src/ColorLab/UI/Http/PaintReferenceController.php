@@ -25,9 +25,15 @@ final class PaintReferenceController extends AbstractController
     }
 
     #[Route('/color-lab/paint-references', name: 'paint_reference_list', methods: ['GET'])]
-    public function list(ListPaintReferencesQueryHandler $handler): JsonResponse
+    public function list(Request $request, ListPaintReferencesQueryHandler $handler): JsonResponse
     {
-        return $this->json($handler(new ListPaintReferencesQuery()));
+        return $this->json($handler(new ListPaintReferencesQuery(
+            $request->headers->get('X-User-Id') ?? '',
+            $request->query->get('brand'),
+            $request->query->get('range'),
+            $request->query->get('type'),
+            $request->query->get('color'),
+        )));
     }
 
     #[Route('/color-lab/paint-references', name: 'paint_reference_create', methods: ['POST'])]
