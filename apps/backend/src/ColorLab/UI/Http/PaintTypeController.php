@@ -20,6 +20,10 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route(name: 'paint_type_')]
 final class PaintTypeController extends AbstractController
 {
+    public function __construct(private readonly CreatePaintTypeCommandHandler $commandHandler, private readonly GetPaintTypeQueryHandler $queryHandler)
+    {
+    }
+
     #[Route('/color-lab/paint-types', name: 'paint_type_list', methods: ['GET'])]
     public function list(ListPaintTypesQueryHandler $handler): JsonResponse
     {
@@ -27,14 +31,14 @@ final class PaintTypeController extends AbstractController
     }
 
     #[Route('/color-lab/paint-types', name: 'paint_type_create', methods: ['POST'])]
-    public function create(Request $request, CreatePaintTypeCommandHandler $handler): JsonResponse
+    public function create(Request $request): JsonResponse
     {
-        $handler(new CreatePaintTypeCommand(
+        $handle = ($this->commandHandler)(new CreatePaintTypeCommand(
             $request->getPayload()->getString('name'),
             $request->headers->get('X-User-Id') ?? '',
         ));
 
-        return $this->json(null, Response::HTTP_CREATED);
+        return $this->json(($this->queryHandler)(new GetPaintTypeQuery((string) $handle)), Response::HTTP_CREATED);
     }
 
     #[Route('/color-lab/paint-types/{handle}', name: 'paint_type_get', methods: ['GET'])]

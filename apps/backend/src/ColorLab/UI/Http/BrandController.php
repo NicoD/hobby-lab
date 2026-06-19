@@ -20,6 +20,10 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route(name: 'brand_')]
 final class BrandController extends AbstractController
 {
+    public function __construct(private readonly CreateBrandCommandHandler $commandHandler, private readonly GetBrandQueryHandler $queryHandler)
+    {
+    }
+
     #[Route('/color-lab/brands', name: 'brand_list', methods: ['GET'])]
     public function list(ListBrandsQueryHandler $handler): JsonResponse
     {
@@ -27,14 +31,14 @@ final class BrandController extends AbstractController
     }
 
     #[Route('/color-lab/brands', name: 'brand_create', methods: ['POST'])]
-    public function create(Request $request, CreateBrandCommandHandler $handler): JsonResponse
+    public function create(Request $request): JsonResponse
     {
-        $handler(new CreateBrandCommand(
+        $handle = ($this->commandHandler)(new CreateBrandCommand(
             $request->getPayload()->getString('name'),
             $request->headers->get('X-User-Id') ?? '',
         ));
 
-        return $this->json(null, Response::HTTP_CREATED);
+        return $this->json(($this->queryHandler)(new GetBrandQuery((string) $handle)), Response::HTTP_CREATED);
     }
 
     #[Route('/color-lab/brands/{handle}', name: 'brand_get', methods: ['GET'])]

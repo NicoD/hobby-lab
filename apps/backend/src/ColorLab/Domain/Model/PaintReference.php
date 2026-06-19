@@ -25,14 +25,14 @@ class PaintReference implements AggregateRoot
         public private(set) PaintReferenceHandle $handle,
         #[ORM\Column(type: 'string', length: 255)]
         public private(set) string $name,
-        #[ORM\Column(type: 'brand_handle')]
-        public private(set) BrandHandle $brandHandle,
-        #[ORM\Column(type: 'range_handle')]
-        public private(set) RangeHandle $rangeHandle,
-        #[ORM\Column(type: 'paint_type_handle')]
-        public private(set) PaintTypeHandle $paintTypeHandle,
-        #[ORM\Column(type: 'color_handle', nullable: true)]
-        public private(set) ?ColorHandle $colorHandle,
+        #[ORM\Column(name: 'brand_handle', type: 'brand_handle')]
+        public private(set) BrandHandle $brand,
+        #[ORM\Column(name: 'range_handle', type: 'range_handle')]
+        public private(set) RangeHandle $range,
+        #[ORM\Column(name: 'paint_type_handle', type: 'paint_type_handle')]
+        public private(set) PaintTypeHandle $paintType,
+        #[ORM\Column(name: 'color_handle', type: 'color_handle', nullable: true)]
+        public private(set) ?ColorHandle $color,
         #[ORM\Column(type: 'user_id')]
         public private(set) UserId $ownedBy,
     ) {
@@ -40,21 +40,21 @@ class PaintReference implements AggregateRoot
 
     public static function create(
         string $name,
-        BrandHandle $brandHandle,
-        RangeHandle $rangeHandle,
-        PaintTypeHandle $paintTypeHandle,
-        ?ColorHandle $colorHandle,
+        BrandHandle $brand,
+        RangeHandle $range,
+        PaintTypeHandle $paintType,
+        ?ColorHandle $color,
         UserId $ownedBy,
         HandleGenerator $handleGenerator,
     ): self {
         $ref = new self(
             PaintReferenceId::create(),
-            new PaintReferenceHandle($handleGenerator->generate("{$brandHandle} {$name}")),
+            new PaintReferenceHandle($handleGenerator->generate("{$brand} {$name}")),
             $name,
-            $brandHandle,
-            $rangeHandle,
-            $paintTypeHandle,
-            $colorHandle,
+            $brand,
+            $range,
+            $paintType,
+            $color,
             $ownedBy,
         );
 
@@ -62,10 +62,10 @@ class PaintReference implements AggregateRoot
             $ref->id,
             $ref->handle,
             $name,
-            $brandHandle,
-            $rangeHandle,
-            $paintTypeHandle,
-            $colorHandle,
+            $brand,
+            $range,
+            $paintType,
+            $color,
             $ownedBy,
         ));
 

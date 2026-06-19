@@ -20,9 +20,11 @@ final readonly class CreateColorCommandHandler
     ) {
     }
 
-    public function __invoke(CreateColorCommand $command): void
+    public function __invoke(CreateColorCommand $command): ColorHandle
     {
-        $this->transactionManager->execute(function () use ($command): Color {
+        $color = null;
+
+        $this->transactionManager->execute(function () use ($command, &$color): Color {
             $color = Color::create(
                 $command->name,
                 new UserId($command->ownedBy),
@@ -35,5 +37,9 @@ final readonly class CreateColorCommandHandler
 
             return $color;
         });
+
+        \assert($color instanceof Color);
+
+        return $color->handle;
     }
 }

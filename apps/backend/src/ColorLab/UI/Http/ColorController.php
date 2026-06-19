@@ -20,6 +20,10 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route(name: 'color_')]
 final class ColorController extends AbstractController
 {
+    public function __construct(private readonly CreateColorCommandHandler $commandHandler, private readonly GetColorQueryHandler $queryHandler)
+    {
+    }
+
     #[Route('/color-lab/colors', name: 'color_list', methods: ['GET'])]
     public function list(ListColorsQueryHandler $handler): JsonResponse
     {
@@ -27,14 +31,14 @@ final class ColorController extends AbstractController
     }
 
     #[Route('/color-lab/colors', name: 'color_create', methods: ['POST'])]
-    public function create(Request $request, CreateColorCommandHandler $handler): JsonResponse
+    public function create(Request $request): JsonResponse
     {
-        $handler(new CreateColorCommand(
+        $handle = ($this->commandHandler)(new CreateColorCommand(
             $request->getPayload()->getString('name'),
             $request->headers->get('X-User-Id') ?? '',
         ));
 
-        return $this->json(null, Response::HTTP_CREATED);
+        return $this->json(($this->queryHandler)(new GetColorQuery((string) $handle)), Response::HTTP_CREATED);
     }
 
     #[Route('/color-lab/colors/{handle}', name: 'color_get', methods: ['GET'])]

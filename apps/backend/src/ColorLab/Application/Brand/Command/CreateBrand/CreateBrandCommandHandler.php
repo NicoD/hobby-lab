@@ -20,9 +20,11 @@ final readonly class CreateBrandCommandHandler
     ) {
     }
 
-    public function __invoke(CreateBrandCommand $command): void
+    public function __invoke(CreateBrandCommand $command): BrandHandle
     {
-        $this->transactionManager->execute(function () use ($command): Brand {
+        $brand = null;
+
+        $this->transactionManager->execute(function () use ($command, &$brand): Brand {
             $brand = Brand::create(
                 $command->name,
                 new UserId($command->ownedBy),
@@ -35,5 +37,9 @@ final readonly class CreateBrandCommandHandler
 
             return $brand;
         });
+
+        \assert($brand instanceof Brand);
+
+        return $brand->handle;
     }
 }

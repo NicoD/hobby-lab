@@ -20,6 +20,10 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route(name: 'paint_reference_')]
 final class PaintReferenceController extends AbstractController
 {
+    public function __construct(private readonly CreatePaintReferenceCommandHandler $commandHandler, private readonly GetPaintReferenceQueryHandler $queryHandler)
+    {
+    }
+
     #[Route('/color-lab/paint-references', name: 'paint_reference_list', methods: ['GET'])]
     public function list(ListPaintReferencesQueryHandler $handler): JsonResponse
     {
@@ -27,10 +31,10 @@ final class PaintReferenceController extends AbstractController
     }
 
     #[Route('/color-lab/paint-references', name: 'paint_reference_create', methods: ['POST'])]
-    public function create(Request $request, CreatePaintReferenceCommandHandler $handler): JsonResponse
+    public function create(Request $request): JsonResponse
     {
         $payload = $request->getPayload();
-        $handler(new CreatePaintReferenceCommand(
+        $handle = ($this->commandHandler)(new CreatePaintReferenceCommand(
             $payload->getString('name'),
             $payload->getString('brandHandle'),
             $payload->getString('rangeHandle'),
@@ -39,7 +43,7 @@ final class PaintReferenceController extends AbstractController
             $request->headers->get('X-User-Id') ?? '',
         ));
 
-        return $this->json(null, Response::HTTP_CREATED);
+        return $this->json(($this->queryHandler)(new GetPaintReferenceQuery((string) $handle)), Response::HTTP_CREATED);
     }
 
     #[Route('/color-lab/paint-references/{handle}', name: 'paint_reference_get', methods: ['GET'])]

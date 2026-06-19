@@ -29,7 +29,7 @@ final class DoctrinePaintReadRepository extends ServiceEntityRepository implemen
         return array_map(
             static fn (Paint $paint): PaintListItemView => new PaintListItemView(
                 (string) $paint->id,
-                (string) $paint->paintReferenceId,
+                (string) $paint->paintReference,
                 $paint->purchasedAt?->format('Y-m-d'),
             ),
             $this->findAll(),
@@ -47,7 +47,7 @@ final class DoctrinePaintReadRepository extends ServiceEntityRepository implemen
 
         return new PaintView(
             (string) $paint->id,
-            (string) $paint->paintReferenceId,
+            (string) $paint->paintReference,
             $paint->purchasedAt?->format('Y-m-d'),
         );
     }

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\ColorLab\Application\Paint\Command\CreatePaint;
 
 use App\ColorLab\Domain\Model\Paint;
+use App\ColorLab\Domain\Model\PaintId;
 use App\ColorLab\Domain\Model\PaintReferenceId;
 use App\ColorLab\Domain\Repository\PaintRepository;
 use App\Shared\Application\Service\TransactionManager;
@@ -18,9 +19,11 @@ final readonly class CreatePaintCommandHandler
     ) {
     }
 
-    public function __invoke(CreatePaintCommand $command): void
+    public function __invoke(CreatePaintCommand $command): PaintId
     {
-        $this->transactionManager->execute(function () use ($command): Paint {
+        $paint = null;
+
+        $this->transactionManager->execute(function () use ($command, &$paint): Paint {
             $purchasedAt = null !== $command->purchasedAt
                 ? new \DateTimeImmutable($command->purchasedAt)
                 : null;
@@ -35,5 +38,9 @@ final readonly class CreatePaintCommandHandler
 
             return $paint;
         });
+
+        \assert($paint instanceof Paint);
+
+        return $paint->id;
     }
 }

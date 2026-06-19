@@ -24,9 +24,11 @@ final readonly class CreatePaintReferenceCommandHandler
     ) {
     }
 
-    public function __invoke(CreatePaintReferenceCommand $command): void
+    public function __invoke(CreatePaintReferenceCommand $command): PaintReferenceHandle
     {
-        $this->transactionManager->execute(function () use ($command): PaintReference {
+        $ref = null;
+
+        $this->transactionManager->execute(function () use ($command, &$ref): PaintReference {
             $ref = PaintReference::create(
                 $command->name,
                 new BrandHandle($command->brandHandle),
@@ -43,5 +45,9 @@ final readonly class CreatePaintReferenceCommandHandler
 
             return $ref;
         });
+
+        \assert($ref instanceof PaintReference);
+
+        return $ref->handle;
     }
 }

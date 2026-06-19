@@ -20,8 +20,8 @@ class Paint implements AggregateRoot
         #[ORM\Id]
         #[ORM\Column(type: 'paint_id')]
         public private(set) PaintId $id,
-        #[ORM\Column(type: 'paint_reference_id')]
-        public private(set) PaintReferenceId $paintReferenceId,
+        #[ORM\Column(name: 'paint_reference_id', type: 'paint_reference_id')]
+        public private(set) PaintReferenceId $paintReference,
         #[ORM\Column(type: 'user_id')]
         public private(set) UserId $ownedBy,
         #[ORM\Column(type: 'date_immutable', nullable: true)]
@@ -30,20 +30,20 @@ class Paint implements AggregateRoot
     }
 
     public static function create(
-        PaintReferenceId $paintReferenceId,
+        PaintReferenceId $paintReference,
         UserId $ownedBy,
         ?\DateTimeImmutable $purchasedAt,
     ): self {
         $paint = new self(
             PaintId::create(),
-            $paintReferenceId,
+            $paintReference,
             $ownedBy,
             $purchasedAt,
         );
 
         $paint->raiseDomainEvent(new PaintCreatedEvent(
             $paint->id,
-            $paintReferenceId,
+            $paintReference,
             $ownedBy,
             $purchasedAt,
         ));

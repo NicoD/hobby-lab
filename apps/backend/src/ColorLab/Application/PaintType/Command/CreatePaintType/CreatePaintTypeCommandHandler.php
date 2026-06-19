@@ -20,9 +20,11 @@ final readonly class CreatePaintTypeCommandHandler
     ) {
     }
 
-    public function __invoke(CreatePaintTypeCommand $command): void
+    public function __invoke(CreatePaintTypeCommand $command): PaintTypeHandle
     {
-        $this->transactionManager->execute(function () use ($command): PaintType {
+        $paintType = null;
+
+        $this->transactionManager->execute(function () use ($command, &$paintType): PaintType {
             $paintType = PaintType::create(
                 $command->name,
                 new UserId($command->ownedBy),
@@ -35,5 +37,9 @@ final readonly class CreatePaintTypeCommandHandler
 
             return $paintType;
         });
+
+        \assert($paintType instanceof PaintType);
+
+        return $paintType->handle;
     }
 }
