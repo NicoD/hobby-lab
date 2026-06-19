@@ -3,7 +3,7 @@ PWD := $(shell pwd)
 .PHONY: help install backend-install frontend-install user-install \
         up down restart logs build \
         shell-backend shell-frontend shell-user composer npm npx-user \
-        backend-test backend-test-setup backend-lint backend-lint-fix backend-analyse backend-watch \
+        backend-test backend-test-setup backend-lint backend-lint-fix backend-analyse backend-refacto backend-watch \
         frontend-test frontend-lint frontend-lint-fix frontend-watch \
         user-test user-lint user-lint-fix user-watch \
         user-migrate user-migrate-reset user-prisma \
@@ -32,8 +32,9 @@ help:
 	@echo "── Backend ───────────────────────────────────────────────────────────────────"
 	@echo "  make backend-test         Set up test DB and run the test suite"
 	@echo "  make backend-test-setup   Create test DB and run pending migrations (idempotent)"
-	@echo "  make backend-lint         Check coding style (PHP CS Fixer, dry-run)"
-	@echo "  make backend-lint-fix     Auto-fix coding style issues"
+	@echo "  make backend-lint         Check coding style (PHP CS Fixer + Rector, dry-run)"
+	@echo "  make backend-lint-fix     Auto-fix coding style issues (PHP CS Fixer + Rector)"
+	@echo "  make backend-refacto      Apply Rector refactoring rules (interactive)"
 	@echo "  make backend-analyse      Run PHPStan static analysis (level max)"
 	@echo "  make backend-watch        Re-run tests on every PHP file change (Ctrl+C to stop)"
 	@echo ""
@@ -122,9 +123,14 @@ backend-test: backend-test-setup
 
 backend-lint:
 	docker compose exec backend php vendor/bin/php-cs-fixer check --diff --ansi
+	docker compose exec backend php vendor/bin/rector --dry-run --ansi
 
 backend-lint-fix:
 	docker compose exec backend php vendor/bin/php-cs-fixer fix --ansi
+	docker compose exec backend php vendor/bin/rector --ansi
+
+backend-refacto:
+	docker compose exec backend php vendor/bin/rector --ansi
 
 backend-analyse:
 	docker compose exec backend php vendor/bin/phpstan analyse --memory-limit=256M
