@@ -24,6 +24,10 @@ All architectural decisions are documented in `docs/adr/`. Before implementing a
 - `docs/adr/ADR-004` — user/identity service (NestJS)
 - `docs/adr/ADR-005` — Symfony multi-domain backend
 
+## Backend task completion
+
+After implementing a **complete backend task** (full feature, bug fix, refactor — not a snippet or a partial answer), always run `/backend-validate` before considering the task done.
+
 ## Key rules (do not deviate without explicit user approval)
 
 - Folder names reflect **responsibility**, not technology (`frontend`, `backend`, `user`)
