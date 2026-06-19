@@ -65,6 +65,12 @@ export default function Combobox({
     close()
   }
 
+  function reset(e) {
+    e.stopPropagation()
+    if (value === undefined) setInternalKey(null)
+    onChange?.(null)
+  }
+
   async function create() {
     const label = query.trim()
     const newKey = await onCreate(label)
@@ -105,9 +111,23 @@ export default function Combobox({
         <span className={selected ? 'text-gray-900' : 'text-gray-400'}>
           {selected ? selected.value : placeholder}
         </span>
-        <svg className="size-4 shrink-0 text-gray-400" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5">
-          <path d="m6 8 4 4 4-4" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
+        <span className="flex shrink-0 items-center gap-1">
+          {selected && (
+            <span
+              role="button"
+              aria-label="Clear selection"
+              onClick={reset}
+              className="flex items-center text-gray-400 hover:text-gray-600"
+            >
+              <svg className="size-4" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5">
+                <path d="M6 6l8 8M14 6l-8 8" strokeLinecap="round" />
+              </svg>
+            </span>
+          )}
+          <svg className="size-4 text-gray-400" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5">
+            <path d="m6 8 4 4 4-4" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </span>
       </button>
 
       {open && (
