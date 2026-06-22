@@ -21,7 +21,7 @@ final readonly class HandleGeneratorFactory
             {
             }
 
-            public function generate(string|\Stringable $name): string
+            public function generate(string|\Stringable $name, ?string $prefix = null): string
             {
                 for ($i = 0;; ++$i) {
                     if ($i >= 50) {
@@ -29,8 +29,9 @@ final readonly class HandleGeneratorFactory
                     }
 
                     $slug = $this->slugifier->slugify($name, $i);
-                    if (!($this->existenceChecker)($slug)) {
-                        return $slug;
+                    $candidate = null !== $prefix ? "{$prefix}-{$slug}" : $slug;
+                    if (!($this->existenceChecker)($candidate)) {
+                        return $candidate;
                     }
                 }
             }

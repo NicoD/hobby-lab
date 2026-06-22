@@ -14,7 +14,7 @@ final readonly class ListBrandsQueryHandler
     }
 
     /** @return list<BrandListItemView> */
-    public function __invoke(ListBrandsQuery $listBrandsQuery): array
+    public function __invoke(): array
     {
         return $this->brands->list();
     }

@@ -8,7 +8,6 @@ use App\ColorLab\Application\Paint\Command\CreatePaint\CreatePaintCommand;
 use App\ColorLab\Application\Paint\Command\CreatePaint\CreatePaintCommandHandler;
 use App\ColorLab\Application\Paint\Query\GetPaint\GetPaintQuery;
 use App\ColorLab\Application\Paint\Query\GetPaint\GetPaintQueryHandler;
-use App\ColorLab\Application\Paint\Query\ListPaints\ListPaintsQuery;
 use App\ColorLab\Application\Paint\Query\ListPaints\ListPaintsQueryHandler;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -27,7 +26,7 @@ final class PaintController extends AbstractController
     #[Route('/color-lab/paints', name: 'paint_list', methods: ['GET'])]
     public function list(ListPaintsQueryHandler $handler): JsonResponse
     {
-        return $this->json($handler(new ListPaintsQuery()));
+        return $this->json($handler());
     }
 
     #[Route('/color-lab/paints', name: 'paint_create', methods: ['POST'])]

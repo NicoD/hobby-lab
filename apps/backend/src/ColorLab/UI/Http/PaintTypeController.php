@@ -8,7 +8,6 @@ use App\ColorLab\Application\PaintType\Command\CreatePaintType\CreatePaintTypeCo
 use App\ColorLab\Application\PaintType\Command\CreatePaintType\CreatePaintTypeCommandHandler;
 use App\ColorLab\Application\PaintType\Query\GetPaintType\GetPaintTypeQuery;
 use App\ColorLab\Application\PaintType\Query\GetPaintType\GetPaintTypeQueryHandler;
-use App\ColorLab\Application\PaintType\Query\ListPaintTypes\ListPaintTypesQuery;
 use App\ColorLab\Application\PaintType\Query\ListPaintTypes\ListPaintTypesQueryHandler;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -27,7 +26,7 @@ final class PaintTypeController extends AbstractController
     #[Route('/color-lab/paint-types', name: 'paint_type_list', methods: ['GET'])]
     public function list(ListPaintTypesQueryHandler $handler): JsonResponse
     {
-        return $this->json($handler(new ListPaintTypesQuery()));
+        return $this->json($handler());
     }
 
     #[Route('/color-lab/paint-types', name: 'paint_type_create', methods: ['POST'])]

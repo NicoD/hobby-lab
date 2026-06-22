@@ -8,7 +8,6 @@ use App\ColorLab\Application\Brand\Command\CreateBrand\CreateBrandCommand;
 use App\ColorLab\Application\Brand\Command\CreateBrand\CreateBrandCommandHandler;
 use App\ColorLab\Application\Brand\Query\GetBrand\GetBrandQuery;
 use App\ColorLab\Application\Brand\Query\GetBrand\GetBrandQueryHandler;
-use App\ColorLab\Application\Brand\Query\ListBrands\ListBrandsQuery;
 use App\ColorLab\Application\Brand\Query\ListBrands\ListBrandsQueryHandler;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -27,7 +26,7 @@ final class BrandController extends AbstractController
     #[Route('/color-lab/brands', name: 'brand_list', methods: ['GET'])]
     public function list(ListBrandsQueryHandler $handler): JsonResponse
     {
-        return $this->json($handler(new ListBrandsQuery()));
+        return $this->json($handler());
     }
 
     #[Route('/color-lab/brands', name: 'brand_create', methods: ['POST'])]

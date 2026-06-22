@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Test;
+namespace Test\Integration;
 
 use App\Shared\Domain\Event\DomainEvent;
 use App\Shared\Infrastructure\Testing\CollectingEventDispatcher;

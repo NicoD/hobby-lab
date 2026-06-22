@@ -42,10 +42,10 @@ final class PaintReferenceController extends AbstractController
         $payload = $request->getPayload();
         $handle = ($this->commandHandler)(new CreatePaintReferenceCommand(
             $payload->getString('name'),
-            $payload->getString('brandHandle'),
-            $payload->getString('rangeHandle'),
-            $payload->getString('paintTypeHandle'),
-            $payload->has('colorHandle') ? $payload->getString('colorHandle') : null,
+            $payload->has('brand') ? $payload->getString('brand') : null,
+            $payload->has('range') ? $payload->getString('range') : null,
+            $payload->has('paintType') ? $payload->getString('paintType') : null,
+            $payload->has('color') ? $payload->getString('color') : null,
             $request->headers->get('X-User-Id') ?? '',
         ));
 

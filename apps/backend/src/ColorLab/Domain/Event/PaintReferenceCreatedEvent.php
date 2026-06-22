@@ -19,9 +19,9 @@ final class PaintReferenceCreatedEvent extends DomainEvent
         PaintReferenceId $aggregateId,
         public readonly PaintReferenceHandle $handle,
         public readonly string $name,
-        public readonly BrandHandle $brandHandle,
-        public readonly RangeHandle $rangeHandle,
-        public readonly PaintTypeHandle $paintTypeHandle,
+        public readonly ?BrandHandle $brandHandle,
+        public readonly ?RangeHandle $rangeHandle,
+        public readonly ?PaintTypeHandle $paintTypeHandle,
         public readonly ?ColorHandle $colorHandle,
         public readonly UserId $ownedBy,
     ) {

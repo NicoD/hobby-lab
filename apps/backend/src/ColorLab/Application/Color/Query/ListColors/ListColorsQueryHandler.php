@@ -14,7 +14,7 @@ final readonly class ListColorsQueryHandler
     }
 
     /** @return list<ColorListItemView> */
-    public function __invoke(ListColorsQuery $listColorsQuery): array
+    public function __invoke(): array
     {
         return $this->colors->list();
     }

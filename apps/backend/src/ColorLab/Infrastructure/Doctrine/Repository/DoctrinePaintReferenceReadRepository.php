@@ -64,10 +64,10 @@ final class DoctrinePaintReferenceReadRepository extends ServiceEntityRepository
                 (string) $ref->id,
                 (string) $ref->handle,
                 $ref->name,
-                (string) $ref->brand,
-                (string) $ref->range,
-                (string) $ref->paintType,
-                $ref->color instanceof \App\ColorLab\Domain\Model\ColorHandle ? (string) $ref->color : null,
+                $ref->brand instanceof BrandHandle ? (string) $ref->brand : null,
+                $ref->range instanceof RangeHandle ? (string) $ref->range : null,
+                $ref->paintType instanceof PaintTypeHandle ? (string) $ref->paintType : null,
+                $ref->color instanceof ColorHandle ? (string) $ref->color : null,
             ),
             $results,
         );
@@ -86,9 +86,9 @@ final class DoctrinePaintReferenceReadRepository extends ServiceEntityRepository
             (string) $ref->id,
             (string) $ref->handle,
             $ref->name,
-            (string) $ref->brand,
-            (string) $ref->range,
-            (string) $ref->paintType,
+            null !== $ref->brand ? (string) $ref->brand : null,
+            null !== $ref->range ? (string) $ref->range : null,
+            null !== $ref->paintType ? (string) $ref->paintType : null,
             null !== $ref->color ? (string) $ref->color : null,
         );
     }

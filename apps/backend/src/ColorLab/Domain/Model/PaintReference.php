@@ -25,12 +25,12 @@ class PaintReference implements AggregateRoot
         public private(set) PaintReferenceHandle $handle,
         #[ORM\Column(type: 'string', length: 255)]
         public private(set) string $name,
-        #[ORM\Column(name: 'brand_handle', type: 'brand_handle')]
-        public private(set) BrandHandle $brand,
-        #[ORM\Column(name: 'range_handle', type: 'range_handle')]
-        public private(set) RangeHandle $range,
-        #[ORM\Column(name: 'paint_type_handle', type: 'paint_type_handle')]
-        public private(set) PaintTypeHandle $paintType,
+        #[ORM\Column(name: 'brand_handle', type: 'brand_handle', nullable: true)]
+        public private(set) ?BrandHandle $brand,
+        #[ORM\Column(name: 'range_handle', type: 'range_handle', nullable: true)]
+        public private(set) ?RangeHandle $range,
+        #[ORM\Column(name: 'paint_type_handle', type: 'paint_type_handle', nullable: true)]
+        public private(set) ?PaintTypeHandle $paintType,
         #[ORM\Column(name: 'color_handle', type: 'color_handle', nullable: true)]
         public private(set) ?ColorHandle $color,
         #[ORM\Column(type: 'user_id')]
@@ -40,16 +40,16 @@ class PaintReference implements AggregateRoot
 
     public static function create(
         string $name,
-        BrandHandle $brand,
-        RangeHandle $range,
-        PaintTypeHandle $paintType,
+        ?BrandHandle $brand,
+        ?RangeHandle $range,
+        ?PaintTypeHandle $paintType,
         ?ColorHandle $color,
         UserId $ownedBy,
         HandleGenerator $handleGenerator,
     ): self {
         $ref = new self(
             PaintReferenceId::create(),
-            new PaintReferenceHandle($handleGenerator->generate("{$brand} {$name}")),
+            new PaintReferenceHandle($handleGenerator->generate($name, str_cast($brand))),
             $name,
             $brand,
             $range,

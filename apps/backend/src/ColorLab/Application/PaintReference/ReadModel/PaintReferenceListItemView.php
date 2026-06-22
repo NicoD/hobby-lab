@@ -10,9 +10,9 @@ final readonly class PaintReferenceListItemView
         public string $id,
         public string $handle,
         public string $name,
-        public string $brandHandle,
-        public string $rangeHandle,
-        public string $paintTypeHandle,
+        public ?string $brandHandle,
+        public ?string $rangeHandle,
+        public ?string $paintTypeHandle,
         public ?string $colorHandle,
     ) {
     }

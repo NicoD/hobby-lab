@@ -14,7 +14,7 @@ final readonly class ListPaintsQueryHandler
     }
 
     /** @return list<PaintListItemView> */
-    public function __invoke(ListPaintsQuery $listPaintsQuery): array
+    public function __invoke(): array
     {
         return $this->paints->list();
     }

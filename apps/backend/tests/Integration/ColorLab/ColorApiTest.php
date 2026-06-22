@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Test\ColorLab\Integration;
+namespace Test\Integration\ColorLab;
 
 use App\ColorLab\Domain\Event\ColorCreatedEvent;
-use Test\ApiTestCase;
+use Test\Integration\ApiTestCase;
 
 class ColorApiTest extends ApiTestCase
 {

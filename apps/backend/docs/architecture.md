@@ -121,3 +121,7 @@ class BrandVoter extends Voter
 
 - `new MyVo($value)` by default. Static factory only when semantically meaningful (`create()`, `inCents()`).
 - Each VO persisted by Doctrine gets a custom type in `Infrastructure/Doctrine/Type/`, extending `AbstractHandleType` or `AbstractUuidType`.
+
+## Tests
+
+See `docs/testing.md`.

@@ -31,10 +31,10 @@ final readonly class CreatePaintReferenceCommandHandler
         $this->transactionManager->execute(function () use ($command, &$ref): PaintReference {
             $ref = PaintReference::create(
                 $command->name,
-                new BrandHandle($command->brandHandle),
-                new RangeHandle($command->rangeHandle),
-                new PaintTypeHandle($command->paintTypeHandle),
-                null !== $command->colorHandle ? new ColorHandle($command->colorHandle) : null,
+                wrap($command->brandHandle, BrandHandle::class),
+                wrap($command->rangeHandle, RangeHandle::class),
+                wrap($command->paintTypeHandle, PaintTypeHandle::class),
+                wrap($command->colorHandle, ColorHandle::class),
                 new UserId($command->ownedBy),
                 $this->handleGeneratorFactory->create(
                     fn (string $h): bool => $this->paintReferences->findByHandle(new PaintReferenceHandle($h)) instanceof PaintReference

@@ -6,5 +6,5 @@ namespace App\Shared\Domain\Service;
 
 interface HandleGenerator
 {
-    public function generate(string|\Stringable $name): string;
+    public function generate(string|\Stringable $name, ?string $prefix = null): string;
 }

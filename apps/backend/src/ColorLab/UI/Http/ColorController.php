@@ -8,7 +8,6 @@ use App\ColorLab\Application\Color\Command\CreateColor\CreateColorCommand;
 use App\ColorLab\Application\Color\Command\CreateColor\CreateColorCommandHandler;
 use App\ColorLab\Application\Color\Query\GetColor\GetColorQuery;
 use App\ColorLab\Application\Color\Query\GetColor\GetColorQueryHandler;
-use App\ColorLab\Application\Color\Query\ListColors\ListColorsQuery;
 use App\ColorLab\Application\Color\Query\ListColors\ListColorsQueryHandler;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -27,7 +26,7 @@ final class ColorController extends AbstractController
     #[Route('/color-lab/colors', name: 'color_list', methods: ['GET'])]
     public function list(ListColorsQueryHandler $handler): JsonResponse
     {
-        return $this->json($handler(new ListColorsQuery()));
+        return $this->json($handler());
     }
 
     #[Route('/color-lab/colors', name: 'color_create', methods: ['POST'])]
