@@ -1,6 +1,6 @@
 import { Link, NavLink, Outlet } from 'react-router-dom'
 import { ErrorBoundary } from 'react-error-boundary'
-import { useAuth } from '../context/AuthContext'
+import { useAuth } from '../shared/context/AuthContext'
 
 function UserCircleIcon({ className }) {
   return (

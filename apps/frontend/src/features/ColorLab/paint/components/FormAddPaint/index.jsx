@@ -1,62 +1,12 @@
 import { useCallback, useEffect, useState } from "react";
-import Combobox from "../Combobox";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useAuth } from "../../context/AuthContext";
-import { useApiFetch } from "../../hooks/useApiFetch";
-
-function useFormAddPaint() {
-    const { token } = useAuth()
-    const apiFetch = useApiFetch()
-    const queryClient = useQueryClient()
-
-    const { data: existingBrands = [] } = useQuery({
-        queryKey: ['brands', token],
-        queryFn: () => apiFetch('/api/color-lab/brands'),
-        enabled: !!token,
-    })
-
-    const { data: existingPaintTypes = [] } = useQuery({
-        queryKey: ['paint-types', token],
-        queryFn: () => apiFetch('/api/color-lab/paint-types'),
-        enabled: !!token,
-    })
-
-    const { data: existingColors = [] } = useQuery({
-        queryKey: ['colors', token],
-        queryFn: () => apiFetch('/api/color-lab/colors'),
-        enabled: !!token,
-    })
-
-    const createBrand = useMutation({
-        mutationFn: (brand) => apiFetch('/api/color-lab/brands', {
-            method: 'POST',
-            body: JSON.stringify(brand),
-        }),
-        onSuccess: () => queryClient.invalidateQueries({ queryKey: ['brands'] }),
-    })
-
-    const createPaintType = useMutation({
-        mutationFn: (paintType) => apiFetch('/api/color-lab/paint-types', {
-            method: 'POST',
-            body: JSON.stringify(paintType),
-        }),
-        onSuccess: () => queryClient.invalidateQueries({ queryKey: ['paint-types'] }),
-    })
-
-    const createColor = useMutation({
-        mutationFn: (color) => apiFetch('/api/color-lab/colors', {
-            method: 'POST',
-            body: JSON.stringify(color),
-        }),
-        onSuccess: () => queryClient.invalidateQueries({ queryKey: ['colors'] }),
-    })
-
-    return { existingBrands, existingPaintTypes, existingColors, createBrand, createPaintType, createColor }
-}
+import Combobox from "../../../../../shared/components/Combobox";
+import { useFormAddPaint } from "./useFormAddPaint";
+import { usePaintReferences } from "./usePaintReferences";
 
 export default function FormAddPaint() {
-    const { existingBrands, existingPaintTypes, existingColors, createBrand, createPaintType, createColor } = useFormAddPaint()
     const [paintReference, setPaintReference] = useState({})
+    const { existingBrands, existingPaintTypes, existingColors, createBrand, createPaintType, createColor } = useFormAddPaint()
+    const { paintReferences: existingPaintReferences, createPaintReference } = usePaintReferences(paintReference)
     const [currentBrand, setCurrentBrand] = useState(null)
 
     useEffect(() => {
@@ -81,6 +31,17 @@ export default function FormAddPaint() {
         const { handle } = await createColor.mutateAsync({ name })
         return handle
     }, [createColor.mutateAsync])
+
+    const handleCreatePaintReference = useCallback(async (name) => {
+        const { handle } = await createPaintReference.mutateAsync({
+            name,
+            brand: paintReference.brand,
+            range: paintReference.range,
+            paintType: paintReference.type,
+            color: paintReference.color,
+        })
+        return handle
+    }, [createPaintReference.mutateAsync, paintReference])
 
     return <form>
         <div className="mb-2">
@@ -127,5 +88,19 @@ export default function FormAddPaint() {
                 <p className="mt-2 text-sm text-red-600">{createColor.error.message}</p>
             )}
         </div>
+        {paintReference.brand && (
+            <div className="mb-2">
+                <Combobox
+                    values={existingPaintReferences.map(ref => ({ key: ref.handle, value: ref.name }))}
+                    value={paintReference.reference}
+                    onChange={(reference) => setPaintReference(prev => ({ ...prev, reference }))}
+                    onCreate={handleCreatePaintReference}
+                    placeholder="Référence…"
+                />
+                {createPaintReference.isError && (
+                    <p className="mt-2 text-sm text-red-600">{createPaintReference.error.message}</p>
+                )}
+            </div>
+        )}
     </form>
 }

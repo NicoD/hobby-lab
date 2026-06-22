@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate, Navigate, useLocation } from 'react-router-dom'
-import { useAuth } from '../context/AuthContext'
+import { useAuth } from '../../../../shared/context/AuthContext'
 
 export default function Login() {
   const { user, login } = useAuth()

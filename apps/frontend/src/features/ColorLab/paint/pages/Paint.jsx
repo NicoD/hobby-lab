@@ -1,7 +1,7 @@
-import FormAddPaint from "../../components/ColorLab/FormAddPaint";
-import ListWrapper from "../../components/ListWrapper";
-import Modal from "../../components/Modal";
-import useModal from "../../hooks/useModal";
+import FormAddPaint from "../components/FormAddPaint";
+import ListWrapper from "../../../../shared/components/ListWrapper";
+import Modal from "../../../../shared/components/Modal";
+import useModal from "../../../../shared/hooks/useModal";
 
 export default function Paint() {
 
