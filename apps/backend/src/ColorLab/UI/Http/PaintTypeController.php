@@ -5,10 +5,11 @@ declare(strict_types=1);
 namespace App\ColorLab\UI\Http;
 
 use App\ColorLab\Application\PaintType\Command\CreatePaintType\CreatePaintTypeCommand;
-use App\ColorLab\Application\PaintType\Command\CreatePaintType\CreatePaintTypeCommandHandler;
 use App\ColorLab\Application\PaintType\Query\GetPaintType\GetPaintTypeQuery;
-use App\ColorLab\Application\PaintType\Query\GetPaintType\GetPaintTypeQueryHandler;
-use App\ColorLab\Application\PaintType\Query\ListPaintTypes\ListPaintTypesQueryHandler;
+use App\ColorLab\Application\PaintType\Query\ListPaintTypes\ListPaintTypesQuery;
+use App\ColorLab\Application\PaintType\ReadModel\PaintTypeView;
+use App\Shared\Application\Bus\CommandBus;
+use App\Shared\Application\Bus\QueryBus;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -19,33 +20,35 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route(name: 'paint_type_')]
 final class PaintTypeController extends AbstractController
 {
-    public function __construct(private readonly CreatePaintTypeCommandHandler $commandHandler, private readonly GetPaintTypeQueryHandler $queryHandler)
-    {
+    public function __construct(
+        private readonly CommandBus $commandBus,
+        private readonly QueryBus $queryBus,
+    ) {
     }
 
     #[Route('/color-lab/paint-types', name: 'paint_type_list', methods: ['GET'])]
-    public function list(ListPaintTypesQueryHandler $handler): JsonResponse
+    public function list(): JsonResponse
     {
-        return $this->json($handler());
+        return $this->json($this->queryBus->handle(new ListPaintTypesQuery()));
     }
 
     #[Route('/color-lab/paint-types', name: 'paint_type_create', methods: ['POST'])]
     public function create(Request $request): JsonResponse
     {
-        $handle = ($this->commandHandler)(new CreatePaintTypeCommand(
+        $handle = $this->commandBus->handle(new CreatePaintTypeCommand(
             $request->getPayload()->getString('name'),
             $request->headers->get('X-User-Id') ?? '',
         ));
 
-        return $this->json(($this->queryHandler)(new GetPaintTypeQuery((string) $handle)), Response::HTTP_CREATED);
+        return $this->json($this->queryBus->handle(new GetPaintTypeQuery((string) $handle)), Response::HTTP_CREATED);
     }
 
     #[Route('/color-lab/paint-types/{handle}', name: 'paint_type_get', methods: ['GET'])]
-    public function get(string $handle, GetPaintTypeQueryHandler $handler): JsonResponse
+    public function get(string $handle): JsonResponse
     {
-        $view = $handler(new GetPaintTypeQuery($handle));
+        $view = $this->queryBus->handle(new GetPaintTypeQuery($handle));
 
-        if (!$view instanceof \App\ColorLab\Application\PaintType\ReadModel\PaintTypeView) {
+        if (!$view instanceof PaintTypeView) {
             throw new NotFoundHttpException();
         }
 

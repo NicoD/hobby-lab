@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace App\ColorLab\Application\Color\Query\ListColors;
 
-final readonly class ListColorsQuery
+use App\ColorLab\Application\Color\ReadModel\ColorListItemView;
+use App\Shared\Application\Bus\Query;
+
+/** @implements Query<list<ColorListItemView>> */
+final readonly class ListColorsQuery implements Query
 {
 }

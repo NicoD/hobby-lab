@@ -4,7 +4,11 @@ declare(strict_types=1);
 
 namespace App\ColorLab\Application\PaintReference\Query\ListPaintReferences;
 
-final readonly class ListPaintReferencesQuery
+use App\ColorLab\Application\PaintReference\ReadModel\PaintReferenceListItemView;
+use App\Shared\Application\Bus\Query;
+
+/** @implements Query<list<PaintReferenceListItemView>> */
+final readonly class ListPaintReferencesQuery implements Query
 {
     public function __construct(
         public string $ownedBy,

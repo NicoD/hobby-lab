@@ -6,7 +6,9 @@ namespace App\ColorLab\Application\PaintReference\Query\GetPaintReference;
 
 use App\ColorLab\Application\PaintReference\ReadModel\PaintReferenceReadRepository;
 use App\ColorLab\Application\PaintReference\ReadModel\PaintReferenceView;
+use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
+#[AsMessageHandler]
 final readonly class GetPaintReferenceQueryHandler
 {
     public function __construct(private PaintReferenceReadRepository $paintReferences)

@@ -4,7 +4,11 @@ declare(strict_types=1);
 
 namespace App\ColorLab\Application\Paint\Command\CreatePaint;
 
-final readonly class CreatePaintCommand
+use App\ColorLab\Domain\Model\PaintId;
+use App\Shared\Application\Bus\Command;
+
+/** @implements Command<PaintId> */
+final readonly class CreatePaintCommand implements Command
 {
     public function __construct(
         public string $paintReferenceId,

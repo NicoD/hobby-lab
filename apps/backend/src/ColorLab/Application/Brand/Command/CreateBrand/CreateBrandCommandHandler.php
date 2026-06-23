@@ -10,7 +10,9 @@ use App\ColorLab\Domain\Repository\BrandRepository;
 use App\Shared\Application\Service\TransactionManager;
 use App\Shared\Domain\Model\UserId;
 use App\Shared\Domain\Service\HandleGeneratorFactory;
+use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
+#[AsMessageHandler]
 final readonly class CreateBrandCommandHandler
 {
     public function __construct(

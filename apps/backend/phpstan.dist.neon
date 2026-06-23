@@ -11,3 +11,9 @@ parameters:
 
     doctrine:
         objectManagerLoader: tests/doctrine_object_manager.php
+
+services:
+    -
+        class: Tools\PhpStan\HandlerReturnTypeRule
+        tags:
+            - phpstan.rules.rule

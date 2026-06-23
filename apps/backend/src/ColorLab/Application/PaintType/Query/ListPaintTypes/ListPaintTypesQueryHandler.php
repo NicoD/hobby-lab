@@ -6,7 +6,9 @@ namespace App\ColorLab\Application\PaintType\Query\ListPaintTypes;
 
 use App\ColorLab\Application\PaintType\ReadModel\PaintTypeListItemView;
 use App\ColorLab\Application\PaintType\ReadModel\PaintTypeReadRepository;
+use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
+#[AsMessageHandler]
 final readonly class ListPaintTypesQueryHandler
 {
     public function __construct(private PaintTypeReadRepository $paintTypes)
@@ -14,7 +16,7 @@ final readonly class ListPaintTypesQueryHandler
     }
 
     /** @return list<PaintTypeListItemView> */
-    public function __invoke(): array
+    public function __invoke(ListPaintTypesQuery $_query): array
     {
         return $this->paintTypes->list();
     }

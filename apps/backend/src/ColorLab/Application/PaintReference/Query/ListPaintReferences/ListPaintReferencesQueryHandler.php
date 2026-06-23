@@ -7,7 +7,9 @@ namespace App\ColorLab\Application\PaintReference\Query\ListPaintReferences;
 use App\ColorLab\Application\PaintReference\ReadModel\PaintReferenceCriteria;
 use App\ColorLab\Application\PaintReference\ReadModel\PaintReferenceListItemView;
 use App\ColorLab\Application\PaintReference\ReadModel\PaintReferenceReadRepository;
+use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
+#[AsMessageHandler]
 final readonly class ListPaintReferencesQueryHandler
 {
     public function __construct(private PaintReferenceReadRepository $paintReferences)

@@ -6,7 +6,9 @@ namespace App\ColorLab\Application\Paint\Query\GetPaint;
 
 use App\ColorLab\Application\Paint\ReadModel\PaintReadRepository;
 use App\ColorLab\Application\Paint\ReadModel\PaintView;
+use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
+#[AsMessageHandler]
 final readonly class GetPaintQueryHandler
 {
     public function __construct(private PaintReadRepository $paints)

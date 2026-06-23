@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace App\ColorLab\UI\Http;
 
 use App\ColorLab\Application\PaintReference\Command\CreatePaintReference\CreatePaintReferenceCommand;
-use App\ColorLab\Application\PaintReference\Command\CreatePaintReference\CreatePaintReferenceCommandHandler;
 use App\ColorLab\Application\PaintReference\Query\GetPaintReference\GetPaintReferenceQuery;
-use App\ColorLab\Application\PaintReference\Query\GetPaintReference\GetPaintReferenceQueryHandler;
 use App\ColorLab\Application\PaintReference\Query\ListPaintReferences\ListPaintReferencesQuery;
-use App\ColorLab\Application\PaintReference\Query\ListPaintReferences\ListPaintReferencesQueryHandler;
+use App\ColorLab\Application\PaintReference\ReadModel\PaintReferenceView;
+use App\Shared\Application\Bus\CommandBus;
+use App\Shared\Application\Bus\QueryBus;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -20,14 +20,16 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route(name: 'paint_reference_')]
 final class PaintReferenceController extends AbstractController
 {
-    public function __construct(private readonly CreatePaintReferenceCommandHandler $commandHandler, private readonly GetPaintReferenceQueryHandler $queryHandler)
-    {
+    public function __construct(
+        private readonly CommandBus $commandBus,
+        private readonly QueryBus $queryBus,
+    ) {
     }
 
     #[Route('/color-lab/paint-references', name: 'paint_reference_list', methods: ['GET'])]
-    public function list(Request $request, ListPaintReferencesQueryHandler $handler): JsonResponse
+    public function list(Request $request): JsonResponse
     {
-        return $this->json($handler(new ListPaintReferencesQuery(
+        return $this->json($this->queryBus->handle(new ListPaintReferencesQuery(
             $request->headers->get('X-User-Id') ?? '',
             $request->query->get('brand'),
             $request->query->get('range'),
@@ -40,7 +42,7 @@ final class PaintReferenceController extends AbstractController
     public function create(Request $request): JsonResponse
     {
         $payload = $request->getPayload();
-        $handle = ($this->commandHandler)(new CreatePaintReferenceCommand(
+        $handle = $this->commandBus->handle(new CreatePaintReferenceCommand(
             $payload->getString('name'),
             $payload->has('brand') ? $payload->getString('brand') : null,
             $payload->has('range') ? $payload->getString('range') : null,
@@ -49,15 +51,15 @@ final class PaintReferenceController extends AbstractController
             $request->headers->get('X-User-Id') ?? '',
         ));
 
-        return $this->json(($this->queryHandler)(new GetPaintReferenceQuery((string) $handle)), Response::HTTP_CREATED);
+        return $this->json($this->queryBus->handle(new GetPaintReferenceQuery((string) $handle)), Response::HTTP_CREATED);
     }
 
     #[Route('/color-lab/paint-references/{handle}', name: 'paint_reference_get', methods: ['GET'])]
-    public function get(string $handle, GetPaintReferenceQueryHandler $handler): JsonResponse
+    public function get(string $handle): JsonResponse
     {
-        $view = $handler(new GetPaintReferenceQuery($handle));
+        $view = $this->queryBus->handle(new GetPaintReferenceQuery($handle));
 
-        if (!$view instanceof \App\ColorLab\Application\PaintReference\ReadModel\PaintReferenceView) {
+        if (!$view instanceof PaintReferenceView) {
             throw new NotFoundHttpException();
         }
 

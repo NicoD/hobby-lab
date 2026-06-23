@@ -1,0 +1,5 @@
+framework:
+    messenger:
+        default_bus: app.bus
+        buses:
+            app.bus: ~

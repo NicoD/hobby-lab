@@ -10,7 +10,9 @@ use App\ColorLab\Domain\Model\PaintReferenceId;
 use App\ColorLab\Domain\Repository\PaintRepository;
 use App\Shared\Application\Service\TransactionManager;
 use App\Shared\Domain\Model\UserId;
+use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
+#[AsMessageHandler]
 final readonly class CreatePaintCommandHandler
 {
     public function __construct(

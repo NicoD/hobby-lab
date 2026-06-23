@@ -6,7 +6,9 @@ namespace App\ColorLab\Application\Brand\Query\GetBrand;
 
 use App\ColorLab\Application\Brand\ReadModel\BrandReadRepository;
 use App\ColorLab\Application\Brand\ReadModel\BrandView;
+use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
+#[AsMessageHandler]
 final readonly class GetBrandQueryHandler
 {
     public function __construct(private BrandReadRepository $brands)

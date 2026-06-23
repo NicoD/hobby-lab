@@ -6,7 +6,9 @@ namespace App\ColorLab\Application\Color\Query\ListColors;
 
 use App\ColorLab\Application\Color\ReadModel\ColorListItemView;
 use App\ColorLab\Application\Color\ReadModel\ColorReadRepository;
+use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
+#[AsMessageHandler]
 final readonly class ListColorsQueryHandler
 {
     public function __construct(private ColorReadRepository $colors)
@@ -14,7 +16,7 @@ final readonly class ListColorsQueryHandler
     }
 
     /** @return list<ColorListItemView> */
-    public function __invoke(): array
+    public function __invoke(ListColorsQuery $_query): array
     {
         return $this->colors->list();
     }

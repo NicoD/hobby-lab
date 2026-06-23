@@ -5,10 +5,11 @@ declare(strict_types=1);
 namespace App\ColorLab\UI\Http;
 
 use App\ColorLab\Application\Color\Command\CreateColor\CreateColorCommand;
-use App\ColorLab\Application\Color\Command\CreateColor\CreateColorCommandHandler;
 use App\ColorLab\Application\Color\Query\GetColor\GetColorQuery;
-use App\ColorLab\Application\Color\Query\GetColor\GetColorQueryHandler;
-use App\ColorLab\Application\Color\Query\ListColors\ListColorsQueryHandler;
+use App\ColorLab\Application\Color\Query\ListColors\ListColorsQuery;
+use App\ColorLab\Application\Color\ReadModel\ColorView;
+use App\Shared\Application\Bus\CommandBus;
+use App\Shared\Application\Bus\QueryBus;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -19,33 +20,35 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route(name: 'color_')]
 final class ColorController extends AbstractController
 {
-    public function __construct(private readonly CreateColorCommandHandler $commandHandler, private readonly GetColorQueryHandler $queryHandler)
-    {
+    public function __construct(
+        private readonly CommandBus $commandBus,
+        private readonly QueryBus $queryBus,
+    ) {
     }
 
     #[Route('/color-lab/colors', name: 'color_list', methods: ['GET'])]
-    public function list(ListColorsQueryHandler $handler): JsonResponse
+    public function list(): JsonResponse
     {
-        return $this->json($handler());
+        return $this->json($this->queryBus->handle(new ListColorsQuery()));
     }
 
     #[Route('/color-lab/colors', name: 'color_create', methods: ['POST'])]
     public function create(Request $request): JsonResponse
     {
-        $handle = ($this->commandHandler)(new CreateColorCommand(
+        $handle = $this->commandBus->handle(new CreateColorCommand(
             $request->getPayload()->getString('name'),
             $request->headers->get('X-User-Id') ?? '',
         ));
 
-        return $this->json(($this->queryHandler)(new GetColorQuery((string) $handle)), Response::HTTP_CREATED);
+        return $this->json($this->queryBus->handle(new GetColorQuery((string) $handle)), Response::HTTP_CREATED);
     }
 
     #[Route('/color-lab/colors/{handle}', name: 'color_get', methods: ['GET'])]
-    public function get(string $handle, GetColorQueryHandler $handler): JsonResponse
+    public function get(string $handle): JsonResponse
     {
-        $view = $handler(new GetColorQuery($handle));
+        $view = $this->queryBus->handle(new GetColorQuery($handle));
 
-        if (!$view instanceof \App\ColorLab\Application\Color\ReadModel\ColorView) {
+        if (!$view instanceof ColorView) {
             throw new NotFoundHttpException();
         }
 

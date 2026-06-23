@@ -24,10 +24,10 @@ Use in the **Application layer** to instantiate a nullable value object from a n
 
 ```php
 // before
-null !== $command->brandHandle ? new BrandHandle($command->brandHandle) : null
+null !== $command->value ? new MyClass($command->value) : null
 
 // after
-wrap($command->brandHandle, BrandHandle::class)
+wrap($command->value, MyClass::class)
 ```
 
 Constraints:
@@ -42,13 +42,20 @@ Use anywhere you need to extract an optional string from a value whose type is n
 
 ```php
 // before
-$brand instanceof BrandHandle ? (string) $brand : null
+$value instanceof MyStringableClass ? (string) $value : null
 
 // after
-str_cast($brand)
+str_cast($value)
 ```
 
-Typical use: passing a nullable VO as a string argument (e.g. `HandleGenerator::generate()` prefix).
+## Bus conventions
+
+The UI layer communicates with the Application layer exclusively through `CommandBus` and `QueryBus` (`Shared\Application\Bus`). Controllers never inject handlers directly.
+
+- `CommandBus::handle()` — write operations; the handler must return an object (value object, aggregate id…).
+- `QueryBus::handle()` — read operations; the handler may return any type (`mixed`).
+- Every handler must carry `#[AsMessageHandler]` — Symfony 8 autoconfigure does not detect handlers by `__invoke` signature alone.
+- List query handlers that ignore their query object must name the parameter `$_query`.
 
 ## Code rules
 

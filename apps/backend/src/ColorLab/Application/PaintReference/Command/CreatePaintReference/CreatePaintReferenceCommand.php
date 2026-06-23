@@ -4,7 +4,11 @@ declare(strict_types=1);
 
 namespace App\ColorLab\Application\PaintReference\Command\CreatePaintReference;
 
-final readonly class CreatePaintReferenceCommand
+use App\ColorLab\Domain\Model\PaintReferenceHandle;
+use App\Shared\Application\Bus\Command;
+
+/** @implements Command<PaintReferenceHandle> */
+final readonly class CreatePaintReferenceCommand implements Command
 {
     public function __construct(
         public string $name,
