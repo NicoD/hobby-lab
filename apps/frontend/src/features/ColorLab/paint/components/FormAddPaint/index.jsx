@@ -9,8 +9,8 @@ export default function FormAddPaint({ onClose }) {
     const [paintReferenceId, setPaintReferenceId] = useState(null)
     const [purchasedAt, setPurchasedAt] = useState('')
 
-    const { existingBrands, existingPaintTypes, existingColors, createBrand, createPaintType, createColor, createPaint } = useFormAddPaint()
-    const { paintReferences: existingPaintReferences, createPaintReference } = usePaintReferences(filters)
+    const { existingBrands, existingPaintTypes, searchColors, createBrand, createPaintType, createColor, createPaint } = useFormAddPaint()
+    const { searchPaintReferences, createPaintReference } = usePaintReferences(filters)
 
     const currentBrand = existingBrands.find(brand => filters.brand === brand.handle) ?? null
 
@@ -80,7 +80,7 @@ export default function FormAddPaint({ onClose }) {
 
         <FormField label="Couleur" error={createColor.isError ? createColor.error.message : null}>
             <Combobox
-                values={existingColors.map(color => ({ key: color.handle, value: color.name }))}
+                onSearch={searchColors}
                 value={filters.color}
                 onChange={(color) => setFilters(prev => ({ ...prev, color }))}
                 onCreate={handleCreateColor}
@@ -91,7 +91,7 @@ export default function FormAddPaint({ onClose }) {
         {filters.brand && (
             <FormField label="Référence" error={createPaintReference.isError ? createPaintReference.error.message : null}>
                 <Combobox
-                    values={existingPaintReferences.map(ref => ({ key: ref.handle, value: ref.name }))}
+                    onSearch={searchPaintReferences}
                     value={paintReferenceId}
                     onChange={setPaintReferenceId}
                     onCreate={handleCreatePaintReference}

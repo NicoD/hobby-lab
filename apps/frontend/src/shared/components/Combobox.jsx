@@ -3,7 +3,10 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 /**
  * Searchable select with inline creation.
  *
- * values   – [{ key, value }] collection to pick from
+ * Static mode  – pass `values` ([{ key, value }]); filtering is local.
+ * Server mode  – pass `onSearch` (async (query) => [{ key, value }]);
+ *                filtering is server-side with 300 ms debounce.
+ *
  * value    – selected key (omit to let the component manage its own selection)
  * onChange – (key) => void, called on every selection
  * onCreate – (label) => key | Promise<key>, called when the "Create" option is
@@ -11,6 +14,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
  */
 export default function Combobox({
   values = [],
+  onSearch,
   value,
   onChange,
   onCreate,
@@ -20,24 +24,35 @@ export default function Combobox({
   const [query, setQuery] = useState('')
   const [activeIndex, setActiveIndex] = useState(0)
   const [internalKey, setInternalKey] = useState(null)
+  const [serverOptions, setServerOptions] = useState([])
+  const [selectedOption, setSelectedOption] = useState(null)
+  const [loading, setLoading] = useState(false)
   const rootRef = useRef(null)
   const inputRef = useRef(null)
+  const debounceRef = useRef(null)
+  const onSearchRef = useRef(onSearch)
+  onSearchRef.current = onSearch
 
   const selectedKey = value !== undefined ? value : internalKey
-  const selected = values.find(v => v.key === selectedKey)
+  const options = onSearch ? serverOptions : values
+  const selected = options.find(v => v.key === selectedKey)
+    ?? values.find(v => v.key === selectedKey)
+    ?? (selectedOption?.key === selectedKey ? selectedOption : null)
 
   const filtered = useMemo(() => {
+    if (onSearch) return serverOptions
     const q = query.trim().toLowerCase()
     if (!q) return values
     return values.filter(v => String(v.value).toLowerCase().includes(q))
-  }, [values, query])
+  }, [onSearch, serverOptions, values, query])
 
   const canCreate =
     !!onCreate &&
     query.trim() !== '' &&
-    !values.some(v => String(v.value).toLowerCase() === query.trim().toLowerCase())
+    !loading &&
+    !values.some(v => String(v.value).toLowerCase() === query.trim().toLowerCase()) &&
+    !serverOptions.some(v => String(v.value).toLowerCase() === query.trim().toLowerCase())
 
-  // Options the keyboard can walk through: filtered items + the create entry.
   const optionCount = filtered.length + (canCreate ? 1 : 0)
 
   useEffect(() => {
@@ -53,13 +68,40 @@ export default function Combobox({
     if (open) inputRef.current?.focus()
   }, [open])
 
+  useEffect(() => {
+    if (!onSearchRef.current) return
+
+    clearTimeout(debounceRef.current)
+
+    if (query.trim() === '') {
+      setServerOptions([])
+      setLoading(false)
+      return
+    }
+
+    setLoading(true)
+    debounceRef.current = setTimeout(async () => {
+      try {
+        const results = await onSearchRef.current(query.trim())
+        setServerOptions(results)
+      } finally {
+        setLoading(false)
+      }
+    }, 300)
+
+    return () => clearTimeout(debounceRef.current)
+  }, [query])
+
   function close() {
     setOpen(false)
     setQuery('')
     setActiveIndex(0)
+    setServerOptions([])
   }
 
   function select(key) {
+    const item = filtered.find(v => v.key === key)
+    if (item) setSelectedOption(item)
     if (value === undefined) setInternalKey(key)
     onChange?.(key)
     close()
@@ -67,6 +109,7 @@ export default function Combobox({
 
   function reset(e) {
     e.stopPropagation()
+    setSelectedOption(null)
     if (value === undefined) setInternalKey(null)
     onChange?.(null)
   }
@@ -106,7 +149,7 @@ export default function Combobox({
         role="combobox"
         aria-expanded={open}
         onClick={() => (open ? close() : setOpen(true))}
-        className="flex w-full items-center justify-between gap-2 rounded-lg border border-gray-300 bg-white px-3 py-2 text-left focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        className={`flex w-full items-center justify-between gap-2 rounded-lg border border-gray-300 bg-white px-3 py-2 text-left focus:outline-none ${open ? '' : 'focus:ring-2 focus:ring-indigo-500'}`}
       >
         <span className={selected ? 'text-gray-900' : 'text-gray-400'}>
           {selected ? selected.value : placeholder}
@@ -124,7 +167,7 @@ export default function Combobox({
               </svg>
             </span>
           )}
-<svg className="size-4 text-gray-400" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5">
+          <svg className="size-4 text-gray-400" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5">
             <path d="m6 8 4 4 4-4" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         </span>
@@ -132,17 +175,29 @@ export default function Combobox({
 
       {open && (
         <div className="absolute z-10 mt-1 w-full rounded-lg border border-gray-200 bg-white shadow-lg">
-          <input
-            ref={inputRef}
-            value={query}
-            onChange={(e) => { setQuery(e.target.value); setActiveIndex(0) }}
-            onKeyDown={onKeyDown}
-            placeholder={placeholder}
-            className="w-full border-b border-gray-200 rounded-t-lg px-3 py-2 focus:outline-none"
-          />
+          <div className="flex items-center border-b border-gray-200">
+            <svg className="ml-3 size-4 shrink-0 text-gray-400" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5">
+              <circle cx="8.5" cy="8.5" r="5" />
+              <path d="m13 13 3 3" strokeLinecap="round" />
+            </svg>
+            <input
+              ref={inputRef}
+              value={query}
+              onChange={(e) => { setQuery(e.target.value); setActiveIndex(0) }}
+              onKeyDown={onKeyDown}
+              placeholder={placeholder}
+              className="w-full rounded-none border-0 bg-transparent px-3 py-2 focus:outline-none focus:ring-0"
+            />
+            {loading && (
+              <svg className="mr-3 size-4 shrink-0 animate-spin text-indigo-400" viewBox="0 0 24 24" fill="none">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
+              </svg>
+            )}
+          </div>
 
           <ul role="listbox" className="max-h-60 overflow-auto p-1">
-            {filtered.length === 0 && !canCreate && (
+            {filtered.length === 0 && !canCreate && !loading && query.trim() !== '' && (
               <li className="px-3 py-2 text-gray-400">No results.</li>
             )}
 
@@ -166,12 +221,6 @@ export default function Combobox({
               </li>
             ))}
 
-            {onCreate && !query.trim() && (
-              <li className="px-3 py-2 text-xs text-gray-400 select-none">
-                Type to search or add a new entry.
-              </li>
-            )}
-
             {canCreate && (
               <li
                 role="option"
@@ -191,6 +240,12 @@ export default function Combobox({
               </li>
             )}
           </ul>
+
+          {(onCreate || onSearch) && query.trim() === '' && (
+            <p className="border-t border-gray-100 px-3 py-2 text-xs text-gray-400 select-none">
+              {onSearch ? 'Type to search or add a new entry.' : 'Type to search or add a new entry.'}
+            </p>
+          )}
         </div>
       )}
     </div>

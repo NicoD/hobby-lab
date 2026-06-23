@@ -1,24 +1,20 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useAuth } from "../../../../../shared/context/AuthContext";
+import { useCallback } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useApiFetch } from "../../../../../shared/hooks/useApiFetch";
 
 export function usePaintReferences(criteria = {}) {
-    const { token } = useAuth()
     const apiFetch = useApiFetch()
     const queryClient = useQueryClient()
 
-    const { data: paintReferences = [] } = useQuery({
-        queryKey: ['paint-references', token, criteria.brand, criteria.range, criteria.type, criteria.color],
-        queryFn: () => {
-            const params = new URLSearchParams()
-            if (criteria.brand) params.set('brand', criteria.brand)
-            if (criteria.range) params.set('range', criteria.range)
-            if (criteria.type) params.set('type', criteria.type)
-            if (criteria.color) params.set('color', criteria.color)
-            return apiFetch(`/api/color-lab/paint-references?${params}`)
-        },
-        enabled: !!token && !!criteria.brand,
-    })
+    const searchPaintReferences = useCallback(async (query) => {
+        const params = new URLSearchParams({ search: query })
+        if (criteria.brand) params.set('brand', criteria.brand)
+        if (criteria.range) params.set('range', criteria.range)
+        if (criteria.type) params.set('type', criteria.type)
+        if (criteria.color) params.set('color', criteria.color)
+        const data = await apiFetch(`/api/color-lab/paint-references?${params}`)
+        return data.map(ref => ({ key: ref.handle, value: ref.name }))
+    }, [apiFetch, criteria.brand, criteria.range, criteria.type, criteria.color])
 
     const createPaintReference = useMutation({
         mutationFn: (reference) => apiFetch('/api/color-lab/paint-references', {
@@ -28,5 +24,5 @@ export function usePaintReferences(criteria = {}) {
         onSuccess: () => queryClient.invalidateQueries({ queryKey: ['paint-references'] }),
     })
 
-    return { paintReferences, createPaintReference }
+    return { searchPaintReferences, createPaintReference }
 }

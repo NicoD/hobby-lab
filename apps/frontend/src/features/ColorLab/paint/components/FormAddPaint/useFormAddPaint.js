@@ -1,3 +1,4 @@
+import { useCallback } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "../../../../../shared/context/AuthContext";
 import { useApiFetch } from "../../../../../shared/hooks/useApiFetch";
@@ -19,11 +20,11 @@ export function useFormAddPaint() {
         enabled: !!token,
     })
 
-    const { data: existingColors = [] } = useQuery({
-        queryKey: ['colors', token],
-        queryFn: () => apiFetch('/api/color-lab/colors'),
-        enabled: !!token,
-    })
+    const searchColors = useCallback(async (query) => {
+        const params = new URLSearchParams({ search: query })
+        const data = await apiFetch(`/api/color-lab/colors?${params}`)
+        return data.map(c => ({ key: c.handle, value: c.name }))
+    }, [apiFetch])
 
     const createBrand = useMutation({
         mutationFn: (brand) => apiFetch('/api/color-lab/brands', {
@@ -57,5 +58,5 @@ export function useFormAddPaint() {
         onSuccess: () => queryClient.invalidateQueries({ queryKey: ['paints'] }),
     })
 
-    return { existingBrands, existingPaintTypes, existingColors, createBrand, createPaintType, createColor, createPaint }
+    return { existingBrands, existingPaintTypes, searchColors, createBrand, createPaintType, createColor, createPaint }
 }
