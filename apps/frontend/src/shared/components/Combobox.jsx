@@ -124,7 +124,7 @@ export default function Combobox({
               </svg>
             </span>
           )}
-          <svg className="size-4 text-gray-400" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5">
+<svg className="size-4 text-gray-400" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5">
             <path d="m6 8 4 4 4-4" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         </span>
@@ -165,6 +165,12 @@ export default function Combobox({
                 )}
               </li>
             ))}
+
+            {onCreate && !query.trim() && (
+              <li className="px-3 py-2 text-xs text-gray-400 select-none">
+                Type to search or add a new entry.
+              </li>
+            )}
 
             {canCreate && (
               <li
