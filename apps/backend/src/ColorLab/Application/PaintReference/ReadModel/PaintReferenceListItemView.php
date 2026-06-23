@@ -7,7 +7,6 @@ namespace App\ColorLab\Application\PaintReference\ReadModel;
 final readonly class PaintReferenceListItemView
 {
     public function __construct(
-        public string $id,
         public string $handle,
         public string $name,
         public ?string $brandHandle,

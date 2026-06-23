@@ -19,9 +19,7 @@ class PaintReference implements AggregateRoot
 
     private function __construct(
         #[ORM\Id]
-        #[ORM\Column(type: 'paint_reference_id')]
-        public private(set) PaintReferenceId $id,
-        #[ORM\Column(type: 'paint_reference_handle', unique: true)]
+        #[ORM\Column(type: 'paint_reference_handle')]
         public private(set) PaintReferenceHandle $handle,
         #[ORM\Column(type: 'string', length: 255)]
         public private(set) string $name,
@@ -48,7 +46,6 @@ class PaintReference implements AggregateRoot
         HandleGenerator $handleGenerator,
     ): self {
         $ref = new self(
-            PaintReferenceId::create(),
             new PaintReferenceHandle($handleGenerator->generate($name, str_cast($brand))),
             $name,
             $brand,
@@ -59,9 +56,8 @@ class PaintReference implements AggregateRoot
         );
 
         $ref->raiseDomainEvent(new PaintReferenceCreatedEvent(
-            $ref->id,
             $ref->handle,
-            $name,
+            $ref->name,
             $brand,
             $range,
             $paintType,

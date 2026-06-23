@@ -38,21 +38,21 @@ class PaintApiTest extends ApiTestCase
         $this->request('GET', '/color-lab/paint-references');
         $refs = $this->responseJson();
 
-        return $refs[0]['id'];
+        return $refs[0]['handle'];
     }
 
     public function testCreate(): void
     {
-        $paintReferenceId = $this->createPaintReference();
+        $paintReferenceHandle = $this->createPaintReference();
 
         $this->request('POST', '/color-lab/paints', [
-            'paintReferenceId' => $paintReferenceId,
+            'paintReferenceHandle' => $paintReferenceHandle,
             'purchasedAt' => '2026-02-15',
         ]);
 
         self::assertResponseStatusCodeSame(201);
-        $this->assertEventDispatched(PaintCreatedEvent::class, static function (PaintCreatedEvent $event) use ($paintReferenceId): void {
-            self::assertSame($paintReferenceId, (string) $event->paintReferenceId);
+        $this->assertEventDispatched(PaintCreatedEvent::class, static function (PaintCreatedEvent $event) use ($paintReferenceHandle): void {
+            self::assertSame($paintReferenceHandle, (string) $event->paintReferenceHandle);
             self::assertSame('019661b9-a000-7000-8000-000000000001', (string) $event->ownedBy);
             self::assertSame('2026-02-15', $event->purchasedAt?->format('Y-m-d'));
         });
@@ -60,10 +60,10 @@ class PaintApiTest extends ApiTestCase
 
     public function testCreateWithoutPurchasedAt(): void
     {
-        $paintReferenceId = $this->createPaintReference();
+        $paintReferenceHandle = $this->createPaintReference();
 
         $this->request('POST', '/color-lab/paints', [
-            'paintReferenceId' => $paintReferenceId,
+            'paintReferenceHandle' => $paintReferenceHandle,
         ]);
 
         self::assertResponseStatusCodeSame(201);
@@ -74,10 +74,10 @@ class PaintApiTest extends ApiTestCase
 
     public function testList(): void
     {
-        $paintReferenceId = $this->createPaintReference();
+        $paintReferenceHandle = $this->createPaintReference();
 
-        $this->request('POST', '/color-lab/paints', ['paintReferenceId' => $paintReferenceId]);
-        $this->request('POST', '/color-lab/paints', ['paintReferenceId' => $paintReferenceId]);
+        $this->request('POST', '/color-lab/paints', ['paintReferenceHandle' => $paintReferenceHandle]);
+        $this->request('POST', '/color-lab/paints', ['paintReferenceHandle' => $paintReferenceHandle]);
 
         $this->request('GET', '/color-lab/paints');
 
@@ -88,10 +88,10 @@ class PaintApiTest extends ApiTestCase
 
     public function testGet(): void
     {
-        $paintReferenceId = $this->createPaintReference();
+        $paintReferenceHandle = $this->createPaintReference();
 
         $this->request('POST', '/color-lab/paints', [
-            'paintReferenceId' => $paintReferenceId,
+            'paintReferenceHandle' => $paintReferenceHandle,
             'purchasedAt' => '2026-02-15',
         ]);
 
@@ -104,7 +104,7 @@ class PaintApiTest extends ApiTestCase
         self::assertResponseIsSuccessful();
         $paint = $this->responseJson();
         self::assertSame($id, $paint['id']);
-        self::assertSame($paintReferenceId, $paint['paintReferenceId']);
+        self::assertSame($paintReferenceHandle, $paint['paintReferenceHandle']);
         self::assertSame('2026-02-15', $paint['purchasedAt']);
     }
 

@@ -1,21 +1,18 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import Combobox from "../../../../../shared/components/Combobox";
+import FormField from "../../../../../shared/components/FormField";
 import { useFormAddPaint } from "./useFormAddPaint";
 import { usePaintReferences } from "./usePaintReferences";
 
-export default function FormAddPaint() {
-    const [paintReference, setPaintReference] = useState({})
-    const { existingBrands, existingPaintTypes, existingColors, createBrand, createPaintType, createColor } = useFormAddPaint()
-    const { paintReferences: existingPaintReferences, createPaintReference } = usePaintReferences(paintReference)
-    const [currentBrand, setCurrentBrand] = useState(null)
+export default function FormAddPaint({ onClose }) {
+    const [filters, setFilters] = useState({})
+    const [paintReferenceId, setPaintReferenceId] = useState(null)
+    const [purchasedAt, setPurchasedAt] = useState('')
 
-    useEffect(() => {
-        if (!paintReference.brand) {
-            setCurrentBrand(null)
-            return
-        }
-        setCurrentBrand(existingBrands.find(brand => paintReference.brand === brand.handle) ?? null)
-    }, [existingBrands, paintReference.brand])
+    const { existingBrands, existingPaintTypes, existingColors, createBrand, createPaintType, createColor, createPaint } = useFormAddPaint()
+    const { paintReferences: existingPaintReferences, createPaintReference } = usePaintReferences(filters)
+
+    const currentBrand = existingBrands.find(brand => filters.brand === brand.handle) ?? null
 
     const handleCreateBrand = useCallback(async (name) => {
         const { handle } = await createBrand.mutateAsync({ name })

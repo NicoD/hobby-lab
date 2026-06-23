@@ -11,7 +11,7 @@ use App\Shared\Application\Bus\Command;
 final readonly class CreatePaintCommand implements Command
 {
     public function __construct(
-        public string $paintReferenceId,
+        public string $paintReferenceHandle,
         public string $ownedBy,
         public ?string $purchasedAt,
     ) {

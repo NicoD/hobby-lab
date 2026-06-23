@@ -61,7 +61,6 @@ final class DoctrinePaintReferenceReadRepository extends ServiceEntityRepository
 
         return array_map(
             static fn (PaintReference $ref): PaintReferenceListItemView => new PaintReferenceListItemView(
-                (string) $ref->id,
                 (string) $ref->handle,
                 $ref->name,
                 $ref->brand instanceof BrandHandle ? (string) $ref->brand : null,
@@ -76,14 +75,13 @@ final class DoctrinePaintReferenceReadRepository extends ServiceEntityRepository
     #[\Override]
     public function findByHandle(string $handle): ?PaintReferenceView
     {
-        $ref = $this->findOneBy(['handle' => new PaintReferenceHandle($handle)]);
+        $ref = $this->find(new PaintReferenceHandle($handle));
 
         if (null === $ref) {
             return null;
         }
 
         return new PaintReferenceView(
-            (string) $ref->id,
             (string) $ref->handle,
             $ref->name,
             null !== $ref->brand ? (string) $ref->brand : null,

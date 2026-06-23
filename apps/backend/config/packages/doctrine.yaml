@@ -7,7 +7,6 @@ doctrine:
             color_handle: App\ColorLab\Infrastructure\Doctrine\Type\ColorHandleType
             paint_type_handle: App\ColorLab\Infrastructure\Doctrine\Type\PaintTypeHandleType
             range_handle: App\ColorLab\Infrastructure\Doctrine\Type\RangeHandleType
-            paint_reference_id: App\ColorLab\Infrastructure\Doctrine\Type\PaintReferenceIdType
             paint_reference_handle: App\ColorLab\Infrastructure\Doctrine\Type\PaintReferenceHandleType
             paint_id: App\ColorLab\Infrastructure\Doctrine\Type\PaintIdType
             range_collection: App\ColorLab\Infrastructure\Doctrine\Type\RangeCollectionType

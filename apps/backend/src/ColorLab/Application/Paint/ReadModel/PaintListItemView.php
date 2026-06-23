@@ -8,7 +8,7 @@ final readonly class PaintListItemView
 {
     public function __construct(
         public string $id,
-        public string $paintReferenceId,
+        public string $paintReferenceHandle,
         public ?string $purchasedAt,
     ) {
     }

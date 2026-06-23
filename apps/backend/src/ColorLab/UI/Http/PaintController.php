@@ -37,7 +37,7 @@ final class PaintController extends AbstractController
     {
         $payload = $request->getPayload();
         $id = $this->commandBus->handle(new CreatePaintCommand(
-            $payload->getString('paintReferenceId'),
+            $payload->getString('paintReferenceHandle'),
             $request->headers->get('X-User-Id') ?? '',
             $payload->has('purchasedAt') ? $payload->getString('purchasedAt') : null,
         ));

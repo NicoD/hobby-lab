@@ -6,7 +6,6 @@ namespace App\ColorLab\Infrastructure\Doctrine\Repository;
 
 use App\ColorLab\Domain\Model\PaintReference;
 use App\ColorLab\Domain\Model\PaintReferenceHandle;
-use App\ColorLab\Domain\Model\PaintReferenceId;
 use App\ColorLab\Domain\Repository\PaintReferenceRepository;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -28,14 +27,8 @@ final class DoctrinePaintReferenceRepository extends ServiceEntityRepository imp
     }
 
     #[\Override]
-    public function findById(PaintReferenceId $id): ?PaintReference
-    {
-        return $this->find($id);
-    }
-
-    #[\Override]
     public function findByHandle(PaintReferenceHandle $handle): ?PaintReference
     {
-        return $this->findOneBy(['handle' => $handle]);
+        return $this->find($handle);
     }
 }
