@@ -25,6 +25,7 @@ final readonly class ListPaintReferencesQueryHandler
             $query->rangeHandle,
             $query->paintTypeHandle,
             $query->colorHandle,
+            $query->search,
         ));
     }
 }

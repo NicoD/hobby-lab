@@ -56,6 +56,11 @@ final class DoctrinePaintReferenceReadRepository extends ServiceEntityRepository
                 ->setParameter('color', new ColorHandle($criteria->color), 'color_handle');
         }
 
+        if (null !== $criteria->search && '' !== $criteria->search) {
+            $qb->andWhere('p.name LIKE :search')
+                ->setParameter('search', '%'.addcslashes($criteria->search, '%_\\').'%');
+        }
+
         /** @var list<PaintReference> $results */
         $results = $qb->getQuery()->getResult();
 

@@ -24,14 +24,24 @@ final class DoctrineColorReadRepository extends ServiceEntityRepository implemen
 
     /** @return list<ColorListItemView> */
     #[\Override]
-    public function list(): array
+    public function list(?string $search = null): array
     {
+        $qb = $this->createQueryBuilder('c');
+
+        if (null !== $search && '' !== $search) {
+            $qb->andWhere('c.name LIKE :search')
+                ->setParameter('search', '%'.addcslashes($search, '%_\\').'%');
+        }
+
+        /** @var list<Color> $results */
+        $results = $qb->getQuery()->getResult();
+
         return array_map(
             static fn (Color $color): ColorListItemView => new ColorListItemView(
                 (string) $color->handle,
                 $color->name,
             ),
-            $this->findAll(),
+            $results,
         );
     }
 

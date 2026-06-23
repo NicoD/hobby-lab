@@ -16,6 +16,7 @@ final readonly class ListPaintReferencesQuery implements Query
         public ?string $rangeHandle = null,
         public ?string $paintTypeHandle = null,
         public ?string $colorHandle = null,
+        public ?string $search = null,
     ) {
     }
 }

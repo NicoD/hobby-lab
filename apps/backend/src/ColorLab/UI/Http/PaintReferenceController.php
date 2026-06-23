@@ -35,6 +35,7 @@ final class PaintReferenceController extends AbstractController
             $request->query->get('range'),
             $request->query->get('type'),
             $request->query->get('color'),
+            $request->query->get('search'),
         )));
     }
 

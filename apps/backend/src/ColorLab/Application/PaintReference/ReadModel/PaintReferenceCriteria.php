@@ -12,6 +12,7 @@ final readonly class PaintReferenceCriteria
         public ?string $range = null,
         public ?string $paintType = null,
         public ?string $color = null,
+        public ?string $search = null,
     ) {
     }
 }

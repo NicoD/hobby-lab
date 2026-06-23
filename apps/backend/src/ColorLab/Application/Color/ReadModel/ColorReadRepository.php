@@ -7,7 +7,7 @@ namespace App\ColorLab\Application\Color\ReadModel;
 interface ColorReadRepository
 {
     /** @return list<ColorListItemView> */
-    public function list(): array;
+    public function list(?string $search = null): array;
 
     public function findByHandle(string $handle): ?ColorView;
 }

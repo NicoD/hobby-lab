@@ -27,9 +27,11 @@ final class ColorController extends AbstractController
     }
 
     #[Route('/color-lab/colors', name: 'color_list', methods: ['GET'])]
-    public function list(): JsonResponse
+    public function list(Request $request): JsonResponse
     {
-        return $this->json($this->queryBus->handle(new ListColorsQuery()));
+        return $this->json($this->queryBus->handle(new ListColorsQuery(
+            $request->query->get('search'),
+        )));
     }
 
     #[Route('/color-lab/colors', name: 'color_create', methods: ['POST'])]
