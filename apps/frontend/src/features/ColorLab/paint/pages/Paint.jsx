@@ -26,7 +26,7 @@ export default function Paint() {
         TODO
         </ListWrapper>
         <Modal title="Ajouter" isOpen={addModal.isOpen} close={addModal.close}>
-            <FormAddPaint />
+            <FormAddPaint onClose={addModal.close} />
         </Modal>
     </>
   )

@@ -100,7 +100,7 @@ export default function Combobox({
   }
 
   return (
-    <div ref={rootRef} className="relative w-full max-w-xs text-sm">
+    <div ref={rootRef} className="relative w-full text-sm">
       <button
         type="button"
         role="combobox"

@@ -49,5 +49,13 @@ export function useFormAddPaint() {
         onSuccess: () => queryClient.invalidateQueries({ queryKey: ['colors'] }),
     })
 
-    return { existingBrands, existingPaintTypes, existingColors, createBrand, createPaintType, createColor }
+    const createPaint = useMutation({
+        mutationFn: (paint) => apiFetch('/api/color-lab/paints', {
+            method: 'POST',
+            body: JSON.stringify(paint),
+        }),
+        onSuccess: () => queryClient.invalidateQueries({ queryKey: ['paints'] }),
+    })
+
+    return { existingBrands, existingPaintTypes, existingColors, createBrand, createPaintType, createColor, createPaint }
 }
