@@ -117,8 +117,12 @@ export default function Combobox({
   async function create() {
     const label = query.trim()
     const newKey = await onCreate(label)
-    if (newKey != null) select(newKey)
-    else close()
+    if (newKey != null) {
+      setSelectedOption({ key: newKey, value: label })
+      select(newKey)
+    } else {
+      close()
+    }
   }
 
   function pick(index) {

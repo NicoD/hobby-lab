@@ -13,7 +13,7 @@ export function useCatalogPaints(criteria = {}) {
         if (criteria.type) params.set('type', criteria.type)
         if (criteria.color) params.set('color', criteria.color)
         const data = await apiFetch(`/api/color-lab/catalog/paints?${params}`)
-        return data.map(ref => ({ key: ref.handle, value: ref.name }))
+        return data.items.map(ref => ({ key: ref.handle, value: ref.name }))
     }, [apiFetch, criteria.brand, criteria.range, criteria.type, criteria.color])
 
     const createCatalogPaint = useMutation({

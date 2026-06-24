@@ -8,11 +8,12 @@ export function useFormAddPaint() {
     const apiFetch = useApiFetch()
     const queryClient = useQueryClient()
 
-    const { data: existingBrands = [] } = useQuery({
+    const { data: brandsData } = useQuery({
         queryKey: ['brands', token],
         queryFn: () => apiFetch('/api/color-lab/catalog/brands'),
         enabled: !!token,
     })
+    const existingBrands = brandsData?.items ?? []
 
     const { data: existingPaintTypes = [] } = useQuery({
         queryKey: ['paint-types', token],
@@ -23,7 +24,7 @@ export function useFormAddPaint() {
     const searchColors = useCallback(async (query) => {
         const params = new URLSearchParams({ search: query })
         const data = await apiFetch(`/api/color-lab/catalog/colors?${params}`)
-        return data.map(c => ({ key: c.handle, value: c.name }))
+        return data.items.map(c => ({ key: c.handle, value: c.name }))
     }, [apiFetch])
 
     const createBrand = useMutation({
