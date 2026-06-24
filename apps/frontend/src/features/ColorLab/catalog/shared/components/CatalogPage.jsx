@@ -1,7 +1,7 @@
 import ListWrapper from '../../../../../shared/components/ListWrapper'
 import CatalogPagination from './CatalogPagination'
 
-export default function CatalogPage({ title, columns, query, search, onSearch, sort, dir, onSort, page, onPage, actions }) {
+export default function CatalogPage({ title, columns, query, search, onSearch, sort, dir, onSort, page, onPage, actions, rowActions }) {
   const { data, isLoading, isError } = query
   const items = data?.items ?? []
 
@@ -38,6 +38,7 @@ export default function CatalogPage({ title, columns, query, search, onSearch, s
                   </span>
                 </th>
               ))}
+              {rowActions && <th className="py-2 px-3 w-0" />}
             </tr>
           </thead>
           <tbody>
@@ -63,6 +64,11 @@ export default function CatalogPage({ title, columns, query, search, onSearch, s
                     {col.render ? col.render(item) : item[col.key]}
                   </td>
                 ))}
+                {rowActions && (
+                  <td className="py-2.5 px-3 text-right">
+                    {rowActions(item)}
+                  </td>
+                )}
               </tr>
             ))}
           </tbody>
