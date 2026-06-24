@@ -34,10 +34,70 @@ class ColorApiTest extends ApiTestCase
         $this->request('GET', '/color-lab/colors');
 
         self::assertResponseIsSuccessful();
-        $colors = $this->responseJson();
-        self::assertCount(2, $colors);
-        self::assertContains('Red', array_column($colors, 'name'));
-        self::assertContains('Green', array_column($colors, 'name'));
+        $response = $this->responseJson();
+        self::assertArrayHasKey('items', $response);
+        self::assertArrayHasKey('total', $response);
+        self::assertArrayHasKey('page', $response);
+        self::assertArrayHasKey('limit', $response);
+        self::assertSame(2, $response['total']);
+        self::assertSame(1, $response['page']);
+        self::assertCount(2, $response['items']);
+        self::assertContains('Red', array_column($response['items'], 'name'));
+        self::assertContains('Green', array_column($response['items'], 'name'));
+    }
+
+    public function testListPagination(): void
+    {
+        foreach (['Red', 'Green', 'Blue'] as $name) {
+            $this->request('POST', '/color-lab/colors', ['name' => $name]);
+        }
+
+        $this->request('GET', '/color-lab/colors?page=1&limit=2');
+
+        self::assertResponseIsSuccessful();
+        $response = $this->responseJson();
+        self::assertSame(3, $response['total']);
+        self::assertSame(2, $response['limit']);
+        self::assertCount(2, $response['items']);
+    }
+
+    public function testListSearch(): void
+    {
+        $this->request('POST', '/color-lab/colors', ['name' => 'Red']);
+        $this->request('POST', '/color-lab/colors', ['name' => 'Green']);
+
+        $this->request('GET', '/color-lab/colors?search=red');
+
+        self::assertResponseIsSuccessful();
+        $response = $this->responseJson();
+        self::assertSame(1, $response['total']);
+        self::assertSame('Red', $response['items'][0]['name']);
+    }
+
+    public function testListSortByName(): void
+    {
+        $this->request('POST', '/color-lab/colors', ['name' => 'Green']);
+        $this->request('POST', '/color-lab/colors', ['name' => 'Blue']);
+
+        $this->request('GET', '/color-lab/colors?sort=name&dir=asc');
+
+        self::assertResponseIsSuccessful();
+        $response = $this->responseJson();
+        self::assertSame('Blue', $response['items'][0]['name']);
+        self::assertSame('Green', $response['items'][1]['name']);
+    }
+
+    public function testListIsolatedByUser(): void
+    {
+        $this->setCurrentUserId('019661b9-a000-7000-8000-000000000001');
+        $this->request('POST', '/color-lab/colors', ['name' => 'Red']);
+
+        $this->setCurrentUserId('019661b9-a000-7000-8000-000000000002');
+        $this->request('GET', '/color-lab/colors');
+
+        self::assertResponseIsSuccessful();
+        $response = $this->responseJson();
+        self::assertSame(0, $response['total']);
     }
 
     public function testGet(): void
@@ -46,7 +106,7 @@ class ColorApiTest extends ApiTestCase
 
         $this->request('GET', '/color-lab/colors');
         $list = $this->responseJson();
-        $handle = $list[0]['handle'];
+        $handle = $list['items'][0]['handle'];
 
         $this->request('GET', '/color-lab/colors/'.$handle);
 

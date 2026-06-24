@@ -9,6 +9,7 @@ final readonly class ColorListItemView
     public function __construct(
         public string $handle,
         public string $name,
+        public string $createdAt,
     ) {
     }
 }

@@ -4,10 +4,14 @@ declare(strict_types=1);
 
 namespace App\ColorLab\Application\Color\ReadModel;
 
+use App\Shared\Application\Query\PaginatedResult;
+
 interface ColorReadRepository
 {
-    /** @return list<ColorListItemView> */
-    public function list(?string $search = null): array;
+    /**
+     * @return PaginatedResult<ColorListItemView>
+     */
+    public function list(ColorCriteria $criteria): PaginatedResult;
 
     public function findByHandle(string $handle): ?ColorView;
 }
