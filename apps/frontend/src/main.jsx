@@ -3,8 +3,9 @@ import { createRoot } from 'react-dom/client'
 import { createBrowserRouter, RouterProvider, Navigate } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import './index.css'
-import { AuthProvider, useAuth } from './shared/context/AuthContext'
+import { AuthProvider } from './shared/context/AuthContext'
 import Layout from './layout/Layout'
+import HomeRedirect from './layout/HomeRedirect'
 import Login from './features/User/login/pages/Login'
 import Profile from './features/User/profile/pages/Profile'
 import ColorLabLayout from './features/ColorLab/layout/ColorLabLayout'
@@ -15,11 +16,6 @@ import StashPaints from './features/ColorLab/stash/paints/pages/StashPaints'
 import ColorLabCatalogBrands from './features/ColorLab/catalog/brands/pages/Brands'
 import ColorLabCatalogColors from './features/ColorLab/catalog/colors/pages/Colors'
 import CatalogPaints from './features/ColorLab/catalog/paints/pages/CatalogPaints'
-
-function HomeRedirect() {
-  const { user } = useAuth()
-  return <Navigate to={user ? '/color-lab' : '/login'} replace />
-}
 
 const router = createBrowserRouter([
   {
