@@ -38,10 +38,12 @@ final class DoctrinePaintReadRepository extends ServiceEntityRepository implemen
             $params['search'] = '%'.addcslashes(strtolower($criteria->search), '%_\\').'%';
         }
 
-        $total = (int) $conn->executeQuery(
+        $count = $conn->executeQuery(
             "SELECT COUNT(*) FROM catalog_paints p WHERE {$where}",
             $params,
         )->fetchOne();
+
+        $total = \is_numeric($count) ? (int) $count : 0;
 
         $sortColumn = 'createdAt' === $criteria->sort->field ? 'p.created_at' : 'p.name';
         $sortDir = $criteria->sort->isAsc ? 'ASC' : 'DESC';

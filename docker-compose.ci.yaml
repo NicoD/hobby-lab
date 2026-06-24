@@ -6,7 +6,7 @@ services:
       - ./apps/backend:/app
     environment:
       APP_ENV: test
-      DATABASE_URL: postgresql://backend:backend@backend-db:5432/recipe_kitchen_test
+      DATABASE_URL: postgresql://backend:backend@backend-db:5432/recipe_kitchen
 
   backend-db:
     image: postgres:16-alpine

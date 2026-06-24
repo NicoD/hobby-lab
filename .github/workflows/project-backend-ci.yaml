@@ -48,8 +48,11 @@ jobs:
       - name: PHP-CS-Fixer
         run: docker compose run --rm -T backend vendor/bin/php-cs-fixer check --diff
 
+      - name: Warm up Symfony cache
+        run: docker compose run --rm -T -e APP_ENV=dev backend bin/console cache:warmup
+
       - name: PHPStan
-        run: docker compose run --rm -T backend vendor/bin/phpstan analyse
+        run: docker compose run --rm -T backend vendor/bin/phpstan analyse --memory-limit=512M
 
   test:
     name: test
