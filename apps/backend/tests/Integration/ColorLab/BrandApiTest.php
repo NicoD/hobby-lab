@@ -22,7 +22,7 @@ class BrandApiTest extends ApiTestCase
         self::assertResponseStatusCodeSame(201);
         $this->assertEventDispatched(BrandCreatedEvent::class, static function (BrandCreatedEvent $event): void {
             self::assertSame('Vallejo', $event->name);
-            self::assertSame('019661b9-a000-7000-8000-000000000001', (string) $event->ownedBy);
+            self::assertSame('019661b9-a000-7000-8000-000000000000', (string) $event->ownedBy);
         });
     }
 
