@@ -124,6 +124,17 @@ Browser (React)
 | `GET` | `/auth/jwks` | RS256 public key (JWKS format) *(stubbed)* |
 | `GET` | `/validate` | ForwardAuth endpoint for Traefik |
 
+## ColorLab domain structure
+
+`ColorLab` is split into two active modules under `src/ColorLab/` (ADR-008):
+
+| Module | Purpose | Tables |
+|---|---|---|
+| `Catalog` | Reference data describing paint products | `catalog_brands`, `catalog_colors`, `catalog_paint_types`, `catalog_paints` |
+| `Stash` | User's personal reserve of physical paints | `stash_paints` |
+
+`Stash` references `Catalog` entries by identity VO (`PaintHandle`) only on the write side. The read side may JOIN catalog tables directly.
+
 ## Related ADRs
 
 - [ADR-001](adr/ADR-001-monorepo-structure.md) — Monorepo structure and naming conventions
@@ -132,3 +143,4 @@ Browser (React)
 - [ADR-004](adr/ADR-004-user-identity-service.md) — user/identity service (NestJS)
 - [ADR-005](adr/ADR-005-backend-symfony.md) — Symfony multi-domain backend
 - [ADR-007](adr/ADR-007-cross-domain-communication.md) — Cross-domain communication (Domain Events, Integration Events, Outbox, RabbitMQ)
+- [ADR-008](adr/ADR-008-colorlab-catalog-stash-modules.md) — ColorLab module separation: Catalog, Stash and Recipe

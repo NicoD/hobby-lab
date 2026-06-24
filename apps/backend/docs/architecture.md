@@ -5,22 +5,38 @@
 ```
 apps/backend/src/
   ColorLab/               ← business domain (PascalCase)
-    Domain/
-      Model/              ← aggregates, entities, value objects (siblings, no sub-namespace)
-      Repository/         ← repository interfaces
-      Event/              ← domain events
-      Service/            ← domain services
-    Application/
-      {Aggregate}/
-        Command/
-        Query/
-        ReadModel/
-    Infrastructure/
-      Doctrine/
-        Repository/
-        Type/
-    UI/
-      Http/               ← JSON controllers
+    Catalog/              ← module: reference data (paint products)
+      Domain/
+        Brand/            ← aggregate root + handle + repository + events
+        Color/
+        PaintType/
+        Range/            ← value object embedded in Brand (no repository)
+        Paint/            ← renamed from PaintReference
+      Application/
+        {Aggregate}/
+          Command/
+          Query/
+          ReadModel/
+      Infrastructure/
+        Doctrine/
+          Repository/
+          Type/           ← catalog_* prefixed types
+      UI/
+        Http/             ← JSON controllers at /color-lab/catalog/*
+    Stash/                ← module: user's physical paint collection
+      Domain/
+        Paint/            ← aggregate root + PaintId + repository + events
+      Application/
+        Paint/
+          Command/
+          Query/
+          ReadModel/
+      Infrastructure/
+        Doctrine/
+          Repository/
+          Type/           ← stash_* prefixed types
+      UI/
+        Http/             ← JSON controllers at /color-lab/stash/*
   Shared/                 ← technical cross-domain building blocks (no business logic)
     Domain/
       Model/              ← abstract base classes (AbstractUuid, AbstractHandle) and cross-cutting VOs (UserId, AggregateRoot, …)
@@ -49,27 +65,39 @@ UI/             → controllers, event listeners; depends on Application
 - Domain depending on Doctrine annotations or Symfony types. (Known exception: `#[ORM\*]` on entities — accepted pragmatic tradeoff, do not extend.)
 - Cross-domain imports — Domain Events only.
 
+## Module isolation (ColorLab)
+
+**Write side — strict.** `Stash` must never import a domain class from `Catalog`. The only cross-module reference allowed is the `PaintHandle` identity VO.
+
+**Read side — free JOIN.** Query handlers in `Stash` may join `catalog_*` tables directly in their infrastructure implementation. No shared Application read layer.
+
+Enforced by Deptrac: `ColorLab.Stash.*` layers list `ColorLab.Catalog.Domain` as an allowed dependency for the VO import only.
+
 ## Domain isolation (Deptrac)
 
-Deptrac is configured from day one. A cross-domain import breaks the CI build.
+See `deptrac.yaml`. A cross-domain import breaks the CI build.
 
-```yaml
-# deptrac.yaml
-layers:
-  - name: ColorLab
-    collectors:
-      - { type: directory, value: src/ColorLab }
-  - name: Shared
-    collectors:
-      - { type: directory, value: src/Shared }
+## API routes
 
-ruleset:
-  ColorLab:
-    - Shared   # business domains may depend on Shared
-  Shared: []   # Shared never depends on a business domain
-```
+| Module | Prefix |
+|---|---|
+| Catalog | `/color-lab/catalog/{brands,colors,paint-types,paints}` |
+| Stash | `/color-lab/stash/paints` |
 
-> Add `Shared` as a Deptrac layer when a second domain is introduced.
+## Doctrine types
+
+All types are module-scoped to avoid name collisions:
+
+| Type name | Module | PHP class |
+|---|---|---|
+| `catalog_brand_handle` | Catalog | `BrandHandle` |
+| `catalog_color_handle` | Catalog | `ColorHandle` |
+| `catalog_paint_type_handle` | Catalog | `PaintTypeHandle` |
+| `catalog_range_handle` | Catalog | `RangeHandle` |
+| `catalog_range_collection` | Catalog | `Range[]` JSON |
+| `catalog_paint_handle` | Catalog | `PaintHandle` |
+| `stash_paint_id` | Stash | `PaintId` (UUID) |
+| `user_id` | Shared | `UserId` (UUID) |
 
 ## User identity
 
@@ -85,21 +113,6 @@ ruleset:
 **Coarse-grained** (access to a route) → Symfony Firewall, based on `X-User-Roles`.
 
 **Fine-grained** (action on a specific aggregate) → Symfony Voters, placed in `Application/Security/` of the relevant domain.
-
-```php
-// ColorLab/Application/Security/BrandVoter.php
-class BrandVoter extends Voter
-{
-    #[\Override]
-    protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token): bool
-    {
-        return match($attribute) {
-            'EDIT' => $subject->isOwnedBy($token->getUserIdentifier()),
-            default => false,
-        };
-    }
-}
-```
 
 ## Aggregate root pattern
 
