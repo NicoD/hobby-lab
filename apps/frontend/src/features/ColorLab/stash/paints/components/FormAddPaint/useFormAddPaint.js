@@ -1,7 +1,7 @@
 import { useCallback } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useAuth } from "../../../../../shared/context/AuthContext";
-import { useApiFetch } from "../../../../../shared/hooks/useApiFetch";
+import { useAuth } from "../../../../../../shared/context/AuthContext";
+import { useApiFetch } from "../../../../../../shared/hooks/useApiFetch";
 
 export function useFormAddPaint() {
     const { token } = useAuth()
@@ -10,24 +10,24 @@ export function useFormAddPaint() {
 
     const { data: existingBrands = [] } = useQuery({
         queryKey: ['brands', token],
-        queryFn: () => apiFetch('/api/color-lab/brands'),
+        queryFn: () => apiFetch('/api/color-lab/catalog/brands'),
         enabled: !!token,
     })
 
     const { data: existingPaintTypes = [] } = useQuery({
         queryKey: ['paint-types', token],
-        queryFn: () => apiFetch('/api/color-lab/paint-types'),
+        queryFn: () => apiFetch('/api/color-lab/catalog/paint-types'),
         enabled: !!token,
     })
 
     const searchColors = useCallback(async (query) => {
         const params = new URLSearchParams({ search: query })
-        const data = await apiFetch(`/api/color-lab/colors?${params}`)
+        const data = await apiFetch(`/api/color-lab/catalog/colors?${params}`)
         return data.map(c => ({ key: c.handle, value: c.name }))
     }, [apiFetch])
 
     const createBrand = useMutation({
-        mutationFn: (brand) => apiFetch('/api/color-lab/brands', {
+        mutationFn: (brand) => apiFetch('/api/color-lab/catalog/brands', {
             method: 'POST',
             body: JSON.stringify(brand),
         }),
@@ -35,7 +35,7 @@ export function useFormAddPaint() {
     })
 
     const createPaintType = useMutation({
-        mutationFn: (paintType) => apiFetch('/api/color-lab/paint-types', {
+        mutationFn: (paintType) => apiFetch('/api/color-lab/catalog/paint-types', {
             method: 'POST',
             body: JSON.stringify(paintType),
         }),
@@ -43,7 +43,7 @@ export function useFormAddPaint() {
     })
 
     const createColor = useMutation({
-        mutationFn: (color) => apiFetch('/api/color-lab/colors', {
+        mutationFn: (color) => apiFetch('/api/color-lab/catalog/colors', {
             method: 'POST',
             body: JSON.stringify(color),
         }),
@@ -51,11 +51,11 @@ export function useFormAddPaint() {
     })
 
     const createPaint = useMutation({
-        mutationFn: (paint) => apiFetch('/api/color-lab/paints', {
+        mutationFn: (paint) => apiFetch('/api/color-lab/stash/paints', {
             method: 'POST',
             body: JSON.stringify(paint),
         }),
-        onSuccess: () => queryClient.invalidateQueries({ queryKey: ['paints'] }),
+        onSuccess: () => queryClient.invalidateQueries({ queryKey: ['stash-paints'] }),
     })
 
     return { existingBrands, existingPaintTypes, searchColors, createBrand, createPaintType, createColor, createPaint }

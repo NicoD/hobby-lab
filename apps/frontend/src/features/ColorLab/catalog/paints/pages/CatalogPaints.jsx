@@ -1,5 +1,5 @@
 import CatalogPage from '../../shared/components/CatalogPage'
-import { usePaintReferences } from '../hooks/usePaintReferences'
+import { useCatalogPaints } from '../hooks/useCatalogPaints'
 
 const dash = <span className="text-gray-300">—</span>
 
@@ -16,8 +16,8 @@ const COLUMNS = [
   },
 ]
 
-export default function PaintReferences() {
-  const catalog = usePaintReferences()
+export default function CatalogPaints() {
+  const catalog = useCatalogPaints()
 
   return (
     <CatalogPage

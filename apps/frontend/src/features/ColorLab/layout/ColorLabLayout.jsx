@@ -19,7 +19,7 @@ export default function ColorLabLayout() {
     <div className="flex h-[calc(100vh-3.5rem)]">
       <aside className="w-56 shrink-0 border-r border-gray-200 bg-white flex flex-col">
         <nav className="px-3 py-4 space-y-1">
-          <NavLink to="/color-lab/paint" className={primaryLink}>
+          <NavLink to="/color-lab/stash/paints" className={primaryLink}>
             Mes peintures
           </NavLink>
           <NavLink to="/color-lab/brush" className={primaryLink}>
@@ -37,7 +37,7 @@ export default function ColorLabLayout() {
           <NavLink to="/color-lab/catalog/colors" className={catalogLink}>
             Couleurs
           </NavLink>
-          <NavLink to="/color-lab/catalog/references" className={catalogLink}>
+          <NavLink to="/color-lab/catalog/paints" className={catalogLink}>
             Références
           </NavLink>
         </nav>

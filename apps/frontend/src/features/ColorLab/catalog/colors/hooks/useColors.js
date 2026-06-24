@@ -17,7 +17,7 @@ export function useColors() {
     queryFn: () => {
       const params = new URLSearchParams({ page, sort, dir })
       if (debouncedSearch) params.set('search', debouncedSearch)
-      return apiFetch(`/api/color-lab/colors?${params}`)
+      return apiFetch(`/api/color-lab/catalog/colors?${params}`)
     },
     placeholderData: keepPreviousData,
   })

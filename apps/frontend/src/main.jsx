@@ -11,10 +11,10 @@ import ColorLabLayout from './features/ColorLab/layout/ColorLabLayout'
 import MiniLab from './features/MiniLab/pages/MiniLab'
 import RouterError from './shared/components/RouterError'
 import RequireAuth from './shared/components/RequireAuth'
-import ColorLabPaint from './features/ColorLab/paint/pages/Paint'
+import StashPaints from './features/ColorLab/stash/paints/pages/StashPaints'
 import ColorLabCatalogBrands from './features/ColorLab/catalog/brands/pages/Brands'
 import ColorLabCatalogColors from './features/ColorLab/catalog/colors/pages/Colors'
-import ColorLabCatalogReferences from './features/ColorLab/catalog/references/pages/PaintReferences'
+import CatalogPaints from './features/ColorLab/catalog/paints/pages/CatalogPaints'
 
 function HomeRedirect() {
   const { user } = useAuth()
@@ -37,11 +37,11 @@ const router = createBrowserRouter([
             path: 'color-lab',
             element: <ColorLabLayout />,
             children: [
-              { index: true, element: <Navigate to="paint" replace /> },
-              { path: 'paint', element: <ColorLabPaint /> },
+              { index: true, element: <Navigate to="stash/paints" replace /> },
+              { path: 'stash/paints', element: <StashPaints /> },
               { path: 'catalog/brands', element: <ColorLabCatalogBrands /> },
               { path: 'catalog/colors', element: <ColorLabCatalogColors /> },
-              { path: 'catalog/references', element: <ColorLabCatalogReferences /> },
+              { path: 'catalog/paints', element: <CatalogPaints /> },
             ]
           },
           { path: 'mini-lab', element: <MiniLab /> },

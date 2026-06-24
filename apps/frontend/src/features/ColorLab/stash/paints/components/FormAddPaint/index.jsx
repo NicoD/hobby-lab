@@ -1,16 +1,16 @@
 import { useCallback, useState } from "react";
-import Combobox from "../../../../../shared/components/Combobox";
-import FormField from "../../../../../shared/components/FormField";
+import Combobox from "../../../../../../shared/components/Combobox";
+import FormField from "../../../../../../shared/components/FormField";
 import { useFormAddPaint } from "./useFormAddPaint";
-import { usePaintReferences } from "./usePaintReferences";
+import { useCatalogPaints } from "./useCatalogPaints";
 
 export default function FormAddPaint({ onClose }) {
     const [filters, setFilters] = useState({})
-    const [paintReferenceId, setPaintReferenceId] = useState(null)
+    const [paintHandle, setPaintHandle] = useState(null)
     const [purchasedAt, setPurchasedAt] = useState('')
 
     const { existingBrands, existingPaintTypes, searchColors, createBrand, createPaintType, createColor, createPaint } = useFormAddPaint()
-    const { searchPaintReferences, createPaintReference } = usePaintReferences(filters)
+    const { searchCatalogPaints, createCatalogPaint } = useCatalogPaints(filters)
 
     const currentBrand = existingBrands.find(brand => filters.brand === brand.handle) ?? null
 
@@ -29,8 +29,8 @@ export default function FormAddPaint({ onClose }) {
         return handle
     }, [createColor.mutateAsync])
 
-    const handleCreatePaintReference = useCallback(async (name) => {
-        const { handle } = await createPaintReference.mutateAsync({
+    const handleCreateCatalogPaint = useCallback(async (name) => {
+        const { handle } = await createCatalogPaint.mutateAsync({
             name,
             brand: filters.brand,
             range: filters.range,
@@ -38,11 +38,11 @@ export default function FormAddPaint({ onClose }) {
             color: filters.color,
         })
         return handle
-    }, [createPaintReference.mutateAsync, filters])
+    }, [createCatalogPaint.mutateAsync, filters])
 
     const handleSubmit = async (e) => {
         e.preventDefault()
-        await createPaint.mutateAsync({ paintReferenceHandle: paintReferenceId, purchasedAt: purchasedAt || null })
+        await createPaint.mutateAsync({ paintHandle, purchasedAt: purchasedAt || null })
         onClose()
     }
 
@@ -89,12 +89,12 @@ export default function FormAddPaint({ onClose }) {
         </FormField>
 
         {filters.brand && (
-            <FormField label="Référence" error={createPaintReference.isError ? createPaintReference.error.message : null}>
+            <FormField label="Référence" error={createCatalogPaint.isError ? createCatalogPaint.error.message : null}>
                 <Combobox
-                    onSearch={searchPaintReferences}
-                    value={paintReferenceId}
-                    onChange={setPaintReferenceId}
-                    onCreate={handleCreatePaintReference}
+                    onSearch={searchCatalogPaints}
+                    value={paintHandle}
+                    onChange={setPaintHandle}
+                    onCreate={handleCreateCatalogPaint}
                     placeholder="Référence…"
                 />
             </FormField>
@@ -106,7 +106,7 @@ export default function FormAddPaint({ onClose }) {
                 aria-label="Date d'achat"
                 value={purchasedAt}
                 onChange={(e) => setPurchasedAt(e.target.value)}
-                disabled={!paintReferenceId}
+                disabled={!paintHandle}
             />
         </FormField>
 
@@ -124,7 +124,7 @@ export default function FormAddPaint({ onClose }) {
             </button>
             <button
                 type="submit"
-                disabled={!paintReferenceId || createPaint.isPending}
+                disabled={!paintHandle || createPaint.isPending}
                 className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 active:bg-indigo-800 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
             >
                 Ajouter

@@ -1,9 +1,9 @@
 import FormAddPaint from "../components/FormAddPaint";
-import ListWrapper from "../../../../shared/components/ListWrapper";
-import Modal from "../../../../shared/components/Modal";
-import useModal from "../../../../shared/hooks/useModal";
+import ListWrapper from "../../../../../shared/components/ListWrapper";
+import Modal from "../../../../../shared/components/Modal";
+import useModal from "../../../../../shared/hooks/useModal";
 
-export default function Paint() {
+export default function StashPaints() {
 
   const addModal = useModal()
 

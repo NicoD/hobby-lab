@@ -3,7 +3,7 @@ import { useQuery, keepPreviousData } from '@tanstack/react-query'
 import { useApiFetch } from '../../../../../shared/hooks/useApiFetch'
 import { useDebounce } from '../../../../../shared/hooks/useDebounce'
 
-export function usePaintReferences() {
+export function useCatalogPaints() {
   const apiFetch = useApiFetch()
   const [search, setSearch] = useState('')
   const [page, setPage] = useState(1)
@@ -13,11 +13,11 @@ export function usePaintReferences() {
   const debouncedSearch = useDebounce(search)
 
   const query = useQuery({
-    queryKey: ['paint-references', debouncedSearch, page, sort, dir],
+    queryKey: ['catalog-paints', debouncedSearch, page, sort, dir],
     queryFn: () => {
       const params = new URLSearchParams({ page, sort, dir })
       if (debouncedSearch) params.set('search', debouncedSearch)
-      return apiFetch(`/api/color-lab/paint-references?${params}`)
+      return apiFetch(`/api/color-lab/catalog/paints?${params}`)
     },
     placeholderData: keepPreviousData,
   })
