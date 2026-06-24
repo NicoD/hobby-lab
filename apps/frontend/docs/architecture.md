@@ -45,11 +45,48 @@ the UI — they do not need to match backend naming conventions.
 ```
 features/
   ColorLab/         ← feature group
-    paint/          ← feature: manage paints
-    brand/          ← future feature: manage brands
+    paint/          ← library feature: manage paints
+    catalog/        ← catalog sub-group (see below)
+      brands/
+      colors/
   User/             ← feature group
     login/          ← feature: authentication
     profile/        ← feature: user profile
+```
+
+## ColorLab — Library vs Catalog
+
+ColorLab features split into two concepts:
+
+**Library** — the user's personal collection. Things they *own*: their paints, their brushes. Data is user-scoped and relational. Library features live directly under `ColorLab/` (e.g. `paint/`, `brush/`). They are the primary purpose of the app and sit at the top of the sidebar.
+
+**Catalog** — the reference data that describes library items: brands, colors, paint references. The user administers catalog entries (add, edit, delete) but does not "own" them the way they own library items. Catalog features live under `ColorLab/catalog/` and share a generic table+filter+pagination layout (`catalog/shared/`). They sit at the bottom of the sidebar with a secondary visual treatment.
+
+A paint in the Library references a brand from the Catalog. The Catalog has no meaning without the Library — it exists to enrich it.
+
+### Routing and import naming
+
+Library routes sit directly under the feature group — no prefix:
+
+```
+/color-lab/paint
+/color-lab/brush
+```
+
+Catalog routes are always prefixed with `catalog/`:
+
+```
+/color-lab/catalog/brands
+/color-lab/catalog/colors
+/color-lab/catalog/references
+```
+
+In `main.jsx`, catalog page imports are named `ColorLab**Catalog**<Entity>` to make the distinction visible at a glance:
+
+```js
+import ColorLabPaint          from '…/paint/pages/Paint'           // library
+import ColorLabCatalogBrands  from '…/catalog/brands/pages/Brands' // catalog
+import ColorLabCatalogColors  from '…/catalog/colors/pages/Colors' // catalog
 ```
 
 There is no top-level `pages/` folder. Every page belongs to a feature. When a feature group

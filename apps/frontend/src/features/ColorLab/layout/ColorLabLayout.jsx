@@ -31,7 +31,7 @@ export default function ColorLabLayout() {
           <p className="px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-gray-300">
             Catalogue
           </p>
-          <NavLink to="/color-lab/brands" className={catalogLink}>
+          <NavLink to="/color-lab/catalog/brands" className={catalogLink}>
             Marques
           </NavLink>
           <NavLink to="/color-lab/colors" className={catalogLink}>
