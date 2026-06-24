@@ -13,6 +13,7 @@ import RouterError from './shared/components/RouterError'
 import RequireAuth from './shared/components/RequireAuth'
 import ColorLabPaint from './features/ColorLab/paint/pages/Paint'
 import ColorLabCatalogBrands from './features/ColorLab/catalog/brands/pages/Brands'
+import ColorLabCatalogColors from './features/ColorLab/catalog/colors/pages/Colors'
 
 function HomeRedirect() {
   const { user } = useAuth()
@@ -38,6 +39,7 @@ const router = createBrowserRouter([
               { index: true, element: <Navigate to="paint" replace /> },
               { path: 'paint', element: <ColorLabPaint /> },
               { path: 'catalog/brands', element: <ColorLabCatalogBrands /> },
+              { path: 'catalog/colors', element: <ColorLabCatalogColors /> },
             ]
           },
           { path: 'mini-lab', element: <MiniLab /> },

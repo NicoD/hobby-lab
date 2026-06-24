@@ -34,7 +34,7 @@ export default function ColorLabLayout() {
           <NavLink to="/color-lab/catalog/brands" className={catalogLink}>
             Marques
           </NavLink>
-          <NavLink to="/color-lab/colors" className={catalogLink}>
+          <NavLink to="/color-lab/catalog/colors" className={catalogLink}>
             Couleurs
           </NavLink>
           <NavLink to="/color-lab/references" className={catalogLink}>
