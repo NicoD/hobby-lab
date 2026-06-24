@@ -3,23 +3,28 @@ doctrine:
         url: '%env(DATABASE_URL)%'
         server_version: '16'
         types:
-            brand_handle: App\ColorLab\Infrastructure\Doctrine\Type\BrandHandleType
-            color_handle: App\ColorLab\Infrastructure\Doctrine\Type\ColorHandleType
-            paint_type_handle: App\ColorLab\Infrastructure\Doctrine\Type\PaintTypeHandleType
-            range_handle: App\ColorLab\Infrastructure\Doctrine\Type\RangeHandleType
-            paint_reference_handle: App\ColorLab\Infrastructure\Doctrine\Type\PaintReferenceHandleType
-            paint_id: App\ColorLab\Infrastructure\Doctrine\Type\PaintIdType
-            range_collection: App\ColorLab\Infrastructure\Doctrine\Type\RangeCollectionType
+            catalog_brand_handle: App\ColorLab\Catalog\Infrastructure\Doctrine\Type\BrandHandleType
+            catalog_color_handle: App\ColorLab\Catalog\Infrastructure\Doctrine\Type\ColorHandleType
+            catalog_paint_type_handle: App\ColorLab\Catalog\Infrastructure\Doctrine\Type\PaintTypeHandleType
+            catalog_range_handle: App\ColorLab\Catalog\Infrastructure\Doctrine\Type\RangeHandleType
+            catalog_range_collection: App\ColorLab\Catalog\Infrastructure\Doctrine\Type\RangeCollectionType
+            catalog_paint_handle: App\ColorLab\Catalog\Infrastructure\Doctrine\Type\PaintHandleType
+            stash_paint_id: App\ColorLab\Stash\Infrastructure\Doctrine\Type\PaintIdType
             user_id: App\Shared\Infrastructure\Doctrine\Type\UserIdType
 
     orm:
         naming_strategy: doctrine.orm.naming_strategy.underscore_number_aware
         auto_mapping: false
         mappings:
-            ColorLab:
+            ColorLab.Catalog:
                 type: attribute
-                dir: '%kernel.project_dir%/src/ColorLab/Domain'
-                prefix: 'App\ColorLab\Domain'
+                dir: '%kernel.project_dir%/src/ColorLab/Catalog/Domain'
+                prefix: 'App\ColorLab\Catalog\Domain'
+                is_bundle: false
+            ColorLab.Stash:
+                type: attribute
+                dir: '%kernel.project_dir%/src/ColorLab/Stash/Domain'
+                prefix: 'App\ColorLab\Stash\Domain'
                 is_bundle: false
 
 when@test:

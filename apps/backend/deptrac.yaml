@@ -18,22 +18,39 @@ parameters:
       collectors:
         - { type: directory, value: 'src/Shared/Infrastructure/.*' }
 
-    # ── ColorLab ──────────────────────────────────────────────────────────────
-    - name: ColorLab.Domain
+    # ── ColorLab.Catalog ──────────────────────────────────────────────────────
+    - name: ColorLab.Catalog.Domain
       collectors:
-        - { type: directory, value: 'src/ColorLab/Domain/.*' }
+        - { type: directory, value: 'src/ColorLab/Catalog/Domain/.*' }
 
-    - name: ColorLab.Application
+    - name: ColorLab.Catalog.Application
       collectors:
-        - { type: directory, value: 'src/ColorLab/Application/.*' }
+        - { type: directory, value: 'src/ColorLab/Catalog/Application/.*' }
 
-    - name: ColorLab.Infrastructure
+    - name: ColorLab.Catalog.Infrastructure
       collectors:
-        - { type: directory, value: 'src/ColorLab/Infrastructure/.*' }
+        - { type: directory, value: 'src/ColorLab/Catalog/Infrastructure/.*' }
 
-    - name: ColorLab.UI
+    - name: ColorLab.Catalog.UI
       collectors:
-        - { type: directory, value: 'src/ColorLab/UI/.*' }
+        - { type: directory, value: 'src/ColorLab/Catalog/UI/.*' }
+
+    # ── ColorLab.Stash ────────────────────────────────────────────────────────
+    - name: ColorLab.Stash.Domain
+      collectors:
+        - { type: directory, value: 'src/ColorLab/Stash/Domain/.*' }
+
+    - name: ColorLab.Stash.Application
+      collectors:
+        - { type: directory, value: 'src/ColorLab/Stash/Application/.*' }
+
+    - name: ColorLab.Stash.Infrastructure
+      collectors:
+        - { type: directory, value: 'src/ColorLab/Stash/Infrastructure/.*' }
+
+    - name: ColorLab.Stash.UI
+      collectors:
+        - { type: directory, value: 'src/ColorLab/Stash/UI/.*' }
 
   ruleset:
     # Shared — never depends on a business domain
@@ -44,19 +61,38 @@ parameters:
       - Shared.Domain
       - Shared.Application
 
-    # ColorLab — strict inward dependency direction
-    ColorLab.Domain:
+    # Catalog — strict inward dependency direction
+    ColorLab.Catalog.Domain:
       - Shared.Domain
-    ColorLab.Application:
-      - ColorLab.Domain
+    ColorLab.Catalog.Application:
+      - ColorLab.Catalog.Domain
       - Shared.Domain
       - Shared.Application
-    ColorLab.Infrastructure:
-      - ColorLab.Domain
-      - ColorLab.Application
+    ColorLab.Catalog.Infrastructure:
+      - ColorLab.Catalog.Domain
+      - ColorLab.Catalog.Application
       - Shared.Domain
       - Shared.Application
       - Shared.Infrastructure
-    ColorLab.UI:
-      - ColorLab.Application
+    ColorLab.Catalog.UI:
+      - ColorLab.Catalog.Application
+      - Shared.Application
+
+    # Stash — may reference Catalog identity VOs (write side: PaintHandle only)
+    ColorLab.Stash.Domain:
+      - Shared.Domain
+      - ColorLab.Catalog.Domain   # Stash\Paint references PaintHandle identity VO
+    ColorLab.Stash.Application:
+      - ColorLab.Stash.Domain
+      - ColorLab.Catalog.Domain   # CreatePaintCommandHandler uses PaintHandle
+      - Shared.Domain
+      - Shared.Application
+    ColorLab.Stash.Infrastructure:
+      - ColorLab.Stash.Domain
+      - ColorLab.Stash.Application
+      - Shared.Domain
+      - Shared.Application
+      - Shared.Infrastructure
+    ColorLab.Stash.UI:
+      - ColorLab.Stash.Application
       - Shared.Application
