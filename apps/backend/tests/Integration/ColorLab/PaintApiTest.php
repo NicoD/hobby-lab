@@ -22,7 +22,7 @@ class PaintApiTest extends ApiTestCase
 
         $this->request('GET', '/color-lab/brands');
         $brands = $this->responseJson();
-        $brandHandle = $brands[0]['handle'];
+        $brandHandle = $brands['items'][0]['handle'];
 
         $this->request('GET', '/color-lab/paint-types');
         $types = $this->responseJson();
@@ -30,15 +30,14 @@ class PaintApiTest extends ApiTestCase
 
         $this->request('POST', '/color-lab/paint-references', [
             'name' => 'Crimson',
-            'brandHandle' => $brandHandle,
-            'rangeHandle' => 'game-color',
-            'paintTypeHandle' => $paintTypeHandle,
+            'brand' => $brandHandle,
+            'paintType' => $paintTypeHandle,
         ]);
 
         $this->request('GET', '/color-lab/paint-references');
         $refs = $this->responseJson();
 
-        return $refs[0]['handle'];
+        return $refs['items'][0]['handle'];
     }
 
     public function testCreate(): void

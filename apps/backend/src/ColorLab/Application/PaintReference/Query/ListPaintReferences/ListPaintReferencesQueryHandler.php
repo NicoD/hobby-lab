@@ -7,6 +7,7 @@ namespace App\ColorLab\Application\PaintReference\Query\ListPaintReferences;
 use App\ColorLab\Application\PaintReference\ReadModel\PaintReferenceCriteria;
 use App\ColorLab\Application\PaintReference\ReadModel\PaintReferenceListItemView;
 use App\ColorLab\Application\PaintReference\ReadModel\PaintReferenceReadRepository;
+use App\Shared\Application\Query\PaginatedResult;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 #[AsMessageHandler]
@@ -16,15 +17,13 @@ final readonly class ListPaintReferencesQueryHandler
     {
     }
 
-    /** @return list<PaintReferenceListItemView> */
-    public function __invoke(ListPaintReferencesQuery $query): array
+    /** @return PaginatedResult<PaintReferenceListItemView> */
+    public function __invoke(ListPaintReferencesQuery $query): PaginatedResult
     {
         return $this->paintReferences->list(new PaintReferenceCriteria(
             $query->ownedBy,
-            $query->brandHandle,
-            $query->rangeHandle,
-            $query->paintTypeHandle,
-            $query->colorHandle,
+            $query->pagination,
+            $query->sort,
             $query->search,
         ));
     }

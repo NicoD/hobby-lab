@@ -33,6 +33,8 @@ class PaintReference implements AggregateRoot
         public private(set) ?ColorHandle $color,
         #[ORM\Column(type: 'user_id')]
         public private(set) UserId $ownedBy,
+        #[ORM\Column(type: 'datetime_immutable')]
+        public private(set) \DateTimeImmutable $createdAt = new \DateTimeImmutable(),
     ) {
     }
 

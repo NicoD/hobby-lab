@@ -9,10 +9,15 @@ final readonly class PaintReferenceListItemView
     public function __construct(
         public string $handle,
         public string $name,
-        public ?string $brandHandle,
-        public ?string $rangeHandle,
-        public ?string $paintTypeHandle,
-        public ?string $colorHandle,
+        public string $createdAt,
+        public ?string $brandId,
+        public ?string $brandName,
+        public ?string $rangeId,
+        public ?string $rangeName,
+        public ?string $paintTypeId,
+        public ?string $paintTypeName,
+        public ?string $colorId,
+        public ?string $colorName,
     ) {
     }
 }
