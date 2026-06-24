@@ -14,6 +14,7 @@ import RequireAuth from './shared/components/RequireAuth'
 import ColorLabPaint from './features/ColorLab/paint/pages/Paint'
 import ColorLabCatalogBrands from './features/ColorLab/catalog/brands/pages/Brands'
 import ColorLabCatalogColors from './features/ColorLab/catalog/colors/pages/Colors'
+import ColorLabCatalogReferences from './features/ColorLab/catalog/references/pages/PaintReferences'
 
 function HomeRedirect() {
   const { user } = useAuth()
@@ -40,6 +41,7 @@ const router = createBrowserRouter([
               { path: 'paint', element: <ColorLabPaint /> },
               { path: 'catalog/brands', element: <ColorLabCatalogBrands /> },
               { path: 'catalog/colors', element: <ColorLabCatalogColors /> },
+              { path: 'catalog/references', element: <ColorLabCatalogReferences /> },
             ]
           },
           { path: 'mini-lab', element: <MiniLab /> },
