@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Test\Integration\ColorLab;
 
-use App\ColorLab\Domain\Event\PaintReferenceCreatedEvent;
+use App\ColorLab\Catalog\Domain\Paint\Event\PaintCreatedEvent;
 use Test\Integration\ApiTestCase;
 
-class PaintReferenceApiTest extends ApiTestCase
+class CatalogPaintApiTest extends ApiTestCase
 {
     protected function setUp(): void
     {
@@ -17,12 +17,12 @@ class PaintReferenceApiTest extends ApiTestCase
 
     public function testCreate(): void
     {
-        $this->request('POST', '/color-lab/paint-references', ['name' => 'Vallejo Red']);
+        $this->request('POST', '/color-lab/catalog/paints', ['name' => 'Vallejo Red']);
 
         self::assertResponseStatusCodeSame(201);
-        $this->assertEventDispatched(PaintReferenceCreatedEvent::class, static function (PaintReferenceCreatedEvent $event): void {
+        $this->assertEventDispatched(PaintCreatedEvent::class, static function (PaintCreatedEvent $event): void {
             self::assertSame('Vallejo Red', $event->name);
-            self::assertSame('019661b9-a000-7000-8000-000000000001', (string) $event->ownedBy);
+            self::assertSame('019661b9-a000-7000-8000-000000000001', (string) $event->userId);
         });
     }
 
@@ -31,7 +31,7 @@ class PaintReferenceApiTest extends ApiTestCase
         $brandHandle = $this->createBrand('Vallejo');
         $colorHandle = $this->createColor('Red');
 
-        $this->request('POST', '/color-lab/paint-references', [
+        $this->request('POST', '/color-lab/catalog/paints', [
             'name' => 'Vallejo Red',
             'brand' => $brandHandle,
             'color' => $colorHandle,
@@ -45,10 +45,10 @@ class PaintReferenceApiTest extends ApiTestCase
 
     public function testList(): void
     {
-        $this->request('POST', '/color-lab/paint-references', ['name' => 'Vallejo Red']);
-        $this->request('POST', '/color-lab/paint-references', ['name' => 'Citadel Blue']);
+        $this->request('POST', '/color-lab/catalog/paints', ['name' => 'Vallejo Red']);
+        $this->request('POST', '/color-lab/catalog/paints', ['name' => 'Citadel Blue']);
 
-        $this->request('GET', '/color-lab/paint-references');
+        $this->request('GET', '/color-lab/catalog/paints');
 
         self::assertResponseIsSuccessful();
         $response = $this->responseJson();
@@ -68,13 +68,13 @@ class PaintReferenceApiTest extends ApiTestCase
         $brandHandle = $this->createBrand('Vallejo');
         $colorHandle = $this->createColor('Red');
 
-        $this->request('POST', '/color-lab/paint-references', [
+        $this->request('POST', '/color-lab/catalog/paints', [
             'name' => 'Vallejo Red',
             'brand' => $brandHandle,
             'color' => $colorHandle,
         ]);
 
-        $this->request('GET', '/color-lab/paint-references');
+        $this->request('GET', '/color-lab/catalog/paints');
 
         self::assertResponseIsSuccessful();
         $item = $this->responseJson()['items'][0];
@@ -88,9 +88,9 @@ class PaintReferenceApiTest extends ApiTestCase
 
     public function testListWithoutRelatedAggregatesHasNullLabels(): void
     {
-        $this->request('POST', '/color-lab/paint-references', ['name' => 'Unknown']);
+        $this->request('POST', '/color-lab/catalog/paints', ['name' => 'Unknown']);
 
-        $this->request('GET', '/color-lab/paint-references');
+        $this->request('GET', '/color-lab/catalog/paints');
 
         self::assertResponseIsSuccessful();
         $item = $this->responseJson()['items'][0];
@@ -103,10 +103,10 @@ class PaintReferenceApiTest extends ApiTestCase
     public function testListPagination(): void
     {
         foreach (['Alpha', 'Beta', 'Gamma'] as $name) {
-            $this->request('POST', '/color-lab/paint-references', ['name' => $name]);
+            $this->request('POST', '/color-lab/catalog/paints', ['name' => $name]);
         }
 
-        $this->request('GET', '/color-lab/paint-references?page=1&limit=2');
+        $this->request('GET', '/color-lab/catalog/paints?page=1&limit=2');
 
         self::assertResponseIsSuccessful();
         $response = $this->responseJson();
@@ -117,10 +117,10 @@ class PaintReferenceApiTest extends ApiTestCase
 
     public function testListSearch(): void
     {
-        $this->request('POST', '/color-lab/paint-references', ['name' => 'Vallejo Red']);
-        $this->request('POST', '/color-lab/paint-references', ['name' => 'Citadel Blue']);
+        $this->request('POST', '/color-lab/catalog/paints', ['name' => 'Vallejo Red']);
+        $this->request('POST', '/color-lab/catalog/paints', ['name' => 'Citadel Blue']);
 
-        $this->request('GET', '/color-lab/paint-references?search=vallejo');
+        $this->request('GET', '/color-lab/catalog/paints?search=vallejo');
 
         self::assertResponseIsSuccessful();
         $response = $this->responseJson();
@@ -130,10 +130,10 @@ class PaintReferenceApiTest extends ApiTestCase
 
     public function testListSortByName(): void
     {
-        $this->request('POST', '/color-lab/paint-references', ['name' => 'Citadel Blue']);
-        $this->request('POST', '/color-lab/paint-references', ['name' => 'Vallejo Red']);
+        $this->request('POST', '/color-lab/catalog/paints', ['name' => 'Citadel Blue']);
+        $this->request('POST', '/color-lab/catalog/paints', ['name' => 'Vallejo Red']);
 
-        $this->request('GET', '/color-lab/paint-references?sort=name&dir=asc');
+        $this->request('GET', '/color-lab/catalog/paints?sort=name&dir=asc');
 
         self::assertResponseIsSuccessful();
         $response = $this->responseJson();
@@ -144,10 +144,10 @@ class PaintReferenceApiTest extends ApiTestCase
     public function testListIsolatedByUser(): void
     {
         $this->setCurrentUserId('019661b9-a000-7000-8000-000000000001');
-        $this->request('POST', '/color-lab/paint-references', ['name' => 'Vallejo Red']);
+        $this->request('POST', '/color-lab/catalog/paints', ['name' => 'Vallejo Red']);
 
         $this->setCurrentUserId('019661b9-a000-7000-8000-000000000002');
-        $this->request('GET', '/color-lab/paint-references');
+        $this->request('GET', '/color-lab/catalog/paints');
 
         self::assertResponseIsSuccessful();
         $response = $this->responseJson();
@@ -156,13 +156,13 @@ class PaintReferenceApiTest extends ApiTestCase
 
     public function testGet(): void
     {
-        $this->request('POST', '/color-lab/paint-references', ['name' => 'Vallejo Red']);
+        $this->request('POST', '/color-lab/catalog/paints', ['name' => 'Vallejo Red']);
 
-        $this->request('GET', '/color-lab/paint-references');
+        $this->request('GET', '/color-lab/catalog/paints');
         $list = $this->responseJson();
         $handle = $list['items'][0]['handle'];
 
-        $this->request('GET', '/color-lab/paint-references/'.$handle);
+        $this->request('GET', '/color-lab/catalog/paints/'.$handle);
 
         self::assertResponseIsSuccessful();
         $ref = $this->responseJson();
@@ -173,15 +173,15 @@ class PaintReferenceApiTest extends ApiTestCase
 
     public function testGetNotFound(): void
     {
-        $this->request('GET', '/color-lab/paint-references/nonexistent-handle');
+        $this->request('GET', '/color-lab/catalog/paints/nonexistent-handle');
 
         self::assertResponseStatusCodeSame(404);
     }
 
     private function createBrand(string $name): string
     {
-        $this->request('POST', '/color-lab/brands', ['name' => $name]);
-        $this->request('GET', '/color-lab/brands');
+        $this->request('POST', '/color-lab/catalog/brands', ['name' => $name]);
+        $this->request('GET', '/color-lab/catalog/brands');
         $brands = $this->responseJson()['items'];
 
         foreach ($brands as $brand) {
@@ -195,8 +195,8 @@ class PaintReferenceApiTest extends ApiTestCase
 
     private function createColor(string $name): string
     {
-        $this->request('POST', '/color-lab/colors', ['name' => $name]);
-        $this->request('GET', '/color-lab/colors');
+        $this->request('POST', '/color-lab/catalog/colors', ['name' => $name]);
+        $this->request('GET', '/color-lab/catalog/colors');
         $colors = $this->responseJson()['items'];
 
         foreach ($colors as $color) {

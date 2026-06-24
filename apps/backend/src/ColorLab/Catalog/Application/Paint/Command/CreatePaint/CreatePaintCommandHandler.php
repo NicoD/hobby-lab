@@ -5,14 +5,14 @@ declare(strict_types=1);
 namespace App\ColorLab\Catalog\Application\Paint\Command\CreatePaint;
 
 use App\ColorLab\Catalog\Domain\Brand\BrandHandle;
+use App\ColorLab\Catalog\Domain\Brand\Range\RangeHandle;
 use App\ColorLab\Catalog\Domain\Color\ColorHandle;
 use App\ColorLab\Catalog\Domain\Paint\Paint;
 use App\ColorLab\Catalog\Domain\Paint\PaintHandle;
 use App\ColorLab\Catalog\Domain\Paint\PaintRepository;
 use App\ColorLab\Catalog\Domain\PaintType\PaintTypeHandle;
-use App\ColorLab\Catalog\Domain\Range\RangeHandle;
+use App\Identity\UserId;
 use App\Shared\Application\Service\TransactionManager;
-use App\Shared\Domain\Model\UserId;
 use App\Shared\Domain\Service\HandleGeneratorFactory;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 

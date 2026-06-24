@@ -7,8 +7,8 @@ namespace App\ColorLab\Catalog\Application\PaintType\Command\CreatePaintType;
 use App\ColorLab\Catalog\Domain\PaintType\PaintType;
 use App\ColorLab\Catalog\Domain\PaintType\PaintTypeHandle;
 use App\ColorLab\Catalog\Domain\PaintType\PaintTypeRepository;
+use App\Identity\UserId;
 use App\Shared\Application\Service\TransactionManager;
-use App\Shared\Domain\Model\UserId;
 use App\Shared\Domain\Service\HandleGeneratorFactory;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 

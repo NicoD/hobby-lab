@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Test\Integration\ColorLab;
 
-use App\ColorLab\Domain\Event\PaintTypeCreatedEvent;
+use App\ColorLab\Catalog\Domain\PaintType\Event\PaintTypeCreatedEvent;
 use Test\Integration\ApiTestCase;
 
 class PaintTypeApiTest extends ApiTestCase
@@ -17,7 +17,7 @@ class PaintTypeApiTest extends ApiTestCase
 
     public function testCreate(): void
     {
-        $this->request('POST', '/color-lab/paint-types', ['name' => 'Standard']);
+        $this->request('POST', '/color-lab/catalog/paint-types', ['name' => 'Standard']);
 
         self::assertResponseStatusCodeSame(201);
         $this->assertEventDispatched(PaintTypeCreatedEvent::class, static function (PaintTypeCreatedEvent $event): void {
@@ -28,10 +28,10 @@ class PaintTypeApiTest extends ApiTestCase
 
     public function testList(): void
     {
-        $this->request('POST', '/color-lab/paint-types', ['name' => 'Standard']);
-        $this->request('POST', '/color-lab/paint-types', ['name' => 'Wash']);
+        $this->request('POST', '/color-lab/catalog/paint-types', ['name' => 'Standard']);
+        $this->request('POST', '/color-lab/catalog/paint-types', ['name' => 'Wash']);
 
-        $this->request('GET', '/color-lab/paint-types');
+        $this->request('GET', '/color-lab/catalog/paint-types');
 
         self::assertResponseIsSuccessful();
         $types = $this->responseJson();
@@ -42,13 +42,13 @@ class PaintTypeApiTest extends ApiTestCase
 
     public function testGet(): void
     {
-        $this->request('POST', '/color-lab/paint-types', ['name' => 'Metallic']);
+        $this->request('POST', '/color-lab/catalog/paint-types', ['name' => 'Metallic']);
 
-        $this->request('GET', '/color-lab/paint-types');
+        $this->request('GET', '/color-lab/catalog/paint-types');
         $list = $this->responseJson();
         $handle = $list[0]['handle'];
 
-        $this->request('GET', '/color-lab/paint-types/'.$handle);
+        $this->request('GET', '/color-lab/catalog/paint-types/'.$handle);
 
         self::assertResponseIsSuccessful();
         $type = $this->responseJson();
@@ -58,7 +58,7 @@ class PaintTypeApiTest extends ApiTestCase
 
     public function testGetNotFound(): void
     {
-        $this->request('GET', '/color-lab/paint-types/nonexistent-handle');
+        $this->request('GET', '/color-lab/catalog/paint-types/nonexistent-handle');
 
         self::assertResponseStatusCodeSame(404);
     }

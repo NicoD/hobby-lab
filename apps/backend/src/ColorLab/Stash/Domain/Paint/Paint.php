@@ -6,9 +6,9 @@ namespace App\ColorLab\Stash\Domain\Paint;
 
 use App\ColorLab\Catalog\Domain\Paint\PaintHandle;
 use App\ColorLab\Stash\Domain\Paint\Event\PaintCreatedEvent;
+use App\Identity\UserId;
 use App\Shared\Domain\Event\DomainEventTrait;
 use App\Shared\Domain\Model\AggregateRoot;
-use App\Shared\Domain\Model\UserId;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]

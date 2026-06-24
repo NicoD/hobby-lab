@@ -7,8 +7,8 @@ namespace App\ColorLab\Catalog\Application\Color\Command\CreateColor;
 use App\ColorLab\Catalog\Domain\Color\Color;
 use App\ColorLab\Catalog\Domain\Color\ColorHandle;
 use App\ColorLab\Catalog\Domain\Color\ColorRepository;
+use App\Identity\UserId;
 use App\Shared\Application\Service\TransactionManager;
-use App\Shared\Domain\Model\UserId;
 use App\Shared\Domain\Service\HandleGeneratorFactory;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 

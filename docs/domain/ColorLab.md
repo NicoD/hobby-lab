@@ -11,30 +11,17 @@ Model a miniature paint catalogue that allows:
 
 ---
 
-## Module structure (ADR-008)
+## Catalog — subdomain
 
-`ColorLab` is divided into two modules:
-
-| Module | Responsibility | Tables |
-|---|---|---|
-| **Catalog** | Reference data describing paint products | `catalog_brands`, `catalog_colors`, `catalog_paint_types`, `catalog_paints` |
-| **Stash** | User's physical paint reserve | `stash_paints` |
-
-`Stash` references `Catalog` only through the `PaintHandle` identity VO (write-side isolation). The read side may JOIN catalog tables directly.
-
----
-
-## Catalog module
+Reference data describing paint products. Shared across users.
 
 ### Brand
 
-The paint manufacturer. Owned by a user.
+The paint manufacturer.
 
 Examples: Vallejo, Citadel, Army Painter, AK Interactive
 
 **Identity:** handle (slug derived from name, unique per system).
-
----
 
 ### Range
 
@@ -44,21 +31,17 @@ Examples: Game Color, Model Color, Base, Contrast, Speedpaint
 
 **Identity:** handle (slug derived from name, unique within a Brand).
 
----
-
 ### PaintType
 
-The technical behavior or usage of the paint. Distinct from color. Owned by a user.
+The technical behavior or usage of the paint. Distinct from color.
 
 Examples: Standard, Metallic, Wash, Glaze, Ink, Contrast, Technical
 
 **Identity:** handle (slug derived from name, unique per system).
 
----
-
 ### Color
 
-The color family. The commercial name of a paint is not necessarily its color. Owned by a user.
+The color family. The commercial name of a paint is not necessarily its color.
 
 Examples:
 
@@ -71,13 +54,9 @@ Examples:
 
 **Identity:** handle (slug derived from name, unique per system).
 
----
+### Paint
 
-### Paint (formerly PaintReference)
-
-A catalogue entry for a paint. The core of the catalogue. Owned by a user (the one who created the entry).
-
-Defined by: Brand, Range, PaintType, Name, and optionally Color.
+A catalogue entry describing a paint product. Defined by Brand, Range, PaintType, Name, and optionally Color.
 
 ```
 Brand     = Vallejo
@@ -91,16 +70,18 @@ Color     = Red (optional)
 
 ---
 
-## Stash module
+## Stash — subdomain
+
+A user's personal reserve of physical paints. References Catalog entries.
 
 ### Paint
 
-A physical paint owned by a user. References a Catalog `PaintHandle` and adds personal ownership data.
+A physical paint owned by a user. References a Catalog Paint and adds personal ownership data.
 
 ```
-PaintHandle  = vallejo-game-color-crimson   ← references Catalog/Paint
-OwnedBy      = User42
-PurchasedAt  = 2026-02-15 (optional)
+Catalog Paint = Vallejo Game Color Crimson
+OwnedBy       = User42
+PurchasedAt   = 2026-02-15 (optional)
 ```
 
 **Identity:** UUID. No handle.
@@ -111,14 +92,12 @@ PurchasedAt  = 2026-02-15 (optional)
 
 ```
 Catalog:
-  Brand                           → userId (creator)
-  Range          → Brand          (value object embedded in Brand, not standalone)
-  PaintType                       → userId (creator)
-  Color                           → userId (creator)
+  Brand          ← owns Range (embedded, not standalone)
+  PaintType
+  Color
   Paint          → Brand, Range, PaintType, Color (optional)
-                 → userId (creator)
 
 Stash:
-  Paint          → Catalog/PaintHandle (identity VO only)
-                 → ownedBy (User), purchasedAt (optional date)
+  Paint          → Catalog/Paint (by handle)
+                 → OwnedBy (User), PurchasedAt (optional)
 ```

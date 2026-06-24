@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\ColorLab\Catalog\Infrastructure\Doctrine\Type;
 
-use App\ColorLab\Catalog\Domain\Range\Range;
-use App\ColorLab\Catalog\Domain\Range\RangeHandle;
+use App\ColorLab\Catalog\Domain\Brand\Range\Range;
+use App\ColorLab\Catalog\Domain\Brand\Range\RangeHandle;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Types\JsonType;
 

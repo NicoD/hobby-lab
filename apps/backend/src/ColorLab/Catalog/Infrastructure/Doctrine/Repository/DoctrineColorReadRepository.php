@@ -10,8 +10,8 @@ use App\ColorLab\Catalog\Application\Color\ReadModel\ColorReadRepository;
 use App\ColorLab\Catalog\Application\Color\ReadModel\ColorView;
 use App\ColorLab\Catalog\Domain\Color\Color;
 use App\ColorLab\Catalog\Domain\Color\ColorHandle;
+use App\Identity\UserId;
 use App\Shared\Application\Query\PaginatedResult;
-use App\Shared\Domain\Model\UserId;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 

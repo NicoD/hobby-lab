@@ -6,8 +6,8 @@ namespace App\ColorLab\Stash\Domain\Paint\Event;
 
 use App\ColorLab\Catalog\Domain\Paint\PaintHandle;
 use App\ColorLab\Stash\Domain\Paint\PaintId;
+use App\Identity\UserId;
 use App\Shared\Domain\Event\DomainEvent;
-use App\Shared\Domain\Model\UserId;
 
 final class PaintCreatedEvent extends DomainEvent
 {

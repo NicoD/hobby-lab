@@ -10,9 +10,9 @@ use App\ColorLab\Catalog\Application\Brand\ReadModel\BrandReadRepository;
 use App\ColorLab\Catalog\Application\Brand\ReadModel\BrandView;
 use App\ColorLab\Catalog\Domain\Brand\Brand;
 use App\ColorLab\Catalog\Domain\Brand\BrandHandle;
-use App\ColorLab\Catalog\Domain\Range\Range;
+use App\ColorLab\Catalog\Domain\Brand\Range\Range;
+use App\Identity\UserId;
 use App\Shared\Application\Query\PaginatedResult;
-use App\Shared\Domain\Model\UserId;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 

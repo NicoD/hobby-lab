@@ -2,89 +2,89 @@
 
 ---
 
-## Priorité haute
+## High priority
 
 ### CI/CD pipeline
-Mettre en place GitHub Actions avec les étapes : lint, test, build, docker push.
-C'est le point le plus visible manquant pour un portfolio lead dev.
+Set up GitHub Actions with the following steps: lint, test, build, docker push.
+This is the most visible missing piece for a lead dev portfolio.
 
-Étapes suggérées :
-- `backend` : PHPStan + Deptrac + PHPUnit
-- `user` : ESLint + Jest
-- `frontend` : ESLint + build Vite
-- Docker build de chaque service
+Suggested steps:
+- `backend`: PHPStan + Deptrac + PHPUnit
+- `user`: ESLint + Jest
+- `frontend`: ESLint + Vite build
+- Docker build for each service
 
 ### Symfony Voters
-Implémenter l'autorisation fine-grained sur au moins une ressource (Brand ou Paint).
-Exemple : seul le propriétaire peut modifier/supprimer sa Brand.
-L'architecture supporte déjà les Voters dans la couche Application — ADR-003.
+Implement fine-grained authorization on at least one resource (Brand or Paint).
+Example: only the owner can modify/delete their Brand.
+The architecture already supports Voters in the Application layer — ADR-003.
 
-### Tests NestJS
-Aucun test observé dans `apps/user`.
-Ajouter des tests e2e pour le flow auth complet :
-- register, login, refresh (dont le cas token révoqué), logout
-- endpoint /validate
+### NestJS tests
+No tests observed in `apps/user`.
+Add e2e tests for the complete auth flow:
+- register, login, refresh (including revoked token case), logout
+- `/validate` endpoint
 
 ---
 
-## Priorité moyenne
+## Medium priority
 
 ### Security headers
-Configurer un middleware Traefik pour ajouter les headers de sécurité :
+Configure a Traefik middleware to add security headers:
 - `X-Content-Type-Options: nosniff`
 - `X-Frame-Options: DENY`
 - `Strict-Transport-Security`
 - `Content-Security-Policy`
 
-Fichier cible : `infra/gateway/dynamic/`
+Target file: `infra/gateway/dynamic/`
 
-### Tests React
-Ajouter des tests unitaires sur les hooks critiques :
-- `useApiFetch` (auto-refresh sur 401, retry, logout)
+### React tests
+Add unit tests for critical hooks:
+- `useApiFetch` (auto-refresh on 401, retry, logout)
 - `AuthContext` (login, logout, restore session)
 
-### Logging structuré
-- Symfony : configurer Monolog en sortie JSON avec correlation ID
-- NestJS : intégrer le Logger NestJS avec format JSON
+### Structured logging
+- Symfony: configure Monolog with JSON output and correlation ID
+- NestJS: integrate NestJS Logger with JSON format
 
 ### OpenAPI / Swagger
-Documenter les endpoints du backend Symfony et du service user.
-Options : NelmioApiDocBundle (Symfony), @nestjs/swagger (NestJS).
+Document the Symfony backend endpoints and the user service.
+Options: NelmioApiDocBundle (Symfony), @nestjs/swagger (NestJS).
 
 ---
 
-## Priorité basse
+## Low priority
 
-### CLAUDE.md apps/user
-Ajouter un CLAUDE.md dans `apps/user/` au même titre que `apps/backend/` et `apps/frontend/`.
+### CLAUDE.md for apps/user
+Add a CLAUDE.md in `apps/user/` on a par with `apps/backend/` and `apps/frontend/`.
 
-### Scénarios de déploiement
-Ajouter un `docker-compose.prod.yml` ou une documentation de déploiement pour démontrer la réflexion sur un environnement non-dev.
+### Deployment scenarios
+Add a `docker-compose.prod.yml` or deployment documentation to demonstrate thinking about a non-dev environment.
 
 ---
 
 ## Tooling & Workflow
 
 ### Conventional commits
-Intégrer la convention de commits (https://www.conventionalcommits.org) :
-- Installer `commitlint` + `husky` à la racine du monorepo
-- Config : `feat`, `fix`, `chore`, `docs`, `test`, `refactor`, `ci`
-- Ajouter un script `make commit-lint` dans le Makefile
-- Documenter dans le README
+Integrate the commit convention (https://www.conventionalcommits.org):
+- Install `commitlint` + `husky` at the monorepo root
+- Config: `feat`, `fix`, `chore`, `docs`, `test`, `refactor`, `ci`
+- Add a `make commit-lint` script to the Makefile
+- Document in the README
 
-### Git dans le workflow Claude
-Configurer le workflow Claude pour respecter les conventional commits :
-- Mettre à jour `CLAUDE.md` racine avec la règle de format de commit
-- Ajouter dans `.claude/settings.local.json` les permissions git nécessaires
-- Exemple de format attendu : `feat(color-lab): add paint reference use case`
+### Git in the Claude workflow
+Configure the Claude workflow to follow conventional commits:
+- Update the root `CLAUDE.md` with the commit format rule
+- Add the required git permissions in `.claude/settings.local.json`
+- Expected format example: `feat(color-lab): add paint reference use case`
 
 ---
 
-## Avant publication GitHub
+## Before publishing on GitHub
 
-- [ ] README : vérifier que le projet se lance avec `make install && make up`
-- [ ] README : ajouter la note Claude Code (rédigée)
-- [ ] README : ajouter topics GitHub (symfony, nestjs, react, ddd, microservices, docker)
-- [ ] Vérifier l'historique git : aucun secret commité (`git log --all -S "PRIVATE KEY"`)
-- [ ] `.env.example` complet et à jour pour chaque service
-- [ ] Passer les anciens projets GitHub en privé
+- [ ] README: verify the project starts with `make install && make up`
+- [ ] README: add the Claude Code note (already written)
+- [ ] README: add GitHub topics (symfony, nestjs, react, ddd, microservices, docker)
+- [ ] Check git history: no committed secrets (`git log --all -S "PRIVATE KEY"`)
+- [ ] Complete and up-to-date `.env.example` for each service
+- [ ] Set older GitHub projects to private

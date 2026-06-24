@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace App\ColorLab\Catalog\Domain\PaintType;
 
 use App\ColorLab\Catalog\Domain\PaintType\Event\PaintTypeCreatedEvent;
+use App\Identity\UserId;
 use App\Shared\Domain\Event\DomainEventTrait;
 use App\Shared\Domain\Model\AggregateRoot;
-use App\Shared\Domain\Model\UserId;
 use App\Shared\Domain\Service\HandleGenerator;
 use Doctrine\ORM\Mapping as ORM;
 

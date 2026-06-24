@@ -1,20 +1,6 @@
-# Sandbox
+# Recipe Lab
 
-A minimal client/server sandbox project with a **Symfony 8** backend (PHP 8.4) and a **React + Vite** frontend, fully containerized with Docker.
-
-## Structure
-
-```
-.
-├── apps/
-│   ├── symfony/        # Symfony 8 skeleton — PHP 8.4
-│   │   └── Dockerfile
-│   └── react/          # React + Vite skeleton
-│       └── Dockerfile
-├── docker-compose.yml
-├── Makefile
-└── README.md
-```
+A miniature paint management application built with **Symfony 8** (PHP 8.4), **React + Vite**, and **NestJS**, fully containerized with Docker.
 
 ## Requirements
 
@@ -32,34 +18,25 @@ make up
 
 | Service           | URL                    | Note                             |
 |-------------------|------------------------|----------------------------------|
-| Gateway (Traefik) | http://localhost:8000  | Single entry point — all traffic |
-| Traefik dashboard | http://localhost:8080  | Sandbox only                     |
-| Symfony (direct)  | http://localhost:8001  | Dev only — bypasses gateway      |
-| React (Vite dev)  | http://localhost:5173  | Dev only — bypasses gateway      |
-
-The two containers run on the same Docker network (`sandbox`).  
+| App               | http://localhost:8000  | Single entry point — all traffic |
+| Traefik dashboard | http://localhost:8080  | Dev only                         |
+| Backend (direct)  | http://localhost:8001  | Dev only — bypasses gateway      |
+| Frontend (Vite)   | http://localhost:5173  | Dev only — bypasses gateway      |
 
 ## Commands
 
+Run `make help` for the full list. Key shortcuts:
+
 | Command                       | Description                              |
 |-------------------------------|------------------------------------------|
-| `make install`                | Install dependencies and clear caches    |
+| `make install`                | Install all dependencies                 |
 | `make up`                     | Start all containers (detached)          |
 | `make down`                   | Stop and remove containers               |
-| `make restart`                | Restart all containers                   |
-| `make build`                  | Rebuild Docker images from scratch       |
-| `make logs`                   | Stream logs from all containers          |
-| `make shell-symfony`          | Open a shell in the Symfony container    |
-| `make shell-react`            | Open a shell in the React container      |
-| `make composer cmd="<cmd>"`   | Run a Composer command                   |
-| `make npm cmd="<cmd>"`        | Run an npm command                       |
-
-### Examples
-
-```bash
-# Add a Symfony package
-make composer cmd="require symfony/orm-pack"
-
-# Add an npm package
-make npm cmd="install axios"
-```
+| `make shell-backend`          | Open a shell in the backend container    |
+| `make shell-frontend`         | Open a shell in the frontend container   |
+| `make shell-user`             | Open a shell in the user container       |
+| `make composer cmd="<cmd>"`   | Run a Composer command in backend        |
+| `make npm cmd="<cmd>"`        | Run an npm command in frontend           |
+| `make backend-lint`           | PHP CS Fixer + Rector + Deptrac (dry-run)|
+| `make backend-analyse`        | PHPStan static analysis (level max)      |
+| `make backend-test`           | Run the PHP test suite                   |

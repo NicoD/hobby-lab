@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\ColorLab\Catalog\Domain\Color\Event;
 
 use App\ColorLab\Catalog\Domain\Color\ColorHandle;
+use App\Identity\UserId;
 use App\Shared\Domain\Event\DomainEvent;
-use App\Shared\Domain\Model\UserId;
 
 final class ColorCreatedEvent extends DomainEvent
 {

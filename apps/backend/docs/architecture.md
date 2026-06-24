@@ -8,9 +8,9 @@ apps/backend/src/
     Catalog/              ← module: reference data (paint products)
       Domain/
         Brand/            ← aggregate root + handle + repository + events
+          Range/          ← value object embedded in Brand (not an aggregate — lives here, not at Domain root)
         Color/
         PaintType/
-        Range/            ← value object embedded in Brand (no repository)
         Paint/            ← renamed from PaintReference
       Application/
         {Aggregate}/
@@ -37,18 +37,45 @@ apps/backend/src/
           Type/           ← stash_* prefixed types
       UI/
         Http/             ← JSON controllers at /color-lab/stash/*
+  Identity/               ← integration contract with apps/user (Anti-Corruption Layer)
+    UserId.php            ← UUID received from X-User-Id header; not owned by this backend
   Shared/                 ← technical cross-domain building blocks (no business logic)
-    Domain/
-      Model/              ← abstract base classes (AbstractUuid, AbstractHandle) and cross-cutting VOs (UserId, AggregateRoot, …)
-      Event/              ← DomainEvent base, DomainEventTrait, DomainEventHolder
+    Domain/               ← organized by technical role (no aggregates here)
+      Model/              ← AbstractHandle, AbstractUuid, AggregateRoot, AggregateRootId
+      Event/              ← DomainEvent, DomainEventTrait, DomainEventHolder, DomainEventId
+      Exception/          ← DomainException
+      Service/            ← HandleGenerator, HandleGeneratorFactory, Slugifier
     Application/
-      Service/            ← interfaces used across handlers (TransactionManager, DomainEventDispatcher)
+      Bus/                ← CommandBus, QueryBus, Command, Query interfaces
+      Query/              ← PaginatedResult, Pagination, SortOrder
+      Service/            ← TransactionManager, TransactionBoundary, DomainEventDispatcher
     Infrastructure/
-      Doctrine/           ← DoctrineTransactionManager, AbstractHandleType, AbstractUuidType
-      Doctrine/Type/      ← abstract Doctrine custom types
-      Event/              ← SymfonyDomainEventDispatcher
+      Doctrine/           ← DoctrineTransactionBoundary
+      Doctrine/Type/      ← AbstractHandleType, AbstractUuidType, UserIdType
+      Event/              ← SymfonyDomainEventDispatcher, LoggingDomainEventDispatcher
+      Messenger/          ← MessengerBus (CommandBus + QueryBus impl)
       Security/           ← GatewayAuthenticator, GatewayUser
+      Testing/            ← CollectingEventDispatcher
 ```
+
+### Domain folder convention — aggregate-centric
+
+The `Domain/` folder is organized around **aggregates**, not around DDD building block types. Each aggregate root has its own subfolder containing everything that belongs to it: its handle (identity VO), its repository interface, its domain events, and any non-root entities or value objects it owns.
+
+```
+Domain/
+  Brand/          ← aggregate
+    Range/        ← entity owned by Brand → nested under Brand, not at root level
+    Brand.php
+    BrandHandle.php
+    BrandRepository.php
+    Event/
+      BrandCreatedEvent.php
+```
+
+A value object or entity that is only reachable through a specific aggregate root **must** live inside that aggregate's folder, not at the `Domain/` root. The folder structure must reflect aggregate ownership.
+
+**Exception — `Shared/`:** `Shared` contains no aggregates, only technical building blocks. Its `Domain/` subfolder is therefore organized by technical role (`Model/`, `Event/`, `Exception/`, `Service/`). This is the only place in the codebase where type-based organization is acceptable.
 
 ## Layers
 
@@ -97,7 +124,7 @@ All types are module-scoped to avoid name collisions:
 | `catalog_range_collection` | Catalog | `Range[]` JSON |
 | `catalog_paint_handle` | Catalog | `PaintHandle` |
 | `stash_paint_id` | Stash | `PaintId` (UUID) |
-| `user_id` | Shared | `UserId` (UUID) |
+| `user_id` | Identity | `UserId` (UUID) |
 
 ## User identity
 

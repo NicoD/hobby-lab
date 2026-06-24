@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Shared\Infrastructure\Doctrine\Type;
 
-use App\Shared\Domain\Model\UserId;
+use App\Identity\UserId;
 
 final class UserIdType extends AbstractUuidType
 {

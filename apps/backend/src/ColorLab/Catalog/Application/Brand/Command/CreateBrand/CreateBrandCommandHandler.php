@@ -7,8 +7,8 @@ namespace App\ColorLab\Catalog\Application\Brand\Command\CreateBrand;
 use App\ColorLab\Catalog\Domain\Brand\Brand;
 use App\ColorLab\Catalog\Domain\Brand\BrandHandle;
 use App\ColorLab\Catalog\Domain\Brand\BrandRepository;
+use App\Identity\UserId;
 use App\Shared\Application\Service\TransactionManager;
-use App\Shared\Domain\Model\UserId;
 use App\Shared\Domain\Service\HandleGeneratorFactory;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 

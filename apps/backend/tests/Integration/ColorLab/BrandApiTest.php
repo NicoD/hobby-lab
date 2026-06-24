@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Test\Integration\ColorLab;
 
-use App\ColorLab\Domain\Event\BrandCreatedEvent;
+use App\ColorLab\Catalog\Domain\Brand\Event\BrandCreatedEvent;
 use Test\Integration\ApiTestCase;
 
 class BrandApiTest extends ApiTestCase
@@ -17,7 +17,7 @@ class BrandApiTest extends ApiTestCase
 
     public function testCreate(): void
     {
-        $this->request('POST', '/color-lab/brands', ['name' => 'Vallejo']);
+        $this->request('POST', '/color-lab/catalog/brands', ['name' => 'Vallejo']);
 
         self::assertResponseStatusCodeSame(201);
         $this->assertEventDispatched(BrandCreatedEvent::class, static function (BrandCreatedEvent $event): void {
@@ -28,10 +28,10 @@ class BrandApiTest extends ApiTestCase
 
     public function testList(): void
     {
-        $this->request('POST', '/color-lab/brands', ['name' => 'Vallejo']);
-        $this->request('POST', '/color-lab/brands', ['name' => 'Citadel']);
+        $this->request('POST', '/color-lab/catalog/brands', ['name' => 'Vallejo']);
+        $this->request('POST', '/color-lab/catalog/brands', ['name' => 'Citadel']);
 
-        $this->request('GET', '/color-lab/brands');
+        $this->request('GET', '/color-lab/catalog/brands');
 
         self::assertResponseIsSuccessful();
         $response = $this->responseJson();
@@ -50,10 +50,10 @@ class BrandApiTest extends ApiTestCase
     public function testListPagination(): void
     {
         foreach (['Alpha', 'Beta', 'Gamma'] as $name) {
-            $this->request('POST', '/color-lab/brands', ['name' => $name]);
+            $this->request('POST', '/color-lab/catalog/brands', ['name' => $name]);
         }
 
-        $this->request('GET', '/color-lab/brands?page=1&limit=2');
+        $this->request('GET', '/color-lab/catalog/brands?page=1&limit=2');
 
         self::assertResponseIsSuccessful();
         $response = $this->responseJson();
@@ -65,10 +65,10 @@ class BrandApiTest extends ApiTestCase
 
     public function testListSearch(): void
     {
-        $this->request('POST', '/color-lab/brands', ['name' => 'Vallejo']);
-        $this->request('POST', '/color-lab/brands', ['name' => 'Citadel']);
+        $this->request('POST', '/color-lab/catalog/brands', ['name' => 'Vallejo']);
+        $this->request('POST', '/color-lab/catalog/brands', ['name' => 'Citadel']);
 
-        $this->request('GET', '/color-lab/brands?search=val');
+        $this->request('GET', '/color-lab/catalog/brands?search=val');
 
         self::assertResponseIsSuccessful();
         $response = $this->responseJson();
@@ -78,10 +78,10 @@ class BrandApiTest extends ApiTestCase
 
     public function testListSortByName(): void
     {
-        $this->request('POST', '/color-lab/brands', ['name' => 'Citadel']);
-        $this->request('POST', '/color-lab/brands', ['name' => 'Vallejo']);
+        $this->request('POST', '/color-lab/catalog/brands', ['name' => 'Citadel']);
+        $this->request('POST', '/color-lab/catalog/brands', ['name' => 'Vallejo']);
 
-        $this->request('GET', '/color-lab/brands?sort=name&dir=asc');
+        $this->request('GET', '/color-lab/catalog/brands?sort=name&dir=asc');
 
         self::assertResponseIsSuccessful();
         $response = $this->responseJson();
@@ -92,10 +92,10 @@ class BrandApiTest extends ApiTestCase
     public function testListIsolatedByUser(): void
     {
         $this->setCurrentUserId('019661b9-a000-7000-8000-000000000001');
-        $this->request('POST', '/color-lab/brands', ['name' => 'Vallejo']);
+        $this->request('POST', '/color-lab/catalog/brands', ['name' => 'Vallejo']);
 
         $this->setCurrentUserId('019661b9-a000-7000-8000-000000000002');
-        $this->request('GET', '/color-lab/brands');
+        $this->request('GET', '/color-lab/catalog/brands');
 
         self::assertResponseIsSuccessful();
         $response = $this->responseJson();
@@ -104,13 +104,13 @@ class BrandApiTest extends ApiTestCase
 
     public function testGet(): void
     {
-        $this->request('POST', '/color-lab/brands', ['name' => 'Vallejo']);
+        $this->request('POST', '/color-lab/catalog/brands', ['name' => 'Vallejo']);
 
-        $this->request('GET', '/color-lab/brands');
+        $this->request('GET', '/color-lab/catalog/brands');
         $list = $this->responseJson();
         $handle = $list['items'][0]['handle'];
 
-        $this->request('GET', '/color-lab/brands/'.$handle);
+        $this->request('GET', '/color-lab/catalog/brands/'.$handle);
 
         self::assertResponseIsSuccessful();
         $brand = $this->responseJson();
@@ -121,7 +121,7 @@ class BrandApiTest extends ApiTestCase
 
     public function testGetNotFound(): void
     {
-        $this->request('GET', '/color-lab/brands/nonexistent-handle');
+        $this->request('GET', '/color-lab/catalog/brands/nonexistent-handle');
 
         self::assertResponseStatusCodeSame(404);
     }

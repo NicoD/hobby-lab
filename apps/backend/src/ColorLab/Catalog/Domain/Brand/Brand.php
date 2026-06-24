@@ -5,11 +5,10 @@ declare(strict_types=1);
 namespace App\ColorLab\Catalog\Domain\Brand;
 
 use App\ColorLab\Catalog\Domain\Brand\Event\BrandCreatedEvent;
-use App\ColorLab\Catalog\Domain\Range\Range;
-use App\ColorLab\Catalog\Domain\Range\RangeHandle;
+use App\ColorLab\Catalog\Domain\Brand\Range\Range;
+use App\Identity\UserId;
 use App\Shared\Domain\Event\DomainEventTrait;
 use App\Shared\Domain\Model\AggregateRoot;
-use App\Shared\Domain\Model\UserId;
 use App\Shared\Domain\Service\HandleGenerator;
 use App\Shared\Domain\Service\HandleGeneratorFactory;
 use Doctrine\ORM\Mapping as ORM;

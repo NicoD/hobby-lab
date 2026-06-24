@@ -8,8 +8,8 @@ use App\ColorLab\Catalog\Domain\Paint\PaintHandle;
 use App\ColorLab\Stash\Domain\Paint\Paint;
 use App\ColorLab\Stash\Domain\Paint\PaintId;
 use App\ColorLab\Stash\Domain\Paint\PaintRepository;
+use App\Identity\UserId;
 use App\Shared\Application\Service\TransactionManager;
-use App\Shared\Domain\Model\UserId;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 #[AsMessageHandler]

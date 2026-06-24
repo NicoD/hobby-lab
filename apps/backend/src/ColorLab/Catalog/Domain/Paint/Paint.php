@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace App\ColorLab\Catalog\Domain\Paint;
 
 use App\ColorLab\Catalog\Domain\Brand\BrandHandle;
+use App\ColorLab\Catalog\Domain\Brand\Range\RangeHandle;
 use App\ColorLab\Catalog\Domain\Color\ColorHandle;
 use App\ColorLab\Catalog\Domain\Paint\Event\PaintCreatedEvent;
 use App\ColorLab\Catalog\Domain\PaintType\PaintTypeHandle;
-use App\ColorLab\Catalog\Domain\Range\RangeHandle;
+use App\Identity\UserId;
 use App\Shared\Domain\Event\DomainEventTrait;
 use App\Shared\Domain\Model\AggregateRoot;
-use App\Shared\Domain\Model\UserId;
 use App\Shared\Domain\Service\HandleGenerator;
 use Doctrine\ORM\Mapping as ORM;
 

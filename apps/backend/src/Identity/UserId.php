@@ -2,7 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Shared\Domain\Model;
+namespace App\Identity;
+
+use App\Shared\Domain\Model\AbstractUuid;
 
 final readonly class UserId extends AbstractUuid
 {
