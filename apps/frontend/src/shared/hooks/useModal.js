@@ -7,7 +7,7 @@ export default function useModal() {
     const toggle = useCallback(() => setIsOpen(v => !v), [])
 
     useEffect(() => {
-    if (!open) return
+    if (!isOpen) return
     const onKey = (e) => { if (e.key === 'Escape') close() }
     document.body.style.overflow = 'hidden'
     window.addEventListener('keydown', onKey)
@@ -15,7 +15,7 @@ export default function useModal() {
       document.body.style.overflow = ''
       window.removeEventListener('keydown', onKey)
     }
-  }, [open, close])
+  }, [isOpen, close])
 
   return { isOpen, close, toggle }
 }

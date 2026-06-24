@@ -24,9 +24,11 @@ export default function Combobox({
   const [query, setQuery] = useState('')
   const [activeIndex, setActiveIndex] = useState(0)
   const [internalKey, setInternalKey] = useState(null)
-  const [serverOptions, setServerOptions] = useState([])
+  const [rawServerOptions, setRawServerOptions] = useState([])
   const [selectedOption, setSelectedOption] = useState(null)
-  const [loading, setLoading] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+  const serverOptions = query.trim() === '' ? [] : rawServerOptions
+  const loading = query.trim() !== '' && isLoading
   const rootRef = useRef(null)
   const inputRef = useRef(null)
   const debounceRef = useRef(null)
@@ -69,23 +71,16 @@ export default function Combobox({
   }, [open])
 
   useEffect(() => {
-    if (!onSearchRef.current) return
-
     clearTimeout(debounceRef.current)
+    if (!onSearchRef.current || query.trim() === '') return
 
-    if (query.trim() === '') {
-      setServerOptions([])
-      setLoading(false)
-      return
-    }
-
-    setLoading(true)
     debounceRef.current = setTimeout(async () => {
+      setIsLoading(true)
       try {
         const results = await onSearchRef.current(query.trim())
-        setServerOptions(results)
+        setRawServerOptions(results)
       } finally {
-        setLoading(false)
+        setIsLoading(false)
       }
     }, 300)
 
@@ -96,7 +91,6 @@ export default function Combobox({
     setOpen(false)
     setQuery('')
     setActiveIndex(0)
-    setServerOptions([])
   }
 
   function select(key) {

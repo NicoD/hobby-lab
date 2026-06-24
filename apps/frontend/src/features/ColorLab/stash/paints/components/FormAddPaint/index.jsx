@@ -17,17 +17,17 @@ export default function FormAddPaint({ onClose }) {
     const handleCreateBrand = useCallback(async (name) => {
         const { handle } = await createBrand.mutateAsync({ name })
         return handle
-    }, [createBrand.mutateAsync])
+    }, [createBrand])
 
     const handleCreatePaintType = useCallback(async (name) => {
         const { handle } = await createPaintType.mutateAsync({ name })
         return handle
-    }, [createPaintType.mutateAsync])
+    }, [createPaintType])
 
     const handleCreateColor = useCallback(async (name) => {
         const { handle } = await createColor.mutateAsync({ name })
         return handle
-    }, [createColor.mutateAsync])
+    }, [createColor])
 
     const handleCreateCatalogPaint = useCallback(async (name) => {
         const { handle } = await createCatalogPaint.mutateAsync({
@@ -38,7 +38,7 @@ export default function FormAddPaint({ onClose }) {
             color: filters.color,
         })
         return handle
-    }, [createCatalogPaint.mutateAsync, filters])
+    }, [createCatalogPaint, filters])
 
     const handleSubmit = async (e) => {
         e.preventDefault()

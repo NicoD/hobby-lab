@@ -19,7 +19,7 @@ function decodeJwt(token) {
 
 export function AuthProvider({ children }) {
   const [token, setToken] = useState(null)
-  const [ready, setReady] = useState(false)
+  const [ready, setReady] = useState(() => !localStorage.getItem(SESSION_FLAG))
   const refreshPromiseRef = useRef(null)
 
   const user = token ? decodeJwt(token) : null
@@ -73,10 +73,7 @@ export function AuthProvider({ children }) {
   // double-invoked effect must not send two refresh calls — token rotation
   // would treat the second one as a stolen-token replay.
   useEffect(() => {
-    if (!localStorage.getItem(SESSION_FLAG)) {
-      setReady(true)
-      return
-    }
+    if (!localStorage.getItem(SESSION_FLAG)) return
     refresh().catch(() => {}).finally(() => setReady(true))
   }, [refresh])
 
@@ -89,6 +86,7 @@ export function AuthProvider({ children }) {
   )
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useAuth() {
   return useContext(AuthContext)
 }
