@@ -14,12 +14,6 @@ class RangeCollectionType extends JsonType
     public const string NAME = 'catalog_range_collection';
 
     #[\Override]
-    public function getName(): string
-    {
-        return self::NAME;
-    }
-
-    #[\Override]
     public function getSQLDeclaration(array $column, AbstractPlatform $platform): string
     {
         return 'JSON';
