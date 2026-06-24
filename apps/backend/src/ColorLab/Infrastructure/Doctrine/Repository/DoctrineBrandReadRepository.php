@@ -4,11 +4,15 @@ declare(strict_types=1);
 
 namespace App\ColorLab\Infrastructure\Doctrine\Repository;
 
+use App\ColorLab\Application\Brand\ReadModel\BrandCriteria;
 use App\ColorLab\Application\Brand\ReadModel\BrandListItemView;
 use App\ColorLab\Application\Brand\ReadModel\BrandReadRepository;
 use App\ColorLab\Application\Brand\ReadModel\BrandView;
 use App\ColorLab\Domain\Model\Brand;
 use App\ColorLab\Domain\Model\BrandHandle;
+use App\ColorLab\Domain\Model\Range;
+use App\Shared\Application\Query\PaginatedResult;
+use App\Shared\Domain\Model\UserId;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -22,22 +26,50 @@ final class DoctrineBrandReadRepository extends ServiceEntityRepository implemen
         parent::__construct($registry, Brand::class);
     }
 
-    /** @return list<BrandListItemView> */
-    public function list(): array
+    /**
+     * @return PaginatedResult<BrandListItemView>
+     */
+    #[\Override]
+    public function list(BrandCriteria $criteria): PaginatedResult
     {
-        return array_map(
-            static fn (Brand $brand): BrandListItemView => new BrandListItemView(
+        $qb = $this->createQueryBuilder('b')
+            ->andWhere('b.ownedBy = :ownedBy')
+            ->setParameter('ownedBy', new UserId($criteria->ownedBy), 'user_id');
+
+        if (null !== $criteria->search && '' !== $criteria->search) {
+            $qb->andWhere('LOWER(b.name) LIKE :search')
+                ->setParameter('search', '%'.addcslashes(strtolower($criteria->search), '%_\\').'%');
+        }
+
+        $countQb = clone $qb;
+        $total = (int) $countQb->select('COUNT(b.handle)')->getQuery()->getSingleScalarResult();
+
+        $sortField = 'createdAt' === $criteria->sort->field ? 'b.createdAt' : 'b.name';
+
+        $qb->orderBy($sortField, $criteria->sort->isAsc ? 'ASC' : 'DESC')
+            ->setFirstResult($criteria->pagination->offset)
+            ->setMaxResults($criteria->pagination->limit);
+
+        /** @var list<Brand> $brands */
+        $brands = $qb->getQuery()->getResult();
+
+        return new PaginatedResult(
+            array_map(static fn (Brand $brand): BrandListItemView => new BrandListItemView(
                 (string) $brand->handle,
                 $brand->name,
                 array_map(
-                    static fn (\App\ColorLab\Domain\Model\Range $range): array => ['handle' => (string) $range->handle, 'name' => $range->name],
-                    $brand->ranges
-                )
-            ),
-            $this->findAll(),
+                    static fn (Range $range): array => ['handle' => (string) $range->handle, 'name' => $range->name],
+                    $brand->ranges,
+                ),
+                $brand->createdAt->format(\DateTimeInterface::ATOM),
+            ), $brands),
+            $total,
+            $criteria->pagination->page,
+            $criteria->pagination->limit,
         );
     }
 
+    #[\Override]
     public function findByHandle(string $handle): ?BrandView
     {
         $brand = $this->find(new BrandHandle($handle));
@@ -50,8 +82,9 @@ final class DoctrineBrandReadRepository extends ServiceEntityRepository implemen
             (string) $brand->handle,
             $brand->name,
             array_map(
-                static fn (\App\ColorLab\Domain\Model\Range $range): array => ['handle' => (string) $range->handle, 'name' => $range->name],
-                $brand->ranges
-            ));
+                static fn (Range $range): array => ['handle' => (string) $range->handle, 'name' => $range->name],
+                $brand->ranges,
+            ),
+        );
     }
 }

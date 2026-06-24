@@ -13,6 +13,7 @@ final readonly class BrandListItemView
         public string $handle,
         public string $name,
         public array $ranges,
+        public string $createdAt,
     ) {
     }
 }
