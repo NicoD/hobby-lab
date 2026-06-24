@@ -1,0 +1,76 @@
+name: Project / frontend
+run-name: frontend / PR #${{ github.event.pull_request.number }}
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize, ready_for_review]
+    paths:
+      - "apps/frontend/**"
+      - "docker-compose.ci.yaml"
+      - ".github/workflows/project-frontend-ci.yaml"
+
+concurrency:
+  group: project-ci-frontend-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  COMPOSE_FILE: docker-compose.ci.yaml
+  DOCKER_BUILDKIT: 1
+
+jobs:
+  lint:
+    name: lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      COMPOSE_PROJECT_NAME: ${{ github.run_id }}_${{ github.run_number }}_lint
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Cache node_modules
+        uses: actions/cache@v4
+        with:
+          path: apps/frontend/node_modules
+          key: ${{ github.repository }}-frontend-node_modules-${{ hashFiles('apps/frontend/package-lock.json') }}
+          restore-keys: ${{ github.repository }}-frontend-node_modules-
+
+      - name: Build
+        run: docker compose build frontend
+
+      - name: Install dependencies
+        run: docker compose run --rm -T frontend npm ci
+
+      - name: Lint
+        run: docker compose run --rm -T frontend npm run lint
+
+  test:
+    name: test
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      COMPOSE_PROJECT_NAME: ${{ github.run_id }}_${{ github.run_number }}_test
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Cache node_modules
+        uses: actions/cache@v4
+        with:
+          path: apps/frontend/node_modules
+          key: ${{ github.repository }}-frontend-node_modules-${{ hashFiles('apps/frontend/package-lock.json') }}
+          restore-keys: ${{ github.repository }}-frontend-node_modules-
+
+      - name: Build
+        run: docker compose build frontend
+
+      - name: Install dependencies
+        run: docker compose run --rm -T frontend npm ci
+
+      - name: Test suite
+        run: docker compose run --rm -T frontend npm test

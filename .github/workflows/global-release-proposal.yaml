@@ -1,0 +1,59 @@
+name: Global / Release Proposal
+run-name: main / manual release proposal
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Run in dry-run mode (no tag/release published)"
+        required: true
+        type: boolean
+        default: true
+
+concurrency:
+  group: semantic-release-main
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
+jobs:
+  semantic-release:
+    name: semantic-release
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: main
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Run semantic-release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DRY_RUN: ${{ inputs.dry_run }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          DRY_RUN_FLAG=""
+          if [[ "$DRY_RUN" == "true" ]]; then
+            DRY_RUN_FLAG="--dry-run"
+          fi
+
+          npx -y \
+            -p semantic-release \
+            -p @semantic-release/commit-analyzer \
+            -p @semantic-release/release-notes-generator \
+            -p @semantic-release/github \
+            -p conventional-changelog-conventionalcommits \
+            semantic-release ${DRY_RUN_FLAG}

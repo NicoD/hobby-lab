@@ -1,0 +1,55 @@
+services:
+  backend:
+    build:
+      context: ./apps/backend
+    volumes:
+      - ./apps/backend:/app
+    environment:
+      APP_ENV: test
+      DATABASE_URL: postgresql://backend:backend@backend-db:5432/recipe_kitchen_test
+
+  backend-db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: backend
+      POSTGRES_PASSWORD: backend
+      POSTGRES_DB: recipe_kitchen_test
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U backend -d recipe_kitchen_test"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    tmpfs:
+      - /var/lib/postgresql/data
+
+  frontend:
+    build:
+      context: ./apps/frontend
+    volumes:
+      - ./apps/frontend:/app
+    environment:
+      CI: "true"
+
+  user:
+    build:
+      context: ./apps/user
+    volumes:
+      - ./apps/user:/app
+    environment:
+      CI: "true"
+      PORT: "3000"
+      DATABASE_URL: postgresql://identity:identity@identity-db:5432/recipe_identity_test
+
+  identity-db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: identity
+      POSTGRES_PASSWORD: identity
+      POSTGRES_DB: recipe_identity_test
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U identity -d recipe_identity_test"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    tmpfs:
+      - /var/lib/postgresql/data

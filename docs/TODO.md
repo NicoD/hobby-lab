@@ -4,15 +4,10 @@
 
 ## High priority
 
-### CI/CD pipeline
-Set up GitHub Actions with the following steps: lint, test, build, docker push.
-This is the most visible missing piece for a lead dev portfolio.
+### ~~CI/CD pipeline~~ ✅
+~~Set up GitHub Actions with the following steps: lint, test, build, docker push.~~
 
-Suggested steps:
-- `backend`: PHPStan + Deptrac + PHPUnit
-- `user`: ESLint + Jest
-- `frontend`: ESLint + Vite build
-- Docker build for each service
+Done: Dependabot + commitlint + semantic-release + CI par service (lint + test via Docker Compose).
 
 ### Symfony Voters
 Implement fine-grained authorization on at least one resource (Brand or Paint).

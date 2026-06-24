@@ -1,0 +1,89 @@
+name: Project / user
+run-name: user / PR #${{ github.event.pull_request.number }}
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize, ready_for_review]
+    paths:
+      - "apps/user/**"
+      - "docker-compose.ci.yaml"
+      - ".github/workflows/project-user-ci.yaml"
+
+concurrency:
+  group: project-ci-user-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  COMPOSE_FILE: docker-compose.ci.yaml
+  DOCKER_BUILDKIT: 1
+
+jobs:
+  lint:
+    name: lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      COMPOSE_PROJECT_NAME: ${{ github.run_id }}_${{ github.run_number }}_lint
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Cache node_modules
+        uses: actions/cache@v4
+        with:
+          path: apps/user/node_modules
+          key: ${{ github.repository }}-user-node_modules-${{ hashFiles('apps/user/package-lock.json') }}
+          restore-keys: ${{ github.repository }}-user-node_modules-
+
+      - name: Build
+        run: docker compose build user
+
+      - name: Install dependencies
+        run: docker compose run --rm -T user npm ci
+
+      - name: Lint
+        run: docker compose run --rm -T user npm run lint
+
+  test:
+    name: test
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      COMPOSE_PROJECT_NAME: ${{ github.run_id }}_${{ github.run_number }}_test
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Cache node_modules
+        uses: actions/cache@v4
+        with:
+          path: apps/user/node_modules
+          key: ${{ github.repository }}-user-node_modules-${{ hashFiles('apps/user/package-lock.json') }}
+          restore-keys: ${{ github.repository }}-user-node_modules-
+
+      - name: Build
+        run: docker compose build user
+
+      - name: Start database
+        run: docker compose up -d --wait identity-db
+
+      - name: Install dependencies
+        run: docker compose run --rm -T user npm ci
+
+      - name: Generate Prisma client
+        run: docker compose run --rm -T user npm run prisma:generate
+
+      - name: Run migrations
+        run: docker compose run --rm -T user npx prisma migrate deploy
+
+      - name: Run tests
+        run: docker compose run --rm -T user npm test
+
+      - name: Teardown
+        if: always()
+        run: docker compose down --volumes --remove-orphans
