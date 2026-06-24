@@ -244,7 +244,7 @@ The following areas require changes. Each item is independently executable.
 8. Update all Application layer classes (commands, queries, handlers, read models, DTOs)
 9. Update all Infrastructure layer classes (repositories, Doctrine types)
 10. Update all UI/Http controllers and their route annotations
-11. Write Doctrine migration: rename the five tables
+11. **Database reset strategy** — the project is pre-production; existing migrations are deleted and a single fresh migration is generated from the final schema. No table-rename migration is needed.
 12. Update Deptrac configuration and verify no violations
 13. Update `apps/backend/docs/architecture.md`
 
