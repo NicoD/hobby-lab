@@ -16,6 +16,7 @@ module.exports = {
         'ci',
         'chore',
         'revert',
+        'infra'
       ],
     ],
   },
