@@ -1,7 +1,38 @@
+import { ReactNode } from 'react'
 import ListWrapper from '../../../../../shared/components/ListWrapper'
 import CatalogPagination from './CatalogPagination'
 
-export default function CatalogPage({ title, columns, query, search, onSearch, sort, dir, onSort, page, onPage, actions, rowActions }) {
+export type Column<T> = {
+  key: string,
+  sortField?: string,
+  label: string,
+  render: ((i: T) => ReactNode),
+}
+
+type CatalogPageProps<T extends { handle: string }> = {
+  title: string,
+  columns: Column<T>[],
+  query: {
+    data?: {
+      items: T[],
+      total: number,
+      limit: number,
+    },
+    isLoading: boolean,
+    isError: boolean
+  },
+  search?: string,
+  onSearch: (s: string) => void,
+  sort: string,
+  dir: string,
+  onSort: (s: string) => void,
+  page: number,
+  onPage: (p: number) => void,
+  actions?: ReactNode,
+  rowActions?: ((i: T) => ReactNode) | null,
+}
+
+export default function CatalogPage<T extends { handle: string }>({ title, columns, query, search, onSearch, sort, dir, onSort, page, onPage, actions, rowActions }: CatalogPageProps<T>) {
   const { data, isLoading, isError } = query
   const items = data?.items ?? []
 
@@ -15,7 +46,7 @@ export default function CatalogPage({ title, columns, query, search, onSearch, s
           <input
             type="search"
             value={search}
-            onChange={e => onSearch(e.target.value)}
+            onChange={e => { onSearch(e.target.value) }}
             placeholder="Rechercher…"
             className="pl-8 pr-3 py-1.5 text-sm border border-gray-200 rounded-md bg-white placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-indigo-300 focus:border-indigo-300 w-56"
           />
@@ -26,18 +57,21 @@ export default function CatalogPage({ title, columns, query, search, onSearch, s
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-gray-200">
-              {columns.map(col => (
-                <th
-                  key={col.key}
-                  className={`text-left py-2 px-3 text-xs font-semibold uppercase tracking-wide text-gray-400 select-none ${col.sortField ? 'cursor-pointer hover:text-gray-600' : ''}`}
-                  onClick={col.sortField ? () => onSort(col.sortField) : undefined}
-                >
-                  <span className="inline-flex items-center gap-1">
-                    {col.label}
-                    {col.sortField && <SortIcon active={sort === col.sortField} asc={dir === 'asc'} />}
-                  </span>
-                </th>
-              ))}
+              {columns.map(col => {
+                const sortField = col.sortField
+                return (
+                  <th
+                    key={col.key}
+                    className={`text-left py-2 px-3 text-xs font-semibold uppercase tracking-wide text-gray-400 select-none ${col.sortField ? 'cursor-pointer hover:text-gray-600' : ''}`}
+                    onClick={sortField ? () => { onSort(sortField) } : undefined}
+                  >
+                    <span className="inline-flex items-center gap-1">
+                      {col.label}
+                      {col.sortField && <SortIcon active={sort === col.sortField} asc={dir === 'asc'} />}
+                    </span>
+                  </th>
+                )
+              })}
               {rowActions && <th className="py-2 px-3 w-0" />}
             </tr>
           </thead>
@@ -61,7 +95,7 @@ export default function CatalogPage({ title, columns, query, search, onSearch, s
               <tr key={item.handle} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
                 {columns.map(col => (
                   <td key={col.key} className="py-2.5 px-3 text-gray-700">
-                    {col.render ? col.render(item) : item[col.key]}
+                    {col.render(item)}
                   </td>
                 ))}
                 {rowActions && (
@@ -87,7 +121,10 @@ export default function CatalogPage({ title, columns, query, search, onSearch, s
   )
 }
 
-function SortIcon({ active, asc }) {
+function SortIcon({ active, asc }: {
+  active: boolean,
+  asc: boolean,
+}) {
   return (
     <span className={`text-[10px] leading-none ${active ? 'text-indigo-500' : 'text-gray-300'}`}>
       {active ? (asc ? '▲' : '▼') : '⇅'}
