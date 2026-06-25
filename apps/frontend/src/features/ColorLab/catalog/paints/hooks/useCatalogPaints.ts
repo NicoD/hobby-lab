@@ -2,9 +2,16 @@ import { useState } from 'react'
 import { useQuery, keepPreviousData } from '@tanstack/react-query'
 import { useApiFetch } from '../../../../../shared/hooks/useApiFetch'
 import { useDebounce } from '../../../../../shared/hooks/useDebounce'
+import { Paint } from '../types'
+
+type PaintsResponse = {
+  items: Paint[]
+  total: number
+  limit: number
+}
 
 export function useCatalogPaints() {
-  const apiFetch = useApiFetch()
+  const apiFetch = useApiFetch<PaintsResponse>()
   const [search, setSearch] = useState('')
   const [page, setPage] = useState(1)
   const [sort, setSort] = useState('name')
@@ -15,19 +22,19 @@ export function useCatalogPaints() {
   const query = useQuery({
     queryKey: ['catalog-paints', debouncedSearch, page, sort, dir],
     queryFn: () => {
-      const params = new URLSearchParams({ page, sort, dir })
+      const params = new URLSearchParams({ page: page.toString(), sort, dir })
       if (debouncedSearch) params.set('search', debouncedSearch)
-      return apiFetch(`/api/color-lab/catalog/paints?${params}`)
+      return apiFetch(`/api/color-lab/catalog/paints?${params}`).then(r => r ?? undefined)
     },
     placeholderData: keepPreviousData,
   })
 
-  function handleSearch(value) {
+  function handleSearch(value: string) {
     setSearch(value)
     setPage(1)
   }
 
-  function handleSort(field) {
+  function handleSort(field: string) {
     if (field === sort) {
       setDir(d => d === 'asc' ? 'desc' : 'asc')
     } else {
