@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useCallback, useEffect, useRef } from 'react'
+import { createContext, useContext, useState, useCallback, useEffect, useRef, ReactNode } from 'react'
 
 export type JwtContent = { accessToken: string }
 
@@ -27,7 +27,7 @@ function decodeJwt(token: string): JwtContent | null {
   }
 }
 
-export function AuthProvider({ children }: { children: React.ReactNode }) {
+export function AuthProvider({ children }: { children: ReactNode }) {
   const [token, setToken] = useState<string | null>(null)
   const [ready, setReady] = useState(() => !localStorage.getItem(SESSION_FLAG))
   const refreshPromiseRef = useRef<Promise<string> | null>(null)

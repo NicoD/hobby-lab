@@ -1,7 +1,14 @@
 import { useEffect } from 'react'
 import { createPortal } from 'react-dom'
 
-export default function Modal({ isOpen, close, title, children }) {
+type ModalProps = {
+  isOpen: boolean,
+  close: () => void,
+  title: string,
+  children: React.ReactNode
+};
+
+export default function Modal({ isOpen, close, title, children }: ModalProps) {
   useEffect(() => {
     if (!isOpen) return
     document.body.style.overflow = 'hidden'
@@ -21,7 +28,7 @@ export default function Modal({ isOpen, close, title, children }) {
         <div className="flex min-h-full items-center justify-center p-4">
           <div
             className="relative w-full max-w-md bg-white rounded-xl shadow-xl"
-            onClick={(e) => e.stopPropagation()}
+            onClick={e => { e.stopPropagation() }}
           >
             <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
               <h2 className="text-lg font-semibold text-gray-900">{title}</h2>
