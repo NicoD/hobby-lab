@@ -14,8 +14,6 @@ services:
   backend:
     build: ./apps/backend
     container_name: hobbylab-backend
-    ports:
-      - "8001:8000"  # direct access in dev (bypasses gateway)
     volumes:
       - ./apps/backend:/app
     environment:
