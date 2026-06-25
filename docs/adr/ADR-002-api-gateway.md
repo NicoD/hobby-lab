@@ -17,7 +17,7 @@ Two distinct responsibilities must be separated:
 
 Use **Traefik** as the API Gateway via the **ForwardAuth** pattern.
 
-### Sandbox (Docker Compose)
+### Local (Docker Compose)
 
 ```
 Traefik                                                  :8000
@@ -46,7 +46,7 @@ Replace ForwardAuth with **Kong** and its native JWT plugin (local RS256 validat
 
 | Context | Solution | Trade-off |
 |---|---|---|
-| Sandbox | Traefik + ForwardAuth | Simple, 1 network call per request |
+| Local | Traefik + ForwardAuth | Simple, 1 network call per request |
 | Production | Kong + JWT plugin | Zero latency, more configuration |
 | Cloud | AWS API Gateway / Cloudflare | Zero ops, variable cost |
 

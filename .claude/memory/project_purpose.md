@@ -1,6 +1,6 @@
 ---
 name: project-purpose
-description: Purpose and philosophy of the recipe-lab project — training sandbox with industry-standard and intentionally over-engineered choices
+description: Purpose and philosophy of the hobby-lab project — training sandbox with industry-standard and intentionally over-engineered choices
 metadata:
   type: project
 ---

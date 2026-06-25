@@ -4,7 +4,7 @@
 
 ## Context
 
-The project is a DDD + microservices learning sandbox. It contains several applications of different natures (frontend, business backend, identity service) and one infrastructure configuration (gateway).
+The project is a DDD + microservices learning project. It contains several applications of different natures (frontend, business backend, identity service) and one infrastructure configuration (gateway).
 
 The initial `apps/<stack>` structure (e.g. `apps/react`, `apps/symfony`) named folders by **technology**, which creates confusion when changing tech or adding services.
 

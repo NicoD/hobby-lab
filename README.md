@@ -1,4 +1,4 @@
-# Recipe Lab
+# HobbyLab
 
 A miniature paint management application built with **Symfony 8** (PHP 8.4), **React + Vite**, and **NestJS**, fully containerized with Docker.
 

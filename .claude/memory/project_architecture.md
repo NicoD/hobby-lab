@@ -1,11 +1,11 @@
 ---
 name: project-architecture
-description: Overall architecture of the recipe-lab monorepo — DDD microservices with React, Symfony, NestJS and Traefik
+description: Overall architecture of the hobby-lab monorepo — DDD microservices with React, Symfony, NestJS and Traefik
 metadata:
   type: project
 ---
 
-Monorepo learning sandbox for DDD + microservices.
+Monorepo learning project for DDD + microservices.
 
 **Why:** Testing a microservices architecture with isolated domains, particularly for auth/identity.
 
