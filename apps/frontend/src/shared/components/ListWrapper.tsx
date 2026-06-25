@@ -1,4 +1,12 @@
-export default function ListWrapper({title, actions, children}) {
+import { ReactNode } from "react"
+
+type ListWrapperProps = {
+  title: string,
+  actions: ReactNode,
+  children: ReactNode,
+}
+
+export default function ListWrapper({title, actions, children}: ListWrapperProps) {
  return (
     <div className="flex flex-col h-full">
       <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 bg-white shrink-0">

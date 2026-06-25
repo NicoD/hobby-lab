@@ -1,12 +1,19 @@
-import { useEffect } from 'react'
+import { ReactNode, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 
-export default function Drawer({ isOpen, onClose, title, children }) {
+type DrawerProps = {
+  isOpen: boolean,
+  onClose: () => void,
+  title: string,
+  children: ReactNode
+};
+
+export default function Drawer({ isOpen, onClose, title, children }: DrawerProps) {
   useEffect(() => {
     if (!isOpen) return
-    const onKey = (e) => { if (e.key === 'Escape') onClose() }
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose() }
     document.addEventListener('keydown', onKey)
-    return () => document.removeEventListener('keydown', onKey)
+    return () => { document.removeEventListener('keydown', onKey) }
   }, [isOpen, onClose])
 
   return createPortal(

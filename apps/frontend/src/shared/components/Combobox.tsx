@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { KeyboardEvent, MouseEvent, useEffect, useMemo, useRef, useState } from 'react'
 
 /**
  * Searchable select with inline creation.
@@ -12,6 +12,17 @@ import { useEffect, useMemo, useRef, useState } from 'react'
  * onCreate – (label) => key | Promise<key>, called when the "Create" option is
  *            picked; if it returns the new key, that key becomes selected
  */
+
+type V = {key: string, value: string}
+
+type ComboboxProps = {
+  values?: V[],
+  onSearch?: (query: string) => Promise<V[]>,
+  value?: string,
+  onChange?: (key: string | null) => void,
+  onCreate?: (arg0: string) => Promise<string | null>,
+  placeholder?: string
+}
 export default function Combobox({
   values = [],
   onSearch,
@@ -19,19 +30,22 @@ export default function Combobox({
   onChange,
   onCreate,
   placeholder = 'Search or create…',
-}) {
+}: ComboboxProps) {
   const [open, setOpen] = useState(false)
   const [query, setQuery] = useState('')
   const [activeIndex, setActiveIndex] = useState(0)
-  const [internalKey, setInternalKey] = useState(null)
-  const [rawServerOptions, setRawServerOptions] = useState([])
-  const [selectedOption, setSelectedOption] = useState(null)
+  const [internalKey, setInternalKey] = useState<string | null>(null)
+  const [rawServerOptions, setRawServerOptions] = useState<V[]>([])
+  const [selectedOption, setSelectedOption] = useState<V | null>(null)
   const [isLoading, setIsLoading] = useState(false)
-  const serverOptions = query.trim() === '' ? [] : rawServerOptions
+  const serverOptions = useMemo(
+    () => query.trim() === '' ? [] : rawServerOptions,
+    [query, rawServerOptions]
+  )
   const loading = query.trim() !== '' && isLoading
-  const rootRef = useRef(null)
-  const inputRef = useRef(null)
-  const debounceRef = useRef(null)
+  const rootRef = useRef<HTMLDivElement>(null)
+  const inputRef = useRef<HTMLInputElement>(null)
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const onSearchRef = useRef(onSearch)
   onSearchRef.current = onSearch
 
@@ -45,25 +59,25 @@ export default function Combobox({
     if (onSearch) return serverOptions
     const q = query.trim().toLowerCase()
     if (!q) return values
-    return values.filter(v => String(v.value).toLowerCase().includes(q))
+    return values.filter(v => v.value.toLowerCase().includes(q))
   }, [onSearch, serverOptions, values, query])
 
   const canCreate =
     !!onCreate &&
     query.trim() !== '' &&
     !loading &&
-    !values.some(v => String(v.value).toLowerCase() === query.trim().toLowerCase()) &&
-    !serverOptions.some(v => String(v.value).toLowerCase() === query.trim().toLowerCase())
+    !values.some(v => v.value.toLowerCase() === query.trim().toLowerCase()) &&
+    !serverOptions.some(v => v.value.toLowerCase() === query.trim().toLowerCase())
 
   const optionCount = filtered.length + (canCreate ? 1 : 0)
 
   useEffect(() => {
     if (!open) return
-    const onPointerDown = (e) => {
-      if (!rootRef.current?.contains(e.target)) close()
+    const onPointerDown = (e: PointerEvent) => {
+      if (!rootRef.current?.contains(e.target as Node)) close()
     }
     document.addEventListener('pointerdown', onPointerDown)
-    return () => document.removeEventListener('pointerdown', onPointerDown)
+    return () => { document.removeEventListener('pointerdown', onPointerDown) }
   }, [open])
 
   useEffect(() => {
@@ -71,20 +85,20 @@ export default function Combobox({
   }, [open])
 
   useEffect(() => {
-    clearTimeout(debounceRef.current)
+    clearTimeout(debounceRef.current ?? undefined)
     if (!onSearchRef.current || query.trim() === '') return
 
     debounceRef.current = setTimeout(async () => {
       setIsLoading(true)
       try {
-        const results = await onSearchRef.current(query.trim())
-        setRawServerOptions(results)
+        const results = await onSearchRef.current?.(query.trim())
+        if(results) setRawServerOptions(results)
       } finally {
         setIsLoading(false)
       }
     }, 300)
 
-    return () => clearTimeout(debounceRef.current)
+    return () => { clearTimeout(debounceRef.current ?? undefined) }
   }, [query])
 
   function close() {
@@ -93,7 +107,7 @@ export default function Combobox({
     setActiveIndex(0)
   }
 
-  function select(key) {
+  function select(key: string) {
     const item = filtered.find(v => v.key === key)
     if (item) setSelectedOption(item)
     if (value === undefined) setInternalKey(key)
@@ -101,7 +115,7 @@ export default function Combobox({
     close()
   }
 
-  function reset(e) {
+  function reset(e: MouseEvent) {
     e.stopPropagation()
     setSelectedOption(null)
     if (value === undefined) setInternalKey(null)
@@ -109,6 +123,7 @@ export default function Combobox({
   }
 
   async function create() {
+    if (!onCreate) return
     const label = query.trim()
     const newKey = await onCreate(label)
     if (newKey != null) {
@@ -119,12 +134,12 @@ export default function Combobox({
     }
   }
 
-  function pick(index) {
-    if (canCreate && index === filtered.length) create()
+  function pick(index: number) {
+    if (canCreate && index === filtered.length) void create()
     else if (filtered[index]) select(filtered[index].key)
   }
 
-  function onKeyDown(e) {
+  function onKeyDown(e: KeyboardEvent) {
     if (e.key === 'ArrowDown') {
       e.preventDefault()
       setActiveIndex(i => Math.min(i + 1, optionCount - 1))
@@ -146,7 +161,7 @@ export default function Combobox({
         type="button"
         role="combobox"
         aria-expanded={open}
-        onClick={() => (open ? close() : setOpen(true))}
+        onClick={() => { if (open) close(); else setOpen(true) }}
         className={`flex w-full items-center justify-between gap-2 rounded-lg border border-gray-300 bg-white px-3 py-2 text-left focus:outline-none ${open ? '' : 'focus:ring-2 focus:ring-indigo-500'}`}
       >
         <span className={selected ? 'text-gray-900' : 'text-gray-400'}>
@@ -204,8 +219,8 @@ export default function Combobox({
                 key={item.key}
                 role="option"
                 aria-selected={item.key === selectedKey}
-                onMouseEnter={() => setActiveIndex(index)}
-                onClick={() => select(item.key)}
+                onMouseEnter={() => { setActiveIndex(index) }}
+                onClick={() => { select(item.key) } }
                 className={`flex cursor-pointer items-center justify-between rounded-md px-3 py-2 ${
                   index === activeIndex ? 'bg-indigo-50 text-indigo-900' : 'text-gray-700'
                 }`}
@@ -223,8 +238,8 @@ export default function Combobox({
               <li
                 role="option"
                 aria-selected={false}
-                onMouseEnter={() => setActiveIndex(filtered.length)}
-                onClick={create}
+                onMouseEnter={() => { setActiveIndex(filtered.length) }}
+                onClick={() => { void create() }}
                 className={`flex cursor-pointer items-center gap-2 rounded-md px-3 py-2 ${
                   activeIndex === filtered.length ? 'bg-indigo-50 text-indigo-900' : 'text-gray-700'
                 }`}
