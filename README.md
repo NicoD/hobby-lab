@@ -14,6 +14,9 @@ make install
 
 # 2. Start all containers
 make up
+
+# 3. Create a user account
+make user-account-create
 ```
 
 | Service           | URL                    | Note                             |
@@ -39,4 +42,5 @@ Run `make help` for the full list. Key shortcuts:
 | `make npm cmd="<cmd>"`        | Run an npm command in frontend           |
 | `make backend-lint`           | PHP CS Fixer + Rector + Deptrac (dry-run)|
 | `make backend-analyse`        | PHPStan static analysis (level max)      |
+| `make user-account-create`            | Create a user account interactively      |
 | `make backend-test`           | Run the PHP test suite                   |

@@ -6,7 +6,7 @@ PWD := $(shell pwd)
         backend-test backend-test-setup backend-lint backend-lint-fix backend-deptrac backend-analyse backend-refacto backend-watch \
         frontend-test frontend-lint frontend-lint-fix frontend-watch \
         user-test user-lint user-lint-fix user-watch \
-        user-migrate user-migrate-reset user-prisma \
+        user-account-create user-migrate user-migrate-reset user-prisma \
         gateway-logs backend-logs
 
 help:
@@ -50,6 +50,7 @@ help:
 	@echo "  make user-lint            Check coding style (ESLint, dry-run)"
 	@echo "  make user-lint-fix        Auto-fix coding style issues"
 	@echo "  make user-watch           Re-run tests on every TS file change (Ctrl+C to stop)"
+	@echo "  make user-account-create          Create a user account interactively"
 	@echo "  make user-migrate         Run pending Prisma migrations"
 	@echo "  make user-migrate-reset   Reset the database and re-run all migrations (destructive)"
 	@echo "  make user-prisma cmd=...  Run any Prisma CLI command (e.g. make user-prisma cmd='studio')"
@@ -168,6 +169,9 @@ user-lint-fix:
 
 user-watch:
 	docker compose exec -it user sh -c "find src -name '*.ts' | entr -c npm test"
+
+user-account-create:
+	docker compose exec -it user npm run cli:create-user
 
 # ── User — Prisma ───────────────────────────────────────────────────────────────
 
