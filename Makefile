@@ -72,8 +72,7 @@ frontend-install:
 	docker compose run --rm frontend npm install
 
 user-install:
-	docker compose run --rm user npm install
-	docker compose run --rm user npx prisma generate
+	docker compose build user
 
 # ── Docker Compose ─────────────────────────────────────────────────────────────
 
