@@ -1,7 +1,7 @@
 PWD := $(shell pwd)
 
 .PHONY: help install backend-install frontend-install user-install \
-        up down restart logs build \
+        up down restart logs \
         shell-backend shell-frontend shell-user composer npm npx-user \
         backend-test backend-test-setup backend-lint backend-lint-fix backend-deptrac backend-analyse backend-refacto backend-watch \
         frontend-test frontend-lint frontend-lint-fix frontend-watch \
@@ -16,7 +16,6 @@ help:
 	@echo "  make up                   Start all containers"
 	@echo "  make down                 Stop all containers"
 	@echo "  make restart              Restart all containers"
-	@echo "  make build                Rebuild Docker images"
 	@echo "  make logs                 Stream logs from all containers"
 	@echo ""
 	@echo "── Shells ────────────────────────────────────────────────────────────────────"
@@ -85,8 +84,6 @@ down:
 restart:
 	docker compose restart
 
-build:
-	docker compose build --no-cache
 
 logs:
 	docker compose logs -f
