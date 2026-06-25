@@ -19,7 +19,8 @@ services:
     environment:
       - DATABASE_URL=postgresql://backend:backend@backend-db:5432/hobby_lab
     depends_on:
-      - backend-db
+      backend-db:
+        condition: service_healthy
     networks:
       - hobbylab
 
@@ -34,6 +35,11 @@ services:
       POSTGRES_DB: hobby_lab
     volumes:
       - backend_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U backend -d hobby_lab"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
     networks:
       - hobbylab
 
@@ -63,7 +69,8 @@ services:
       - path: ./apps/user/.env
         required: false
     depends_on:
-      - identity-db
+      identity-db:
+        condition: service_healthy
     networks:
       - hobbylab
 
@@ -78,6 +85,11 @@ services:
       POSTGRES_DB: hobby_lab_identity
     volumes:
       - identity_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U identity -d hobby_lab_identity"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
     networks:
       - hobbylab
 
