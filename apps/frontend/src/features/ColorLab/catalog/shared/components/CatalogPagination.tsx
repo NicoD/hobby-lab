@@ -1,4 +1,10 @@
-export default function CatalogPagination({ page, total, limit, onPage }) {
+type CatalogPaginationProps = {
+  page: number,
+  total: number,
+  limit: number,
+  onPage: (page: number) => void,
+}
+export default function CatalogPagination({ page, total, limit, onPage }: CatalogPaginationProps) {
   const pageCount = Math.ceil(total / limit)
 
   if (pageCount <= 1) return null
@@ -12,28 +18,34 @@ export default function CatalogPagination({ page, total, limit, onPage }) {
       </p>
 
       <div className="flex items-center gap-1">
-        <PageButton onClick={() => onPage(page - 1)} disabled={page === 1} label="←" />
+        <PageButton onClick={() => {onPage(page - 1)}} disabled={page === 1} label="←" />
 
         {pages.map((p, i) =>
           p === '…' ? (
-            <span key={`ellipsis-${i}`} className="px-2 text-gray-300 text-sm select-none">…</span>
+            <span key={`ellipsis-${i.toString()}`} className="px-2 text-gray-300 text-sm select-none">…</span>
           ) : (
             <PageButton
               key={p}
-              onClick={() => onPage(p)}
+              onClick={() => { onPage(p) }}
               active={p === page}
               label={p}
             />
           )
         )}
 
-        <PageButton onClick={() => onPage(page + 1)} disabled={page === pageCount} label="→" />
+        <PageButton onClick={() => { onPage(page + 1) }} disabled={page === pageCount} label="→" />
       </div>
     </div>
   )
 }
 
-function PageButton({ onClick, disabled, active, label }) {
+function PageButton(
+  { onClick, disabled, active, label }: {
+  onClick: () => void
+  disabled?: boolean
+  active?: boolean
+  label: number | string
+}) {
   return (
     <button
       onClick={onClick}
@@ -51,7 +63,7 @@ function PageButton({ onClick, disabled, active, label }) {
   )
 }
 
-function buildPageRange(current, total) {
+function buildPageRange(current: number, total: number): ('…' | number)[] {
   if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1)
 
   if (current <= 4) return [1, 2, 3, 4, 5, '…', total]

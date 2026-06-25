@@ -1,10 +1,11 @@
-import CatalogPage from '../../shared/components/CatalogPage'
+import CatalogPage, { Column } from '../../shared/components/CatalogPage'
 import { useBrands } from '../hooks/useBrands'
+import { type Brand } from '../types'
 import BrandEditDrawer from '../components/BrandEditDrawer'
 import useDrawer from '../../../../../shared/hooks/useDrawer'
 
-const COLUMNS = [
-  { key: 'name', label: 'Nom', sortField: 'name' },
+const COLUMNS: Column<Brand>[] = [
+  { key: 'name', label: 'Nom', sortField: 'name', render: item => item.name },
   {
     key: 'ranges',
     label: 'Gammes',
@@ -25,16 +26,16 @@ function EditIcon() {
 
 export default function Brands() {
   const catalog = useBrands()
-  const drawer = useDrawer()
+  const drawer = useDrawer<Brand>()
 
   return (
     <>
       <CatalogPage
         title="Marques"
         columns={COLUMNS}
-        rowActions={(item) => (
+        rowActions={(item: Brand) => (
           <button
-            onClick={() => drawer.open(item)}
+            onClick={() => { drawer.open(item) }}
             className="p-1 text-gray-400 hover:text-indigo-600 transition-colors"
             aria-label="Modifier"
           >
