@@ -14,5 +14,11 @@ services:
     ports:
       - "3000:3000"
     command: >
-      sh -c "./node_modules/.bin/prisma migrate deploy
+      sh -c "npm install
+      && ./node_modules/.bin/prisma migrate deploy
       && npm run start:dev"
+
+  frontend:
+    command: >
+      sh -c "npm install
+      && npm run dev -- --host 0.0.0.0"
