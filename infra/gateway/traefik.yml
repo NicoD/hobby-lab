@@ -1,6 +1,6 @@
 api:
   dashboard: true
-  insecure: true  # sandbox only — disable in production
+  insecure: true  # local only — disable in production
 
 entryPoints:
   web:

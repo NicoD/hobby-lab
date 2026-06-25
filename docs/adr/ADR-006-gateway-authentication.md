@@ -42,7 +42,7 @@ Traefik :80        ← only public port
 apps/backend       ← internal Docker network only, no public port
 ```
 
-In Docker Compose, `apps/backend` and `apps/user` expose **no `ports`** to the host. They are reachable only within the `sandbox` Docker network. Because Traefik is the only service with a public port, it is physically impossible for an external caller to forge `X-User-Id`.
+In Docker Compose, `apps/backend` and `apps/user` expose **no `ports`** to the host. They are reachable only within the `hobbylab` Docker network. Because Traefik is the only service with a public port, it is physically impossible for an external caller to forge `X-User-Id`.
 
 A `docker-compose.override.yml` (gitignored) re-exposes ports for local development.
 

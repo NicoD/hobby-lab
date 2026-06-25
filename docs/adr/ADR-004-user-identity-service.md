@@ -65,7 +65,7 @@ apps/user/
 | Repository | Native repository pattern |
 | DI Container | Built-in DI container |
 
-### Sandbox: registration and authentication
+### Registration and authentication
 
 Registration is fully implemented (`POST /auth/register`). The goal is to validate the JWT flow and ForwardAuth with real users created via the CLI (`npm run cli:create-user`) or the API.
 

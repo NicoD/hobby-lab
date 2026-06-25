@@ -1,65 +1,65 @@
 services:
   gateway:
     image: traefik:v3.3
-    container_name: sandbox-gateway
+    container_name: hobbylab-gateway
     ports:
       - "8000:8000"  # main entrypoint
-      - "8080:8080"  # dashboard (sandbox only — http://localhost:8080)
+      - "8080:8080"  # dashboard (local only — http://localhost:8080)
     volumes:
       - ./infra/gateway/traefik.yml:/etc/traefik/traefik.yml:ro
       - ./infra/gateway/dynamic:/etc/traefik/dynamic:ro
     networks:
-      - sandbox
+      - hobbylab
 
   backend:
     build: ./apps/backend
-    container_name: sandbox-backend
+    container_name: hobbylab-backend
     ports:
       - "8001:8000"  # direct access in dev (bypasses gateway)
     volumes:
       - ./apps/backend:/app
     environment:
-      - DATABASE_URL=postgresql://backend:backend@backend-db:5432/recipe_kitchen
+      - DATABASE_URL=postgresql://backend:backend@backend-db:5432/hobby_lab
     depends_on:
       - backend-db
     networks:
-      - sandbox
+      - hobbylab
 
   backend-db:
     image: postgres:16-alpine
-    container_name: sandbox-backend-db
+    container_name: hobbylab-backend-db
     ports:
       - "5433:5432"
     environment:
       POSTGRES_USER: backend
       POSTGRES_PASSWORD: backend
-      POSTGRES_DB: recipe_kitchen
+      POSTGRES_DB: hobby_lab
     volumes:
       - backend_db_data:/var/lib/postgresql/data
     networks:
-      - sandbox
+      - hobbylab
 
   frontend:
     build: ./apps/frontend
-    container_name: sandbox-frontend
+    container_name: hobbylab-frontend
     ports:
       - "5173:5173"
     volumes:
       - ./apps/frontend:/app
       - frontend_node_modules:/app/node_modules
     networks:
-      - sandbox
+      - hobbylab
 
   user:
     build: ./apps/user
-    container_name: sandbox-user
+    container_name: hobbylab-user
     # no ports exposed — only reachable via Traefik on the internal network
     volumes:
       - ./apps/user:/app
       - user_node_modules:/app/node_modules
     environment:
       - PORT=3000
-      - DATABASE_URL=postgresql://identity:identity@identity-db:5432/recipe_identity
+      - DATABASE_URL=postgresql://identity:identity@identity-db:5432/hobby_lab_identity
       # JWT_PRIVATE_KEY and JWT_PUBLIC_KEY must be set in apps/user/.env (see .env.example)
     env_file:
       - path: ./apps/user/.env
@@ -67,21 +67,21 @@ services:
     depends_on:
       - identity-db
     networks:
-      - sandbox
+      - hobbylab
 
   identity-db:
     image: postgres:16-alpine
-    container_name: sandbox-identity-db
+    container_name: hobbylab-identity-db
     ports:
       - "5432:5432"
     environment:
       POSTGRES_USER: identity
       POSTGRES_PASSWORD: identity
-      POSTGRES_DB: recipe_identity
+      POSTGRES_DB: hobby_lab_identity
     volumes:
       - identity_db_data:/var/lib/postgresql/data
     networks:
-      - sandbox
+      - hobbylab
 
 volumes:
   frontend_node_modules:
@@ -90,5 +90,5 @@ volumes:
   backend_db_data:
 
 networks:
-  sandbox:
+  hobbylab:
     driver: bridge

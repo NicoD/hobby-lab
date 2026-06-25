@@ -6,16 +6,16 @@ services:
       - ./apps/backend:/app
     environment:
       APP_ENV: test
-      DATABASE_URL: postgresql://backend:backend@backend-db:5432/recipe_kitchen
+      DATABASE_URL: postgresql://backend:backend@backend-db:5432/hobby_lab
 
   backend-db:
     image: postgres:16-alpine
     environment:
       POSTGRES_USER: backend
       POSTGRES_PASSWORD: backend
-      POSTGRES_DB: recipe_kitchen_test
+      POSTGRES_DB: hobby_lab_test
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U backend -d recipe_kitchen_test"]
+      test: ["CMD-SHELL", "pg_isready -U backend -d hobby_lab_test"]
       interval: 5s
       timeout: 5s
       retries: 10
@@ -38,16 +38,16 @@ services:
     environment:
       CI: "true"
       PORT: "3000"
-      DATABASE_URL: postgresql://identity:identity@identity-db:5432/recipe_identity_test
+      DATABASE_URL: postgresql://identity:identity@identity-db:5432/hobby_lab_identity_test
 
   identity-db:
     image: postgres:16-alpine
     environment:
       POSTGRES_USER: identity
       POSTGRES_PASSWORD: identity
-      POSTGRES_DB: recipe_identity_test
+      POSTGRES_DB: hobby_lab_identity_test
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U identity -d recipe_identity_test"]
+      test: ["CMD-SHELL", "pg_isready -U identity -d hobby_lab_identity_test"]
       interval: 5s
       timeout: 5s
       retries: 10

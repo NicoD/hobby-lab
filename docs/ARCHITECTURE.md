@@ -1,4 +1,4 @@
-# Architecture — Recipe Lab
+# Architecture — HobbyLab
 
 > Reference document for the agent. All decisions are detailed in `docs/adr/`.
 
@@ -7,7 +7,7 @@
 Monorepo with 3 applications and 1 infrastructure configuration, following a **DDD + microservices** approach.
 
 ```
-recipe-lab/
+hobby-lab/
 ├── apps/
 │   ├── frontend/      ← React (user interface)
 │   ├── backend/       ← Symfony (business domains)

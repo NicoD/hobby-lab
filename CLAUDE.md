@@ -1,4 +1,4 @@
-# recipe-lab — Agent instructions
+# hobby-lab — Agent instructions
 
 ## Language
 
