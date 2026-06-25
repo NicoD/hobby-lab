@@ -42,13 +42,6 @@
     "ts-node": "^10.9.0",
     "typescript": "^5.0.0"
   },
-  "allowScripts": {
-    "@nestjs/core": true,
-    "@prisma/client": true,
-    "@prisma/engines": true,
-    "argon2": true,
-    "prisma": true
-  },
   "jest": {
     "moduleFileExtensions": ["js", "json", "ts"],
     "rootDir": "src",
