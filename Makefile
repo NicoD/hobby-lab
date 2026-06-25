@@ -65,14 +65,17 @@ help:
 install: backend-install frontend-install user-install
 
 backend-install:
+	docker compose build backend
 	docker compose run --rm backend composer install
 	docker compose run --rm backend php bin/console cache:clear
 
 frontend-install:
+	docker compose build frontend
 	docker compose run --rm frontend npm install
 
 user-install:
 	docker compose build user
+	docker compose run --rm user npm install
 
 # ── Docker Compose ─────────────────────────────────────────────────────────────
 
