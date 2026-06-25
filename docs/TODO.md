@@ -49,7 +49,7 @@ Options: NelmioApiDocBundle (Symfony), @nestjs/swagger (NestJS).
 ## Low priority
 
 ### CLAUDE.md for apps/user
-Add a CLAUDE.md in `apps/user/` on a par with `apps/backend/` and `apps/frontend/`.
+~~Add a CLAUDE.md in `apps/user/` on a par with `apps/backend/` and `apps/frontend/`.~~
 
 ### Deployment scenarios
 Add a `docker-compose.prod.yml` or deployment documentation to demonstrate thinking about a non-dev environment.
