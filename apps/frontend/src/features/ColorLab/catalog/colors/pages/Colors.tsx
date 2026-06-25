@@ -1,8 +1,9 @@
-import CatalogPage from '../../shared/components/CatalogPage'
+import CatalogPage, { Column } from '../../shared/components/CatalogPage'
 import { useColors } from '../hooks/useColors'
+import { Color } from '../types'
 
-const COLUMNS = [
-  { key: 'name', label: 'Nom', sortField: 'name' },
+const COLUMNS: Column<Color>[] = [
+  { key: 'name', label: 'Nom', sortField: 'name', render: item => item.name },
   { key: 'createdAt', label: 'Créé le', sortField: 'createdAt', render: item => new Date(item.createdAt).toLocaleDateString('fr-FR') },
 ]
 
