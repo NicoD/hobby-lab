@@ -7,8 +7,6 @@
 ### ~~CI/CD pipeline~~ ✅
 ~~Set up GitHub Actions with the following steps: lint, test, build, docker push.~~
 
-Done: Dependabot + commitlint + semantic-release + CI par service (lint + test via Docker Compose).
-
 ### Symfony Voters
 Implement fine-grained authorization on at least one resource (Brand or Paint).
 Example: only the owner can modify/delete their Brand.
@@ -61,11 +59,11 @@ Add a `docker-compose.prod.yml` or deployment documentation to demonstrate think
 ## Tooling & Workflow
 
 ### Conventional commits
-Integrate the commit convention (https://www.conventionalcommits.org):
-- Install `commitlint` + `husky` at the monorepo root
-- Config: `feat`, `fix`, `chore`, `docs`, `test`, `refactor`, `ci`
-- Add a `make commit-lint` script to the Makefile
-- Document in the README
+~~Integrate the commit convention (https://www.conventionalcommits.org):~~
+~~- Install `commitlint` + `husky` at the monorepo root~~
+~~- Config: `feat`, `fix`, `chore`, `docs`, `test`, `refactor`, `ci`~~
+~~- Add a `make commit-lint` script to the Makefile~~
+~~- Document in the README~~
 
 ### Git in the Claude workflow
 Configure the Claude workflow to follow conventional commits:
@@ -77,7 +75,7 @@ Configure the Claude workflow to follow conventional commits:
 
 ## Before publishing on GitHub
 
-- [ ] README: verify the project starts with `make install && make up`
+- [x] README: verify the project starts with `make install && make up`
 - [ ] README: add the Claude Code note (already written)
 - [ ] README: add GitHub topics (symfony, nestjs, react, ddd, microservices, docker)
 - [ ] Check git history: no committed secrets (`git log --all -S "PRIVATE KEY"`)
