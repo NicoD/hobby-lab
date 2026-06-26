@@ -2,7 +2,7 @@ import { ReactNode } from "react"
 
 type FormFieldProp = {
     label: string,
-    error: string,
+    error?: string | null,
     children: ReactNode,
 }
 export default function FormField({ label, error, children }: FormFieldProp) {

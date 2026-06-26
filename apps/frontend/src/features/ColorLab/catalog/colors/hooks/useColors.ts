@@ -1,18 +1,11 @@
 import { useState } from 'react'
 import { useQuery, keepPreviousData } from '@tanstack/react-query'
-import { useApiFetch } from '../../../../../shared/hooks/useApiFetch'
+import { ListResponse, useApiFetch } from '../../../../../shared/hooks/useApiFetch'
 import { useDebounce } from '../../../../../shared/hooks/useDebounce'
 import { Color } from '../types'
 
-type ColorsResponse = {
-  items: Color[]
-  total: number
-  limit: number
-}
-
-
 export function useColors() {
-  const apiFetch = useApiFetch<ColorsResponse>()
+  const apiFetch = useApiFetch()
   const [search, setSearch] = useState('')
   const [page, setPage] = useState(1)
   const [sort, setSort] = useState('name')
@@ -25,7 +18,7 @@ export function useColors() {
     queryFn: () => {
       const params = new URLSearchParams({ page: page.toString(), sort, dir })
       if (debouncedSearch) params.set('search', debouncedSearch)
-      return apiFetch(`/api/color-lab/catalog/colors?${params}`).then(r => r ?? undefined)
+      return apiFetch<ListResponse<Color>>(`/api/color-lab/catalog/colors?${params}`).then(r => r ?? undefined)
     },
     placeholderData: keepPreviousData,
   })

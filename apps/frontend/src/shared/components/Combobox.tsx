@@ -18,7 +18,7 @@ type V = {key: string, value: string}
 type ComboboxProps = {
   values?: V[],
   onSearch?: (query: string) => Promise<V[]>,
-  value?: string,
+  value: string | null,
   onChange?: (key: string | null) => void,
   onCreate?: (arg0: string) => Promise<string | null>,
   placeholder?: string
@@ -49,7 +49,7 @@ export default function Combobox({
   const onSearchRef = useRef(onSearch)
   onSearchRef.current = onSearch
 
-  const selectedKey = value !== undefined ? value : internalKey
+  const selectedKey = value ?? internalKey
   const options = onSearch ? serverOptions : values
   const selected = options.find(v => v.key === selectedKey)
     ?? values.find(v => v.key === selectedKey)
@@ -110,7 +110,7 @@ export default function Combobox({
   function select(key: string) {
     const item = filtered.find(v => v.key === key)
     if (item) setSelectedOption(item)
-    if (value === undefined) setInternalKey(key)
+    if (value !== null) setInternalKey(key)
     onChange?.(key)
     close()
   }
@@ -118,7 +118,7 @@ export default function Combobox({
   function reset(e: MouseEvent) {
     e.stopPropagation()
     setSelectedOption(null)
-    if (value === undefined) setInternalKey(null)
+    if (value !== null) setInternalKey(null)
     onChange?.(null)
   }
 

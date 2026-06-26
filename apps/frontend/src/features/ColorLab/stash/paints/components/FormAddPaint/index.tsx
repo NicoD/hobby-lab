@@ -1,12 +1,17 @@
-import { useCallback, useState } from "react";
+import { SubmitEvent, useCallback, useState } from "react";
 import Combobox from "../../../../../../shared/components/Combobox";
 import FormField from "../../../../../../shared/components/FormField";
 import { useFormAddPaint } from "./useFormAddPaint";
-import { useCatalogPaints } from "./useCatalogPaints";
+import { Criteria, useCatalogPaints } from "./useCatalogPaints";
 
-export default function FormAddPaint({ onClose }) {
-    const [filters, setFilters] = useState({})
-    const [paintHandle, setPaintHandle] = useState(null)
+type FormAddPaintProps = {
+    onClose: () => void
+};
+
+
+export default function FormAddPaint({ onClose }: FormAddPaintProps) {
+    const [filters, setFilters] = useState<Criteria>({})
+    const [paintHandle, setPaintHandle] = useState<string|null>(null)
     const [purchasedAt, setPurchasedAt] = useState('')
 
     const { existingBrands, existingPaintTypes, searchColors, createBrand, createPaintType, createColor, createPaint } = useFormAddPaint()
@@ -14,55 +19,54 @@ export default function FormAddPaint({ onClose }) {
 
     const currentBrand = existingBrands.find(brand => filters.brand === brand.handle) ?? null
 
-    const handleCreateBrand = useCallback(async (name) => {
-        const { handle } = await createBrand.mutateAsync({ name })
-        return handle
+    const handleCreateBrand = useCallback(async (name: string) => {
+        return (await createBrand.mutateAsync({ name }))?.handle ?? null
     }, [createBrand])
 
-    const handleCreatePaintType = useCallback(async (name) => {
-        const { handle } = await createPaintType.mutateAsync({ name })
-        return handle
+    const handleCreatePaintType = useCallback(async (name: string) => {
+        return (await createPaintType.mutateAsync({ name }))?.handle ?? null
     }, [createPaintType])
 
-    const handleCreateColor = useCallback(async (name) => {
-        const { handle } = await createColor.mutateAsync({ name })
-        return handle
+    const handleCreateColor = useCallback(async (name: string) => {
+        return (await createColor.mutateAsync({ name }))?.handle ?? null
     }, [createColor])
 
-    const handleCreateCatalogPaint = useCallback(async (name) => {
-        const { handle } = await createCatalogPaint.mutateAsync({
+    const handleCreateCatalogPaint = useCallback(async (name: string) => {
+        return (await createCatalogPaint.mutateAsync({
             name,
-            brand: filters.brand,
-            range: filters.range,
-            paintType: filters.type,
-            color: filters.color,
-        })
-        return handle
+            brand: filters.brand ?? null,
+            range: filters.range ?? null,
+            paintType: filters.type ?? null,
+            color: filters.color ?? null,
+        }))?.handle ?? null
     }, [createCatalogPaint, filters])
 
-    const handleSubmit = async (e) => {
+    const handleSubmit = async (e: SubmitEvent) => {
+        if (null === paintHandle) {
+            return;
+        }
         e.preventDefault()
         await createPaint.mutateAsync({ paintHandle, purchasedAt: purchasedAt || null })
         onClose()
     }
 
-    return <form onSubmit={handleSubmit}>
+    return <form onSubmit={(e) => void handleSubmit(e)}>
         <FormField label="Marque" error={createBrand.isError ? createBrand.error.message : null}>
             <Combobox
                 values={existingBrands.map(brand => ({ key: brand.handle, value: brand.name }))}
-                value={filters.brand}
-                onChange={(brand) => setFilters(prev => ({ ...prev, brand, range: undefined }))}
+                value={filters.brand ?? null}
+                onChange={(brand) => { setFilters(prev => ({ ...prev, brand, range: undefined } )) }}
                 onCreate={handleCreateBrand}
                 placeholder="Marque…"
             />
         </FormField>
 
-        {currentBrand?.ranges?.length ? (
+        {currentBrand?.ranges.length ? (
             <FormField label="Gamme">
                 <Combobox
                     values={currentBrand.ranges.map(range => ({ key: range.handle, value: range.name }))}
-                    value={filters.range}
-                    onChange={(range) => setFilters(prev => ({ ...prev, range }))}
+                    value={filters.range ?? null}
+                    onChange={(range) => {setFilters(prev => ({ ...prev, range }))}}
                     placeholder="Gamme…"
                 />
             </FormField>
@@ -71,8 +75,8 @@ export default function FormAddPaint({ onClose }) {
         <FormField label="Type" error={createPaintType.isError ? createPaintType.error.message : null}>
             <Combobox
                 values={existingPaintTypes.map(paintType => ({ key: paintType.handle, value: paintType.name }))}
-                value={filters.type}
-                onChange={(type) => setFilters(prev => ({ ...prev, type }))}
+                value={filters.type ?? null}
+                onChange={(type) => {setFilters(prev => ({ ...prev, type }))}}
                 onCreate={handleCreatePaintType}
                 placeholder="Type…"
             />
@@ -81,8 +85,8 @@ export default function FormAddPaint({ onClose }) {
         <FormField label="Couleur" error={createColor.isError ? createColor.error.message : null}>
             <Combobox
                 onSearch={searchColors}
-                value={filters.color}
-                onChange={(color) => setFilters(prev => ({ ...prev, color }))}
+                value={filters.color ?? null}
+                onChange={(color) => { setFilters(prev => ({ ...prev, color }))}}
                 onCreate={handleCreateColor}
                 placeholder="Couleur…"
             />
@@ -105,7 +109,7 @@ export default function FormAddPaint({ onClose }) {
                 type="date"
                 aria-label="Date d'achat"
                 value={purchasedAt}
-                onChange={(e) => setPurchasedAt(e.target.value)}
+                onChange={(e) => { setPurchasedAt(e.target.value) }}
                 disabled={!paintHandle}
             />
         </FormField>
