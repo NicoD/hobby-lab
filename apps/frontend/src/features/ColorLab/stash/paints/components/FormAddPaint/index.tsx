@@ -1,8 +1,11 @@
 import { SubmitEvent, useCallback, useState } from 'react';
 import Combobox from '../../../../../../shared/components/Combobox';
 import FormField from '../../../../../../shared/components/FormField';
-import { useFormAddPaint } from './useFormAddPaint';
+import { useCatalogBrands } from './useCatalogBrands';
+import { useCatalogColors } from './useCatalogColors';
 import { Criteria, useCatalogPaints } from './useCatalogPaints';
+import { useCatalogPaintTypes } from './useCatalogPaintTypes';
+import { useStashPaints } from './useStashPaints';
 
 type FormAddPaintProps = {
   onClose: () => void;
@@ -13,16 +16,11 @@ export default function FormAddPaint({ onClose }: FormAddPaintProps) {
   const [paintHandle, setPaintHandle] = useState<string | null>(null);
   const [purchasedAt, setPurchasedAt] = useState('');
 
-  const {
-    existingBrands,
-    existingPaintTypes,
-    searchColors,
-    createBrand,
-    createPaintType,
-    createColor,
-    createPaint,
-  } = useFormAddPaint();
+  const { brands: existingBrands, createBrand } = useCatalogBrands();
+  const { paintTypes: existingPaintTypes, createPaintType } = useCatalogPaintTypes();
+  const { searchColors, createColor } = useCatalogColors();
   const { searchCatalogPaints, createCatalogPaint } = useCatalogPaints(filters);
+  const { createPaint } = useStashPaints();
 
   const currentBrand = existingBrands.find((brand) => filters.brand === brand.handle) ?? null;
 
