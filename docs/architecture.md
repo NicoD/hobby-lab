@@ -18,7 +18,7 @@ hobby-lab/
 
 | App | Tech | Role |
 |---|---|---|
-| `frontend` | React | End-user interface |
+| `frontend` | React + TypeScript | End-user interface |
 | `backend` | Symfony | Business domains (DDD) |
 | `user` | NestJS | Identity domain (auth + profile) |
 | `gateway` | Traefik | Routing, ForwardAuth |
