@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, SubmitEvent } from 'react'
 import { useNavigate, Navigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../../../../shared/context/AuthContext'
 
@@ -8,23 +8,23 @@ export default function Login() {
   const location = useLocation()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [error, setError] = useState(null)
+  const [error, setError] = useState<string|null>(null)
   const [loading, setLoading] = useState(false)
 
-  // Where RequireAuth bounced the user from, if anywhere.
-  const from = location.state?.from?.pathname ?? '/'
+  const state = location.state as { from?: { pathname?: string } } | null
+  const from = state?.from?.pathname ?? '/'
 
   if (user) return <Navigate to={from} replace />
 
-  async function handleSubmit(e) {
+  async function handleSubmit(e: SubmitEvent) {
     e.preventDefault()
     setError(null)
     setLoading(true)
     try {
       await login(email, password)
-      navigate(from, { replace: true })
+      void navigate(from, { replace: true })
     } catch (err) {
-      setError(err.message)
+      setError(err instanceof Error ? err.message : 'Une erreur est survenue')
     } finally {
       setLoading(false)
     }
@@ -35,7 +35,7 @@ export default function Login() {
       <div className="w-full max-w-sm bg-white rounded-xl border border-gray-200 shadow-sm p-8">
         <h1 className="text-xl font-semibold text-gray-900 mb-6">Sign in</h1>
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+        <form onSubmit={(e) => void handleSubmit(e)} className="flex flex-col gap-4">
           <div className="flex flex-col gap-1">
             <label htmlFor="email" className="text-sm font-medium text-gray-700">Email</label>
             <input
@@ -44,7 +44,7 @@ export default function Login() {
               autoComplete="email"
               required
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e) => { setEmail(e.target.value) }}
               className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
           </div>
@@ -57,7 +57,7 @@ export default function Login() {
               autoComplete="current-password"
               required
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={(e) => { setPassword(e.target.value)}}
               className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
           </div>

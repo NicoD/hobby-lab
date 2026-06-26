@@ -8,8 +8,8 @@ export default function Profile() {
   if (!user) return <Navigate to="/login" replace />
 
   function handleLogout() {
-    logout()
-    navigate('/', { replace: true })
+    void logout()
+    void navigate('/', { replace: true })
   }
 
   return (

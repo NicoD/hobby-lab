@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useCallback, useEffect, useRef, ReactNode } from 'react'
 
-export type JwtContent = { accessToken: string }
+export type JwtContent = { email: string, sub: string, roles?: string[] }
 
 export type AuthContextType = {
   user: JwtContent | null
@@ -45,7 +45,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const body = await res.json().catch(() => ({})) as { message?: string }
       throw new Error(body.message ?? 'Invalid credentials')
     }
-    const { accessToken } = await res.json() as JwtContent
+   const { accessToken } = await res.json() as { accessToken: string }
     localStorage.setItem(SESSION_FLAG, '1')
     setToken(accessToken)
   }, [])
