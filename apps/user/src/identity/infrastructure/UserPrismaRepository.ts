@@ -5,7 +5,6 @@ import { Role } from '../domain/Role';
 import { Token } from '../domain/Token';
 import { PrismaService } from './PrismaService';
 
-
 @Injectable()
 export class UserPrismaRepository implements UserRepository {
   constructor(private readonly prisma: PrismaService) {}
@@ -82,8 +81,7 @@ export class UserPrismaRepository implements UserRepository {
       passwordHash: row.passwordHash,
       roles: row.roles as Role[],
       tokens: (row.tokens ?? []).map(
-        (t: any) =>
-          new Token(t.id, t.userId, t.hashedToken, t.expiresAt, t.revokedAt),
+        (t: any) => new Token(t.id, t.userId, t.hashedToken, t.expiresAt, t.revokedAt),
       ),
       createdAt: row.createdAt,
     });

@@ -2,14 +2,17 @@ import 'reflect-metadata';
 import { NestFactory } from '@nestjs/core';
 import * as readline from 'readline';
 import { AppModule } from '../app.module';
-import { RegisterUserHandler, RegisterUserCommand } from '../identity/application/commands/RegisterUser';
+import {
+  RegisterUserHandler,
+  RegisterUserCommand,
+} from '../identity/application/commands/RegisterUser';
 
 function ask(rl: readline.Interface, question: string): Promise<string> {
-  return new Promise(resolve => rl.question(question, resolve));
+  return new Promise((resolve) => rl.question(question, resolve));
 }
 
 function askPassword(question: string): Promise<string> {
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
     process.stdout.write(question);
     const { stdin } = process;
     stdin.setRawMode(true);
@@ -76,7 +79,7 @@ async function main() {
   await app.close();
 }
 
-main().catch(err => {
+main().catch((err) => {
   console.error(err);
   process.exit(1);
 });

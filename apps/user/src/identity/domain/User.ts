@@ -11,19 +11,8 @@ export class User {
     readonly createdAt: Date,
   ) {}
 
-  static create(params: {
-    id: string;
-    email: string;
-    passwordHash: string;
-  }): User {
-    return new User(
-      params.id,
-      params.email,
-      params.passwordHash,
-      [Role.USER],
-      [],
-      new Date(),
-    );
+  static create(params: { id: string; email: string; passwordHash: string }): User {
+    return new User(params.id, params.email, params.passwordHash, [Role.USER], [], new Date());
   }
 
   static reconstitute(params: {

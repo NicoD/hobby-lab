@@ -16,9 +16,7 @@ export class RegisterUserCommand {
 
 @Injectable()
 export class RegisterUserHandler {
-  constructor(
-    @Inject(USER_REPOSITORY) private readonly users: UserRepository,
-  ) {}
+  constructor(@Inject(USER_REPOSITORY) private readonly users: UserRepository) {}
 
   async execute(command: RegisterUserCommand): Promise<{ id: string }> {
     const existing = await this.users.findByEmail(command.email);
