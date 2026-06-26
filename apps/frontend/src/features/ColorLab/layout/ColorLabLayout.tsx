@@ -1,13 +1,13 @@
 import { NavLink, Outlet } from 'react-router-dom'
 
-const primaryLink = ({ isActive }) =>
+const primaryLink = ({ isActive }: { isActive: boolean }) =>
   `block px-3 py-2 rounded-md text-sm font-medium transition-colors ${
     isActive
       ? 'bg-indigo-50 text-indigo-700'
       : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
   }`
 
-const catalogLink = ({ isActive }) =>
+const catalogLink = ({ isActive }: { isActive: boolean }) =>
   `block px-3 py-1.5 rounded text-xs transition-colors ${
     isActive
       ? 'text-indigo-600 font-medium'
