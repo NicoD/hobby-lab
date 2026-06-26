@@ -1,42 +1,53 @@
-import { useState } from 'react'
-import { useQuery, keepPreviousData } from '@tanstack/react-query'
-import { ListResponse, useApiFetch } from '../../../../../shared/hooks/useApiFetch'
-import { useDebounce } from '../../../../../shared/hooks/useDebounce'
-import { Paint } from '../types'
+import { useState } from 'react';
+import { useQuery, keepPreviousData } from '@tanstack/react-query';
+import { ListResponse, useApiFetch } from '../../../../../shared/hooks/useApiFetch';
+import { useDebounce } from '../../../../../shared/hooks/useDebounce';
+import { Paint } from '../types';
 
 export function useCatalogPaints() {
-  const apiFetch = useApiFetch()
-  const [search, setSearch] = useState('')
-  const [page, setPage] = useState(1)
-  const [sort, setSort] = useState('name')
-  const [dir, setDir] = useState('asc')
+  const apiFetch = useApiFetch();
+  const [search, setSearch] = useState('');
+  const [page, setPage] = useState(1);
+  const [sort, setSort] = useState('name');
+  const [dir, setDir] = useState('asc');
 
-  const debouncedSearch = useDebounce(search)
+  const debouncedSearch = useDebounce(search);
 
   const query = useQuery({
     queryKey: ['catalog-paints', debouncedSearch, page, sort, dir],
     queryFn: () => {
-      const params = new URLSearchParams({ page: page.toString(), sort, dir })
-      if (debouncedSearch) params.set('search', debouncedSearch)
-      return apiFetch<ListResponse<Paint>>(`/api/color-lab/catalog/paints?${params}`).then(r => r ?? undefined)
+      const params = new URLSearchParams({ page: page.toString(), sort, dir });
+      if (debouncedSearch) params.set('search', debouncedSearch);
+      return apiFetch<ListResponse<Paint>>(`/api/color-lab/catalog/paints?${params}`).then(
+        (r) => r ?? undefined,
+      );
     },
     placeholderData: keepPreviousData,
-  })
+  });
 
   function handleSearch(value: string) {
-    setSearch(value)
-    setPage(1)
+    setSearch(value);
+    setPage(1);
   }
 
   function handleSort(field: string) {
     if (field === sort) {
-      setDir(d => d === 'asc' ? 'desc' : 'asc')
+      setDir((d) => (d === 'asc' ? 'desc' : 'asc'));
     } else {
-      setSort(field)
-      setDir('asc')
+      setSort(field);
+      setDir('asc');
     }
-    setPage(1)
+    setPage(1);
   }
 
-  return { query, search, onSearch: handleSearch, page, onPage: setPage, sort, dir, onSort: handleSort }
+  return {
+    query,
+    search,
+    onSearch: handleSearch,
+    page,
+    onPage: setPage,
+    sort,
+    dir,
+    onSort: handleSort,
+  };
 }

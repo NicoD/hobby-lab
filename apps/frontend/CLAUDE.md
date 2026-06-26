@@ -15,8 +15,8 @@ Library routes: `/color-lab/<feature>` — Catalog routes: `/color-lab/catalog/<
 In `main.tsx`, catalog imports are prefixed `ColorLabCatalog<Entity>`:
 
 ```ts
-import ColorLabPaint          from '…/paint/pages/Paint'           // library
-import ColorLabCatalogBrands  from '…/catalog/brands/pages/Brands' // catalog
+import ColorLabPaint from '…/paint/pages/Paint'; // library
+import ColorLabCatalogBrands from '…/catalog/brands/pages/Brands'; // catalog
 ```
 
 ## Component and hook placement

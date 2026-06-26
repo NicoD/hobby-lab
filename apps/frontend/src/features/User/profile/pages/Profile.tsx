@@ -1,15 +1,15 @@
-import { Navigate, useNavigate } from 'react-router-dom'
-import { useAuth } from '../../../../shared/context/AuthContext'
+import { Navigate, useNavigate } from 'react-router-dom';
+import { useAuth } from '../../../../shared/context/AuthContext';
 
 export default function Profile() {
-  const { user, logout } = useAuth()
-  const navigate = useNavigate()
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
 
-  if (!user) return <Navigate to="/login" replace />
+  if (!user) return <Navigate to="/login" replace />;
 
   function handleLogout() {
-    void logout()
-    void navigate('/', { replace: true })
+    void logout();
+    void navigate('/', { replace: true });
   }
 
   return (
@@ -30,7 +30,10 @@ export default function Profile() {
             <dt className="text-gray-500 font-medium">Roles</dt>
             <dd className="mt-1 flex gap-1 flex-wrap">
               {user.roles?.map((role) => (
-                <span key={role} className="bg-indigo-50 text-indigo-700 text-xs font-medium px-2 py-0.5 rounded-full border border-indigo-100">
+                <span
+                  key={role}
+                  className="bg-indigo-50 text-indigo-700 text-xs font-medium px-2 py-0.5 rounded-full border border-indigo-100"
+                >
                   {role}
                 </span>
               ))}
@@ -47,5 +50,5 @@ export default function Profile() {
         </button>
       </div>
     </div>
-  )
+  );
 }

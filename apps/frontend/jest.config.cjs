@@ -4,4 +4,4 @@ module.exports = {
     '^.+\\.jsx?$': 'babel-jest',
   },
   testMatch: ['**/*.test.js', '**/*.test.jsx'],
-}
+};

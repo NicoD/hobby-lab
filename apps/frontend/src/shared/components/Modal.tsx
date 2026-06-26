@@ -1,21 +1,23 @@
-import { useEffect } from 'react'
-import { createPortal } from 'react-dom'
+import { useEffect } from 'react';
+import { createPortal } from 'react-dom';
 
 type ModalProps = {
-  isOpen: boolean,
-  close: () => void,
-  title: string,
-  children: React.ReactNode
+  isOpen: boolean;
+  close: () => void;
+  title: string;
+  children: React.ReactNode;
 };
 
 export default function Modal({ isOpen, close, title, children }: ModalProps) {
   useEffect(() => {
-    if (!isOpen) return
-    document.body.style.overflow = 'hidden'
-    return () => { document.body.style.overflow = '' }
-  }, [isOpen])
+    if (!isOpen) return;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isOpen]);
 
-  if (!isOpen) return null
+  if (!isOpen) return null;
 
   return createPortal(
     <div className="fixed inset-0 z-50" aria-modal="true" role="dialog">
@@ -28,7 +30,9 @@ export default function Modal({ isOpen, close, title, children }: ModalProps) {
         <div className="flex min-h-full items-center justify-center p-4">
           <div
             className="relative w-full max-w-md bg-white rounded-xl shadow-xl"
-            onClick={e => { e.stopPropagation() }}
+            onClick={(e) => {
+              e.stopPropagation();
+            }}
           >
             <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
               <h2 className="text-lg font-semibold text-gray-900">{title}</h2>
@@ -41,13 +45,11 @@ export default function Modal({ isOpen, close, title, children }: ModalProps) {
               </button>
             </div>
 
-            <div className="p-6">
-              {children}
-            </div>
+            <div className="p-6">{children}</div>
           </div>
         </div>
       </div>
     </div>,
-    document.body
-  )
+    document.body,
+  );
 }

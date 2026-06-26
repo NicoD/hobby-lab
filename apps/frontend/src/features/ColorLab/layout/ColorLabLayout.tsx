@@ -1,18 +1,16 @@
-import { NavLink, Outlet } from 'react-router-dom'
+import { NavLink, Outlet } from 'react-router-dom';
 
 const primaryLink = ({ isActive }: { isActive: boolean }) =>
   `block px-3 py-2 rounded-md text-sm font-medium transition-colors ${
     isActive
       ? 'bg-indigo-50 text-indigo-700'
       : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
-  }`
+  }`;
 
 const catalogLink = ({ isActive }: { isActive: boolean }) =>
   `block px-3 py-1.5 rounded text-xs transition-colors ${
-    isActive
-      ? 'text-indigo-600 font-medium'
-      : 'text-gray-400 hover:text-gray-600'
-  }`
+    isActive ? 'text-indigo-600 font-medium' : 'text-gray-400 hover:text-gray-600'
+  }`;
 
 export default function ColorLabLayout() {
   return (
@@ -48,5 +46,5 @@ export default function ColorLabLayout() {
         <Outlet />
       </main>
     </div>
-  )
+  );
 }

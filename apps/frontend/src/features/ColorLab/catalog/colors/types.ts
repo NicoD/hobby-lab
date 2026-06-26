@@ -1,5 +1,5 @@
 export type Color = {
-  handle: string,
-  name: string,
-  createdAt: string
-}
+  handle: string;
+  name: string;
+  createdAt: string;
+};
