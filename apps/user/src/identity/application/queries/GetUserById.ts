@@ -8,9 +8,7 @@ export class GetUserByIdQuery {
 
 @Injectable()
 export class GetUserByIdHandler {
-  constructor(
-    @Inject(USER_REPOSITORY) private readonly users: UserRepository,
-  ) {}
+  constructor(@Inject(USER_REPOSITORY) private readonly users: UserRepository) {}
 
   async execute(query: GetUserByIdQuery): Promise<User> {
     const user = await this.users.findById(query.userId);

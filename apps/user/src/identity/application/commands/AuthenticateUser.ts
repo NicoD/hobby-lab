@@ -38,7 +38,8 @@ export class AuthenticateUserHandler {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    const { accessToken, rawRefreshToken, hashedRefreshToken } = await this.jwtService.issueTokens(user);
+    const { accessToken, rawRefreshToken, hashedRefreshToken } =
+      await this.jwtService.issueTokens(user);
 
     const token = new Token(
       randomUUID(),

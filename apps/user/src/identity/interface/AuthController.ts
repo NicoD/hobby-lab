@@ -12,7 +12,10 @@ import {
 } from '@nestjs/common';
 import { createHash, randomUUID } from 'crypto';
 import { Request, Response } from 'express';
-import { AuthenticateUserCommand, AuthenticateUserHandler } from '../application/commands/AuthenticateUser';
+import {
+  AuthenticateUserCommand,
+  AuthenticateUserHandler,
+} from '../application/commands/AuthenticateUser';
 import { RegisterUserCommand, RegisterUserHandler } from '../application/commands/RegisterUser';
 import { IdentityJwtService } from '../infrastructure/JwtService';
 import { USER_REPOSITORY, UserRepository } from '../domain/UserRepository';
@@ -39,10 +42,7 @@ export class AuthController {
 
   @Post('auth/login')
   @HttpCode(HttpStatus.OK)
-  async login(
-    @Body() command: AuthenticateUserCommand,
-    @Res({ passthrough: true }) res: Response,
-  ) {
+  async login(@Body() command: AuthenticateUserCommand, @Res({ passthrough: true }) res: Response) {
     const { accessToken, rawRefreshToken } = await this.authenticateHandler.execute(command);
     res.cookie('refreshToken', rawRefreshToken, COOKIE_OPTIONS);
     return { accessToken };
@@ -56,10 +56,7 @@ export class AuthController {
 
   @Post('auth/refresh')
   @HttpCode(HttpStatus.OK)
-  async refresh(
-    @Req() req: Request,
-    @Res({ passthrough: true }) res: Response,
-  ) {
+  async refresh(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
     const raw: string | undefined = req.cookies?.refreshToken;
     if (!raw) throw new UnauthorizedException();
 
@@ -81,7 +78,8 @@ export class AuthController {
 
     await this.users.revokeToken(token.id);
 
-    const { accessToken, rawRefreshToken, hashedRefreshToken } = await this.jwtService.issueTokens(user);
+    const { accessToken, rawRefreshToken, hashedRefreshToken } =
+      await this.jwtService.issueTokens(user);
     const newToken = new Token(
       randomUUID(),
       user.id,
@@ -96,10 +94,7 @@ export class AuthController {
 
   @Post('auth/logout')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async logout(
-    @Req() req: Request,
-    @Res({ passthrough: true }) res: Response,
-  ) {
+  async logout(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
     const raw: string | undefined = req.cookies?.refreshToken;
     if (raw) {
       const hash = createHash('sha256').update(raw).digest('hex');
