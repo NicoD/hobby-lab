@@ -1,21 +1,27 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from 'react';
 
 export default function useModal() {
-    const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
 
-    const close = useCallback(() => { setIsOpen(false) }, [])
-    const toggle = useCallback(() => { setIsOpen(v => !v) }, [])
+  const close = useCallback(() => {
+    setIsOpen(false);
+  }, []);
+  const toggle = useCallback(() => {
+    setIsOpen((v) => !v);
+  }, []);
 
-    useEffect(() => {
-    if (!isOpen) return
-    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') close() }
-    document.body.style.overflow = 'hidden'
-    window.addEventListener('keydown', onKey)
+  useEffect(() => {
+    if (!isOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') close();
+    };
+    document.body.style.overflow = 'hidden';
+    window.addEventListener('keydown', onKey);
     return () => {
-      document.body.style.overflow = ''
-      window.removeEventListener('keydown', onKey)
-    }
-  }, [isOpen, close])
+      document.body.style.overflow = '';
+      window.removeEventListener('keydown', onKey);
+    };
+  }, [isOpen, close]);
 
-  return { isOpen, close, toggle }
+  return { isOpen, close, toggle };
 }

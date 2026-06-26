@@ -1,8 +1,8 @@
 export type Brand = {
-  handle: string
-  name: string
+  handle: string;
+  name: string;
   ranges: {
-    name: string
-  }[]
-  createdAt: string
-}
+    name: string;
+  }[];
+  createdAt: string;
+};

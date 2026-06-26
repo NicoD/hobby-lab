@@ -1,20 +1,24 @@
-import { ReactNode, useEffect } from 'react'
-import { createPortal } from 'react-dom'
+import { ReactNode, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 
 type DrawerProps = {
-  isOpen: boolean,
-  onClose: () => void,
-  title: string,
-  children: ReactNode
+  isOpen: boolean;
+  onClose: () => void;
+  title: string;
+  children: ReactNode;
 };
 
 export default function Drawer({ isOpen, onClose, title, children }: DrawerProps) {
   useEffect(() => {
-    if (!isOpen) return
-    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose() }
-    document.addEventListener('keydown', onKey)
-    return () => { document.removeEventListener('keydown', onKey) }
-  }, [isOpen, onClose])
+    if (!isOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    document.addEventListener('keydown', onKey);
+    return () => {
+      document.removeEventListener('keydown', onKey);
+    };
+  }, [isOpen, onClose]);
 
   return createPortal(
     <div
@@ -38,16 +42,20 @@ export default function Drawer({ isOpen, onClose, title, children }: DrawerProps
             className="text-gray-400 hover:text-gray-600 transition-colors"
             aria-label="Fermer"
           >
-            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={2}
+              stroke="currentColor"
+            >
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
             </svg>
           </button>
         </div>
-        <div className="flex-1 overflow-y-auto p-6">
-          {children}
-        </div>
+        <div className="flex-1 overflow-y-auto p-6">{children}</div>
       </div>
     </div>,
-    document.body
-  )
+    document.body,
+  );
 }

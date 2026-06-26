@@ -1,10 +1,19 @@
-import { useCallback, useState } from 'react'
+import { useCallback, useState } from 'react';
 
-export default function useDrawer<T>(): {isOpen: boolean, item: T | null, open: (it: T) => void, close: () => void}  {
-  const [item, setItem] = useState<T | null>(null)
+export default function useDrawer<T>(): {
+  isOpen: boolean;
+  item: T | null;
+  open: (it: T) => void;
+  close: () => void;
+} {
+  const [item, setItem] = useState<T | null>(null);
 
-  const open = useCallback((it: T) => { setItem(it) }, [])
-  const close = useCallback(() => { setItem(null) }, [])
+  const open = useCallback((it: T) => {
+    setItem(it);
+  }, []);
+  const close = useCallback(() => {
+    setItem(null);
+  }, []);
 
-  return { isOpen: item !== null, item, open, close }
+  return { isOpen: item !== null, item, open, close };
 }

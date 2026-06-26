@@ -6,5 +6,5 @@ export default function MiniLab() {
         <em>Soon</em>
       </p>
     </div>
-  )
+  );
 }

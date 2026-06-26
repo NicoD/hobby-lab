@@ -1,29 +1,31 @@
-import { useCallback } from 'react'
-import { useAuth } from '../context/AuthContext'
-import { apiFetch, ApiFetchOptions, HttpError } from '../lib/apiFetch'
+import { useCallback } from 'react';
+import { useAuth } from '../context/AuthContext';
+import { apiFetch, ApiFetchOptions, HttpError } from '../lib/apiFetch';
 
 export type ListResponse<T> = {
-  items: T[],
-  total: number,
-  limit: number
-}
-
+  items: T[];
+  total: number;
+  limit: number;
+};
 
 export function useApiFetch() {
-  const { token, refresh, logout } = useAuth()
+  const { token, refresh, logout } = useAuth();
 
-  return useCallback(async <T>(url: string, options: Omit<ApiFetchOptions, 'token'> = {}) => {
-    try {
-      return await apiFetch<T>(url, { token: token ?? undefined, ...options })
-    } catch (err: unknown) {
-      if (!(err instanceof HttpError) || err.status !== 401) throw err
+  return useCallback(
+    async <T>(url: string, options: Omit<ApiFetchOptions, 'token'> = {}) => {
       try {
-        const newToken = await refresh()
-        return await apiFetch<T>(url, { token: newToken, ...options })
-      } catch {
-        void logout()
-        throw err
+        return await apiFetch<T>(url, { token: token ?? undefined, ...options });
+      } catch (err: unknown) {
+        if (!(err instanceof HttpError) || err.status !== 401) throw err;
+        try {
+          const newToken = await refresh();
+          return await apiFetch<T>(url, { token: newToken, ...options });
+        } catch {
+          void logout();
+          throw err;
+        }
       }
-    }
-  }, [token, refresh, logout])
+    },
+    [token, refresh, logout],
+  );
 }

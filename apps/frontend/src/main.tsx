@@ -1,22 +1,22 @@
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import { createBrowserRouter, RouterProvider, Navigate } from 'react-router-dom'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import './index.css'
-import { AuthProvider } from './shared/context/AuthContext'
-import Layout from './layout/Layout'
-import HomeRedirect from './layout/HomeRedirect'
-import Login from './features/User/login/pages/Login'
-import Profile from './features/User/profile/pages/Profile'
-import ColorLabLayout from './features/ColorLab/layout/ColorLabLayout'
-import MiniLab from './features/MiniLab/pages/MiniLab'
-import RouterError from './shared/components/RouterError'
-import RequireAuth from './shared/components/RequireAuth'
-import StashPaints from './features/ColorLab/stash/paints/pages/StashPaints'
-import ColorLabCatalogBrands from './features/ColorLab/catalog/brands/pages/Brands'
-import ColorLabCatalogColors from './features/ColorLab/catalog/colors/pages/Colors'
-import CatalogPaints from './features/ColorLab/catalog/paints/pages/CatalogPaints'
-import { HttpError } from './shared/lib/apiFetch'
+import { StrictMode } from 'react';
+import { createRoot } from 'react-dom/client';
+import { createBrowserRouter, RouterProvider, Navigate } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import './index.css';
+import { AuthProvider } from './shared/context/AuthContext';
+import Layout from './layout/Layout';
+import HomeRedirect from './layout/HomeRedirect';
+import Login from './features/User/login/pages/Login';
+import Profile from './features/User/profile/pages/Profile';
+import ColorLabLayout from './features/ColorLab/layout/ColorLabLayout';
+import MiniLab from './features/MiniLab/pages/MiniLab';
+import RouterError from './shared/components/RouterError';
+import RequireAuth from './shared/components/RequireAuth';
+import StashPaints from './features/ColorLab/stash/paints/pages/StashPaints';
+import ColorLabCatalogBrands from './features/ColorLab/catalog/brands/pages/Brands';
+import ColorLabCatalogColors from './features/ColorLab/catalog/colors/pages/Colors';
+import CatalogPaints from './features/ColorLab/catalog/paints/pages/CatalogPaints';
+import { HttpError } from './shared/lib/apiFetch';
 
 const router = createBrowserRouter([
   {
@@ -39,29 +39,30 @@ const router = createBrowserRouter([
               { path: 'catalog/brands', element: <ColorLabCatalogBrands /> },
               { path: 'catalog/colors', element: <ColorLabCatalogColors /> },
               { path: 'catalog/paints', element: <CatalogPaints /> },
-            ]
+            ],
           },
           { path: 'mini-lab', element: <MiniLab /> },
-        ]
+        ],
       },
-    ]
+    ],
   },
-])
+]);
 
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       staleTime: 1000 * 60 * 5,
-      retry: (failureCount, error) => error instanceof HttpError && error.status >= 500 && failureCount < 3,
+      retry: (failureCount, error) =>
+        error instanceof HttpError && error.status >= 500 && failureCount < 3,
     },
     mutations: {
       retry: false,
     },
   },
-})
+});
 
-const root = document.getElementById('root')
-if (!root) throw new Error('Root element not found')
+const root = document.getElementById('root');
+if (!root) throw new Error('Root element not found');
 createRoot(root).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
@@ -70,4 +71,4 @@ createRoot(root).render(
       </AuthProvider>
     </QueryClientProvider>
   </StrictMode>,
-)
+);
