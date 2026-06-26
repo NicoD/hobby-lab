@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "8b8109e0dd8741eada38e6c95bbe9611",
+    "content-hash": "8ea360b7669821842f1b0cfc7183ad9c",
     "packages": [
         {
             "name": "doctrine/collections",
@@ -1119,6 +1119,41 @@
                 "source": "https://github.com/doctrine/sql-formatter/tree/1.5.4"
             },
             "time": "2026-02-08T16:21:46+00:00"
+        },
+        {
+            "name": "hobby-lab/outbox-bundle",
+            "version": "dev-main",
+            "dist": {
+                "type": "path",
+                "url": "./packages/outbox-bundle",
+                "reference": "6a8ab2d94333b2ada023026141825b2056612fa5"
+            },
+            "require": {
+                "doctrine/doctrine-bundle": "^3.0",
+                "doctrine/doctrine-migrations-bundle": "^4.0",
+                "php": ">=8.4",
+                "symfony/config": "8.0.*",
+                "symfony/console": "8.0.*",
+                "symfony/dependency-injection": "8.0.*",
+                "symfony/http-kernel": "8.0.*",
+                "symfony/messenger": "8.0.*",
+                "symfony/uid": "8.0.*"
+            },
+            "type": "symfony-bundle",
+            "extra": {
+                "symfony": {
+                    "allow-contrib": false,
+                    "require": "8.0.*"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Outbox\\": "src/"
+                }
+            },
+            "transport-options": {
+                "relative": true
+            }
         },
         {
             "name": "monolog/monolog",
@@ -9089,7 +9124,9 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {},
+    "stability-flags": {
+        "hobby-lab/outbox-bundle": 20
+    },
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {

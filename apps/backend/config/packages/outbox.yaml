@@ -1,0 +1,2 @@
+outbox:
+    # transport: domain_events  # uncomment when RabbitMQ is configured

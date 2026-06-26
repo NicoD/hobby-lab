@@ -8,34 +8,79 @@ ADR-007 establishes the Outbox Pattern as the delivery mechanism for all Integra
 
 This ADR completes ADR-007 with those implementation decisions.
 
-A placeholder already exists in `TransactionManager` to write Integration Events to the outbox within the same DB transaction as the aggregate change. RabbitMQ is not yet installed.
+A placeholder already exists in `TransactionManager` to write events to the outbox within the same DB transaction as the aggregate change. RabbitMQ is not yet installed.
 
 ## Decisions
 
-### 1. outbox_events table schema
+### 1. Domain event vs integration event — two-phase processing
+
+The outbox stores two distinct payloads:
+
+| Phase | Name | Content | When produced |
+|---|---|---|---|
+| Write | **Domain payload** | Serialized domain event state | Inside the DB transaction |
+| Resolve | **Integration payload** | Routing type + consumer-facing data | Worker, outside transaction |
+
+**Why not resolve the integration event before writing to the outbox?**
+
+The naive approach is to call the mapper before the transaction and write the integration event directly. This is simple but creates coupling: the integration mapping logic must run inside the transaction, which risks making the transaction heavy (joins, read-model queries) and ties the broker's concerns to the DB write path.
+
+**The two-phase approach separates these concerns:**
+
+1. **Write phase** (inside transaction): `TransactionManager` stores the raw domain event class and domain payload. This is always cheap — it mirrors what the domain event already carries.
+2. **Resolve phase** (worker, outside transaction): the worker calls `IntegrationEventResolverInterface::resolve()` to produce the integration event, then stores it alongside the domain payload. This mapping can be arbitrarily complex without affecting commit latency.
+3. **Publish phase** (worker, outside transaction): the worker publishes the already-resolved integration payload to the broker.
+
+If publishing fails, retries replay from the resolved integration payload — no re-resolution needed.
+
+**`DomainEvent::$payload` — abstract property hook**
+
+Every domain event exposes its state through an abstract `payload` hook (PHP 8.4):
+
+```php
+abstract class DomainEvent
+{
+    abstract public array $payload { get; }
+}
+```
+
+Each concrete event implements the hook, returning a flat `array<string, scalar|null>` — the canonical serialization of the event's state. This is what the outbox stores as `domain_payload`.
+
+### 2. `outbox_events` table schema
 
 ```sql
 CREATE TABLE outbox_events (
-    id              UUID        PRIMARY KEY,
-    event_type      VARCHAR     NOT NULL,            -- routing key: "colorlab.brand.created"
-    payload         JSONB       NOT NULL,
-    occurred_at     TIMESTAMPTZ NOT NULL,
-    status          VARCHAR     NOT NULL DEFAULT 'pending'
-                        CHECK (status IN ('pending', 'sent', 'failed')),
-    attempt         SMALLINT    NOT NULL DEFAULT 0,
-    next_retry_at   TIMESTAMPTZ,
-    last_error      TEXT,
-    sent_at         TIMESTAMPTZ,
-    created_at      TIMESTAMPTZ NOT NULL DEFAULT now()
+    id                  UUID        PRIMARY KEY,
+    domain_event_class  VARCHAR     NOT NULL,   -- FQCN, e.g. "App\ColorLab\Brand\Event\BrandCreatedEvent"
+    domain_payload      JSONB       NOT NULL,   -- serialized domain state at the moment of the write
+    integration_type    VARCHAR,                -- routing key resolved by worker: "colorlab.brand.created"
+    integration_payload JSONB,                  -- consumer-facing payload resolved by worker
+    occurred_at         TIMESTAMPTZ NOT NULL,
+    mapped_at           TIMESTAMPTZ,            -- when the worker resolved the integration event
+    status              VARCHAR     NOT NULL DEFAULT 'pending'
+                            CHECK (status IN ('pending', 'mapped', 'sent', 'failed')),
+    attempt             SMALLINT    NOT NULL DEFAULT 0,
+    next_retry_at       TIMESTAMPTZ,
+    last_error          TEXT,
+    sent_at             TIMESTAMPTZ,
+    created_at          TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
-CREATE INDEX ON outbox_events (status, next_retry_at)
-    WHERE status = 'pending';
+CREATE INDEX outbox_events_processable_idx ON outbox_events (status, next_retry_at)
+    WHERE status IN ('pending', 'mapped');
 ```
 
-`global_id` and any ownership identifier are part of each event's domain identity and belong inside `payload`. The worker treats the payload as opaque — it only needs `event_type` for routing and the delivery mechanic columns above.
+**Status lifecycle:**
 
-### 2. Write path — TransactionManager
+```
+pending → mapped → sent
+   ↘          ↘
+   failed     failed    (after 5 attempts at any phase)
+```
+
+`domain_event_class` records the FQCN of the domain event — both for routing and for debugging (replaying, inspecting, filtering by CLI).
+
+### 3. Write path — TransactionManager
 
 The Application layer writes to `outbox_events` **in the same Doctrine transaction** as the aggregate change. No event is written outside a transaction.
 
@@ -43,77 +88,94 @@ The Application layer writes to `outbox_events` **in the same Doctrine transacti
 Command Handler
   → opens transaction
   → aggregate.doSomething() → raises DomainEvent
-  → Application EventListener reacts → builds IntegrationEvent
-  → TransactionManager.appendEvent(integrationEvent)   ← writes to outbox_events
+  → TransactionManager.execute() collects domain events
+  → outbox.record(...$events)          ← writes domain_event_class + domain_payload
   → commits transaction
 ```
 
-If the commit fails, the outbox row is rolled back with it. The outbox is the single source of truth for "what needs to be published".
+The domain event's `payload` hook is the sole source of serialized state. Mapping to an integration event happens in the worker, not here.
 
-### 3. Worker — PostgreSQL LISTEN/NOTIFY with timeout fallback
+### 4. Worker — two-phase loop with PostgreSQL LISTEN/NOTIFY
 
-The worker is a long-lived Symfony Console command (`bin/console app:outbox:process`) running as a dedicated Docker service.
+The worker is a long-lived Symfony Console command (`bin/console outbox:process`) running as a dedicated Docker service.
 
 **Wake-up strategy: LISTEN/NOTIFY + 30s timeout**
-
-The worker blocks on a PostgreSQL LISTEN call with a 30-second timeout. It can be woken up in two ways:
-
-- **Immediate**: the `TransactionManager` sends a `pg_notify` after each successful commit
-- **Fallback**: the 30-second timeout fires regardless, catching any event missed while the worker was down
-
-Both paths execute the same processing function — one loop, two wake-up triggers:
 
 ```php
 while (true) {
     $pdo->pgsqlGetNotify(PDO::FETCH_ASSOC, 30_000); // blocks up to 30s
-    $this->processOutbox();
+    $this->process();
 }
 ```
 
-**Notification from TransactionManager (not a DB trigger)**
+The worker blocks on a PostgreSQL LISTEN call with a 30-second timeout:
 
-The `TransactionManager` sends the notification from PHP after flush, keeping the logic in application code:
+- **Immediate**: the `TransactionManager` sends `pg_notify('outbox_new_event', '')` after each successful commit.
+- **Fallback**: the 30-second timeout fires regardless, catching any event missed while the worker was down.
 
-```php
-// After $entityManager->flush()
-$connection->executeStatement("SELECT pg_notify('outbox_new_event', '')");
+The notify is sent after the transaction commits. If the process crashes between commit and notify, the timeout fallback ensures the event is still picked up.
+
+**Phase 1 — resolve (`resolvePending`)**
+
+```
+SELECT pending FOR UPDATE SKIP LOCKED LIMIT 1
+  → IntegrationEventResolverInterface::resolve(domainEventClass, domainPayload)
+  → UPDATE status='mapped', integration_type, integration_payload, mapped_at
+  → COMMIT
 ```
 
-The notify is sent as a standalone query **after** the transaction commits, not inside it. There is no risk of waking the worker for a rolled-back write: if the transaction rolls back, the PHP code path that sends the notify is never reached. If the process crashes between commit and notify, the 30-second timeout fallback ensures the worker will still pick up the event.
+If `resolve()` returns `null` (no mapper registered for this event class), the row is silently moved to `sent` — the event does not need to be published.
+
+**Phase 2 — publish (`publishMapped`)**
+
+```
+SELECT mapped FOR UPDATE SKIP LOCKED LIMIT 1
+  → EventPublisher::publish(IntegrationEvent)
+  → UPDATE status='sent', sent_at
+  → COMMIT
+```
+
+Each phase runs in its own transaction. A failure in Phase 2 retries from the already-resolved `integration_payload` without re-running the mapper.
 
 **Concurrent worker safety — SKIP LOCKED**
 
-When fetching pending rows, the worker uses `SELECT FOR UPDATE SKIP LOCKED`:
+`SELECT FOR UPDATE SKIP LOCKED` ensures two concurrent workers (e.g. during a rolling deploy) never process the same row simultaneously. This is the standard PostgreSQL mechanism for queue-like workloads.
 
-```sql
-SELECT * FROM outbox_events
-WHERE status = 'pending'
-ORDER BY created_at
-LIMIT 10
-FOR UPDATE SKIP LOCKED
-```
-
-`SKIP LOCKED` causes any row already locked by another worker to be silently skipped. Two concurrent workers (e.g. during a rolling deploy) will never process the same event simultaneously. This is the standard PostgreSQL mechanism for queue-like workloads.
-
-The worker only picks rows where `next_retry_at IS NULL OR next_retry_at <= now()`.
-
-For each pending row, the worker:
-1. Publishes to the RabbitMQ Topic Exchange (`domain.events`)
-2. On success → marks `status = 'sent'`, sets `sent_at = now()`
-3. On failure → increments `attempt`, sets `last_error`, sets `next_retry_at` with exponential backoff (`30s * 2^attempt`), keeps `status = 'pending'`
-
-**Considered alternatives**
+**Considered alternatives for worker strategy**
 
 | Strategy | Latency | Complexity | Rejected because |
 |---|---|---|---|
-| Cron / Symfony Scheduler | depends on interval | low | interval is a hard floor on latency; scheduler overhead for what is a tight loop |
-| Sleep loop daemon | depends on sleep | low | wastes CPU polling when idle; same latency problem as cron |
-| `kernel.terminate` listener | sub-ms | low | no retry, no delivery guarantee, silent on daemon-generated events |
+| Cron / Symfony Scheduler | depends on interval | low | interval is a hard floor on latency; no early wake-up from application code |
+| Sleep loop daemon | depends on sleep | low | wastes CPU polling when idle |
+| `kernel.terminate` listener | sub-ms | low | no retry, no delivery guarantee |
 | **LISTEN/NOTIFY + timeout** | **sub-second** | **low-medium** | **chosen** |
 
-The Symfony Scheduler was specifically considered as a lighter alternative to a sleep loop — it avoids the manual sleep management and integrates with the framework. It was ruled out for the same reason as cron: the polling interval is a ceiling on throughput, and there is no mechanism to wake it early from application code.
+### 5. IntegrationEventResolverInterface — bundle/application boundary
 
-### 4. RabbitMQ topology
+The bundle defines:
+
+```php
+interface IntegrationEventResolverInterface
+{
+    /** @param class-string $domainEventClass */
+    public function resolve(string $domainEventClass, array $domainPayload): ?array;
+}
+```
+
+`apps/backend` provides the implementation (`IntegrationEventTranslator`) which iterates tagged `IntegrationEventMapper` services. Each domain registers its own mapper:
+
+```php
+#[AutoconfigureTag('app.outbox.integration_event_mapper')]
+interface IntegrationEventMapper
+{
+    public function supports(string $domainEventClass): bool;
+    public function map(array $domainPayload): array;
+}
+```
+
+The bundle worker only knows `IntegrationEventResolverInterface` — it is unaware of individual mappers or domain event classes.
+
+### 6. RabbitMQ topology
 
 All Integration Events are published to a single **Topic Exchange**: `domain.events`.
 
@@ -128,99 +190,93 @@ Each consumer declares its own **durable queue** bound to the exchange:
 
 The publisher is unaware of consumers. Adding a consumer requires no change to `apps/backend`.
 
-### 5. Retry and failure handling
+### 7. Retry and failure handling
 
-- The worker retries `pending` events where `next_retry_at IS NULL OR next_retry_at <= now()`.
-- Each failure sets `next_retry_at = now() + interval '30 seconds' * 2^attempt` (exponential backoff: 30s, 1m, 2m, 4m, 8m…).
-- After **5 failed attempts**, the row is moved to `status = 'failed'` and excluded from polling.
-- Failed rows trigger a manual alert (log + monitoring). No automatic dead-letter queue at this stage.
-- Retrying a `failed` row requires a manual status reset to `pending` and clearing `next_retry_at`.
+- Each phase (`pending → mapped`, `mapped → sent`) has its own retry counter.
+- Each failure increments `attempt` and sets `next_retry_at = now() + 30s * 2^attempt` (backoff: 30s, 1m, 2m, 4m, 8m…).
+- After **5 failed attempts**, the row moves to `status = 'failed'` and is excluded from polling.
+- Failed rows require a manual status reset to either `pending` or `mapped` to be retried.
+- Failed rows trigger monitoring alerts. No automatic dead-letter queue at this stage.
 
-### 7. Code organisation — internal Symfony bundle
+### 8. PostgreSQL hard requirement
 
-The outbox pattern is pure technical infrastructure. It does not belong to any bounded context and does not fit the hexagonal organisation enforced inside `apps/backend/src/`. Placing it there would force an artificial mapping onto a structure designed for domain code.
+This bundle uses PostgreSQL-specific features that have no portable equivalent:
 
-**Decision: the outbox is extracted as an internal Symfony bundle, living in the monorepo under `packages/`.**
+- `LISTEN/NOTIFY` — wake-up mechanism for the worker
+- `pgsqlGetNotify()` — PHP PDO extension, PostgreSQL only
+- `SELECT FOR UPDATE SKIP LOCKED` — concurrent worker safety
+- `JSONB` — payload column type
+- `TIMESTAMPTZ` — timezone-aware timestamps
 
-```
-hobby-lab/
-  apps/
-    backend/
-  packages/
-    outbox-bundle/
-      src/
-        Entity/
-          OutboxEvent.php
-        Migrations/
-          Version_CreateOutboxEvents.php
-        Worker/
-          OutboxWorker.php
-          ProcessOutboxCommand.php
-        Port/
-          OutboxPort.php              ← interface consumed by apps/backend
-        Adapter/
-          DoctrineOutboxAdapter.php   ← implements OutboxPort
-        DependencyInjection/
-          OutboxExtension.php         ← registers entity mappings, migration path, services
-      composer.json
-```
+The bundle enforces the requirement at boot with a runtime guard in `OutboxWorker`:
 
-`apps/backend` declares a `path` repository in its `composer.json` and requires the bundle like any Composer dependency:
-
-```json
-"repositories": [
-  { "type": "path", "url": "../../packages/outbox-bundle" }
-],
-"require": {
-  "hobby-lab/outbox-bundle": "*"
+```php
+if (!$this->connection->getDatabasePlatform() instanceof PostgreSQLPlatform) {
+    throw new \RuntimeException('OutboxBundle requires PostgreSQL — LISTEN/NOTIFY and SKIP LOCKED are not portable.');
 }
 ```
 
-**Doctrine migrations**
+### 9. Code organisation — internal Symfony bundle
 
-The bundle's `OutboxExtension` registers its own migration path via `prepend`:
+The outbox pattern is pure technical infrastructure. It does not belong to any bounded context and does not fit the hexagonal organisation enforced inside `apps/backend/src/`.
 
-```php
-$container->prependExtensionConfig('doctrine_migrations', [
-    'migrations_paths' => [
-        'HobbyLab\OutboxBundle\Migrations' => __DIR__.'/../Migrations',
-    ],
-]);
-```
-
-`doctrine:migrations:migrate` run from `apps/backend` picks up both the app's migrations and the bundle's migrations. Tracking is shared in the same `doctrine_migration_versions` table, with no conflict because namespaces differ.
-
-**Integration point in apps/backend**
-
-`apps/backend` depends only on `OutboxPort` (the interface). The `TransactionManager` receives it by injection. The bundle wires the concrete adapter automatically via its extension.
+**Decision: extracted as an internal Symfony bundle under `apps/backend/packages/`.**
 
 ```
 apps/backend/
-  Application layer → injects OutboxPort
-  ↓
-  (bundle DI wires to)
-  ↓
-  DoctrineOutboxAdapter → outbox_events table
+  packages/
+    outbox-bundle/
+      migrations/
+        Version20260626000000CreateOutboxEvents.php
+        Version20260629000000_OutboxTwoPhase.php   ← renames columns, adds mapped status
+      src/
+        OutboxBundle.php
+        OutboxMessage.php        ← id, domainEventClass, domainPayload, occurredAt
+        OutboxRecorder.php       ← interface consumed by apps/backend
+        Adapter/
+          DoctrineOutboxAdapter.php
+        Publisher/
+          IntegrationEvent.php
+          IntegrationEventResolverInterface.php
+          EventPublisher.php
+          MessengerEventPublisher.php
+        Worker/
+          OutboxWorker.php
+        CLI/
+          ListOutboxEventsCommand.php   ← outbox:events (--status, --type, --limit, --watch)
+          ShowOutboxEventCommand.php    ← outbox:event <uuid>
+          ProcessOutboxCommand.php
+        DependencyInjection/
+          OutboxExtension.php
+  src/
+    Shared/
+      Application/Service/
+        Outbox.php                      ← record(DomainEvent ...$events): void
+        IntegrationEventMapper.php      ← supports() + map()
+        IntegrationEventTranslator.php  ← implements IntegrationEventResolverInterface
+      Infrastructure/Outbox/
+        OutboxAdapter.php               ← implements Outbox, creates OutboxMessage from DomainEvent
 ```
 
-**Why not place it in `Shared/`**
+`OutboxRecorder` is the **only** public contract the bundle exposes to `apps/backend`. Everything else is internal.
 
-`Shared` inside `apps/backend` already contains cross-domain code. Adding technical infrastructure there conflates two different concerns: shared domain concepts and shared plumbing. The bundle boundary enforces a cleaner separation — the outbox has an explicit public API (`OutboxPort`) and its internals are fully encapsulated.
+**Doctrine migrations — hand-written, not generated**
 
-**Why not a separate repository**
+The bundle uses DBAL directly (no ORM entity). The `outbox_events` table is therefore invisible to `doctrine:migrations:diff`. The bundle ships hand-written migrations registered via `OutboxExtension::prepend`.
 
-The bundle will evolve in lockstep with `apps/backend` during initial development. A separate repository would introduce version coordination overhead without the reuse benefit that justifies it. Extraction to a standalone repository remains straightforward if the bundle is ever needed in another project.
-
-### 8. At-least-once delivery
+### 10. At-least-once delivery
 
 The outbox guarantees **at-least-once** delivery. Consumers must be idempotent: receiving the same event twice must produce the same result.
 
-Each Integration Event carries a stable `id` (UUID). Consumers use this id to detect and discard duplicates if needed.
+Each Integration Event carries a stable `id` (the domain event UUID). Consumers use this id to detect and discard duplicates.
 
 ## Consequences
 
 - Every aggregate mutation that crosses a domain boundary is durable — no event is lost on broker unavailability or process crash.
-- The worker is a simple polling loop with no framework magic — straightforward to debug and monitor.
+- Domain payload and integration payload are both stored — full audit trail and ability to replay from either stage.
+- The mapping step can be arbitrarily complex without affecting commit latency.
+- A failed publish retries from the resolved integration payload — no re-mapping needed.
 - Consumers must handle duplicate delivery. This is documented as a contract, not a limitation.
 - `status = 'failed'` rows require manual intervention. Monitoring must alert on their presence.
-- When RabbitMQ is unavailable, rows accumulate in `pending` and are published when the broker recovers — no data loss.
+- When RabbitMQ is unavailable, rows accumulate as `mapped` and are published when the broker recovers — no data loss.
+- **PostgreSQL is a hard requirement.** The bundle will throw at boot on any other engine.

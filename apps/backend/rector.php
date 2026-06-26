@@ -5,7 +5,7 @@ declare(strict_types=1);
 use Rector\Config\RectorConfig;
 
 return RectorConfig::configure()
-    ->withPaths([__DIR__ . '/src', __DIR__ . '/tests'])
+    ->withPaths([__DIR__ . '/src', __DIR__ . '/tests', __DIR__ . '/packages/outbox-bundle/src'])
     ->withSkipPath(__DIR__ . '/src/Kernel.php')
 
     // PHP 8.4 upgrade rules
