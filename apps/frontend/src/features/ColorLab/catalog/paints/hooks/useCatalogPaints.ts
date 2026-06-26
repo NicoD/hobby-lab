@@ -1,17 +1,11 @@
 import { useState } from 'react'
 import { useQuery, keepPreviousData } from '@tanstack/react-query'
-import { useApiFetch } from '../../../../../shared/hooks/useApiFetch'
+import { ListResponse, useApiFetch } from '../../../../../shared/hooks/useApiFetch'
 import { useDebounce } from '../../../../../shared/hooks/useDebounce'
 import { Paint } from '../types'
 
-type PaintsResponse = {
-  items: Paint[]
-  total: number
-  limit: number
-}
-
 export function useCatalogPaints() {
-  const apiFetch = useApiFetch<PaintsResponse>()
+  const apiFetch = useApiFetch()
   const [search, setSearch] = useState('')
   const [page, setPage] = useState(1)
   const [sort, setSort] = useState('name')
@@ -24,7 +18,7 @@ export function useCatalogPaints() {
     queryFn: () => {
       const params = new URLSearchParams({ page: page.toString(), sort, dir })
       if (debouncedSearch) params.set('search', debouncedSearch)
-      return apiFetch(`/api/color-lab/catalog/paints?${params}`).then(r => r ?? undefined)
+      return apiFetch<ListResponse<Paint>>(`/api/color-lab/catalog/paints?${params}`).then(r => r ?? undefined)
     },
     placeholderData: keepPreviousData,
   })

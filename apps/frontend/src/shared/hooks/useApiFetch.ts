@@ -2,10 +2,17 @@ import { useCallback } from 'react'
 import { useAuth } from '../context/AuthContext'
 import { apiFetch, ApiFetchOptions, HttpError } from '../lib/apiFetch'
 
-export function useApiFetch<T>() {
+export type ListResponse<T> = {
+  items: T[],
+  total: number,
+  limit: number
+}
+
+
+export function useApiFetch() {
   const { token, refresh, logout } = useAuth()
 
-  return useCallback(async (url: string, options: Omit<ApiFetchOptions, 'token'> = {}) => {
+  return useCallback(async <T>(url: string, options: Omit<ApiFetchOptions, 'token'> = {}) => {
     try {
       return await apiFetch<T>(url, { token: token ?? undefined, ...options })
     } catch (err: unknown) {
