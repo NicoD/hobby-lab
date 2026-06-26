@@ -14,7 +14,7 @@ export function useCatalogPaints() {
   const debouncedSearch = useDebounce(search);
 
   const query = useQuery({
-    queryKey: ['catalog-paints', debouncedSearch, page, sort, dir],
+    queryKey: ['colorlab-catalog-paints', debouncedSearch, page, sort, dir],
     queryFn: () => {
       const params = new URLSearchParams({ page: page.toString(), sort, dir });
       if (debouncedSearch) params.set('search', debouncedSearch);

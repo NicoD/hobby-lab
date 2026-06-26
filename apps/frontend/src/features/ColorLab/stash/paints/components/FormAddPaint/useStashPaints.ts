@@ -12,7 +12,7 @@ export function useStashPaints() {
         method: 'POST',
         body: JSON.stringify(paint),
       }),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['stash-paints'] }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['colorlab-stash-paints'] }),
   });
 
   return { createPaint };
