@@ -16,6 +16,7 @@ import StashPaints from './features/ColorLab/stash/paints/pages/StashPaints'
 import ColorLabCatalogBrands from './features/ColorLab/catalog/brands/pages/Brands'
 import ColorLabCatalogColors from './features/ColorLab/catalog/colors/pages/Colors'
 import CatalogPaints from './features/ColorLab/catalog/paints/pages/CatalogPaints'
+import { HttpError } from './shared/lib/apiFetch'
 
 const router = createBrowserRouter([
   {
@@ -51,7 +52,7 @@ const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       staleTime: 1000 * 60 * 5,
-      retry: (failureCount, error) => error.status >= 500 && failureCount < 3,
+      retry: (failureCount, error) => error instanceof HttpError && error.status >= 500 && failureCount < 3,
     },
     mutations: {
       retry: false,
@@ -59,7 +60,9 @@ const queryClient = new QueryClient({
   },
 })
 
-createRoot(document.getElementById('root')).render(
+const root = document.getElementById('root')
+if (!root) throw new Error('Root element not found')
+createRoot(root).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
