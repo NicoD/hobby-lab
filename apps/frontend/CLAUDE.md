@@ -33,8 +33,11 @@ A component with co-located logic uses a folder:
 ```
 FormAddPaint/
   index.tsx
-  useFormAddPaint.ts
-  usePaintReferences.ts
+  useCatalogBrands.ts
+  useCatalogColors.ts
+  useCatalogPaints.ts
+  useCatalogPaintTypes.ts
+  useStashPaints.ts
 ```
 
 ## Hook conventions
@@ -42,6 +45,12 @@ FormAddPaint/
 - One hook per entity or concern — do not aggregate unrelated queries into one hook.
 - Hooks that mix a query and its related mutation for the same entity stay together.
 - Pass external state as an argument rather than reading it from context inside the hook.
+
+## React Query keys
+
+Format: `['<bounded-context>-<domain>-<resource>', ...params]`
+
+Examples: `['colorlab-catalog-brands', ...params]`, `['colorlab-catalog-brands', ...params]`, `['colorlab-stash-paints', ...params]`
 
 ## TypeScript patterns
 

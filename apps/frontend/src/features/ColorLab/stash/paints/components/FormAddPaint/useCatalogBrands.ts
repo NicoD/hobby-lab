@@ -7,7 +7,7 @@ export function useCatalogBrands() {
   const queryClient = useQueryClient();
 
   const { data } = useQuery({
-    queryKey: ['catalog-brands'],
+    queryKey: ['colorlab-catalog-brands'],
     queryFn: () =>
       apiFetch<ListResponse<CatalogBrand>>('/api/color-lab/catalog/brands').then(
         (r) => r ?? undefined,
@@ -20,7 +20,7 @@ export function useCatalogBrands() {
         method: 'POST',
         body: JSON.stringify(brand),
       }),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['catalog-brands'] }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['colorlab-catalog-brands'] }),
   });
 
   return { brands: data?.items ?? [], createBrand };

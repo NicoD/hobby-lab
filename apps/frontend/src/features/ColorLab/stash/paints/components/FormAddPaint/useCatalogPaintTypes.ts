@@ -7,7 +7,7 @@ export function useCatalogPaintTypes() {
   const queryClient = useQueryClient();
 
   const { data } = useQuery({
-    queryKey: ['catalog-paint-types'],
+    queryKey: ['colorlab-catalog-paint-types'],
     queryFn: () =>
       apiFetch<ListResponse<CatalogPaintType>>('/api/color-lab/catalog/paint-types').then(
         (r) => r ?? undefined,
@@ -20,7 +20,7 @@ export function useCatalogPaintTypes() {
         method: 'POST',
         body: JSON.stringify(paintType),
       }),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['catalog-paint-types'] }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['colorlab-catalog-paint-types'] }),
   });
 
   return { paintTypes: data?.items ?? [], createPaintType };

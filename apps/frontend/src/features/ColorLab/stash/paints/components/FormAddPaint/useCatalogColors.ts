@@ -24,7 +24,7 @@ export function useCatalogColors() {
         method: 'POST',
         body: JSON.stringify(color),
       }),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['catalog-colors'] }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['colorlab-catalog-colors'] }),
   });
 
   return { searchColors, createColor };

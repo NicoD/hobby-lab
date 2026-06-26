@@ -46,7 +46,7 @@ export function useCatalogPaints(criteria: Criteria = {}) {
         method: 'POST',
         body: JSON.stringify(paint),
       }),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['catalog-paints'] }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['colorlab-catalog-paints'] }),
   });
 
   return { searchCatalogPaints, createCatalogPaint };

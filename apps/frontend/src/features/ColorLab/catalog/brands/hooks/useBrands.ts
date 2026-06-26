@@ -14,7 +14,7 @@ export function useBrands() {
   const debouncedSearch = useDebounce(search);
 
   const query = useQuery({
-    queryKey: ['catalog-brands', debouncedSearch, page, sort, dir],
+    queryKey: ['colorlab-catalog-brands', debouncedSearch, page, sort, dir],
     queryFn: () => {
       const params = new URLSearchParams({ page: page.toString(), sort, dir });
       if (debouncedSearch) params.set('search', debouncedSearch);
