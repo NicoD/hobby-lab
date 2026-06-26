@@ -20,6 +20,7 @@
     <testsuites>
         <testsuite name="Unit">
             <directory>tests/Unit</directory>
+            <directory>packages/outbox-bundle/tests</directory>
         </testsuite>
         <testsuite name="Integration">
             <directory>tests/Integration</directory>

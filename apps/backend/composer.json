@@ -3,6 +3,12 @@
     "license": "proprietary",
     "minimum-stability": "stable",
     "prefer-stable": true,
+    "stability-flags": {
+        "hobby-lab/outbox-bundle": "dev"
+    },
+    "repositories": [
+        { "type": "path", "url": "./packages/outbox-bundle" }
+    ],
     "require": {
         "php": ">=8.4",
         "ext-ctype": "*",
@@ -18,6 +24,7 @@
         "symfony/monolog-bundle": "^4.0",
         "symfony/runtime": "8.0.*",
         "symfony/security-bundle": "8.0.*",
+        "hobby-lab/outbox-bundle": "dev-main",
         "symfony/uid": "8.0.*",
         "symfony/yaml": "8.0.*"
     },
@@ -55,7 +62,8 @@
     "autoload-dev": {
         "psr-4": {
             "Test\\": "tests/",
-            "Tools\\PhpStan\\": "tools/PhpStan/"
+            "Tools\\PhpStan\\": "tools/PhpStan/",
+            "OutboxTest\\": "packages/outbox-bundle/tests/"
         }
     },
     "replace": {

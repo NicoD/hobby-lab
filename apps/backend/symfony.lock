@@ -56,6 +56,9 @@
             ".php-cs-fixer.dist.php"
         ]
     },
+    "hobby-lab/outbox-bundle": {
+        "version": "1.0.0"
+    },
     "phpstan/phpstan": {
         "version": "2.1",
         "recipe": {
