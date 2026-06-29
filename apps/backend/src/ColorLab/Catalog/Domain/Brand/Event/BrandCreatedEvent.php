@@ -17,4 +17,15 @@ final class BrandCreatedEvent extends DomainEvent
     ) {
         parent::__construct($aggregateId);
     }
+
+    public string $type { get => 'colorlab.brand.created'; }
+
+    /** @var array<string, scalar|null> */
+    public array $payload {
+        get => [
+            'brand_handle' => (string) $this->aggregateId,
+            'name' => $this->name,
+            'owned_by' => (string) $this->ownedBy,
+        ];
+    }
 }

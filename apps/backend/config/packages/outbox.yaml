@@ -1,2 +1,3 @@
 outbox:
+    resolver: App\Shared\Application\Service\IntegrationEventResolver
     # transport: domain_events  # uncomment when RabbitMQ is configured

@@ -17,4 +17,15 @@ final class PaintTypeCreatedEvent extends DomainEvent
     ) {
         parent::__construct($aggregateId);
     }
+
+    public string $type { get => 'colorlab.paint_type.created'; }
+
+    /** @var array<string, scalar|null> */
+    public array $payload {
+        get => [
+            'paint_type_handle' => (string) $this->aggregateId,
+            'name' => $this->name,
+            'owned_by' => (string) $this->ownedBy,
+        ];
+    }
 }

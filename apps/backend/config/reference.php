@@ -1343,6 +1343,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *     }>,
  * }
  * @psalm-type OutboxConfig = array{
+ *     resolver?: scalar|Param|null, // Service id implementing IntegrationEventResolverInterface.
  *     transport?: scalar|Param|null, // Name of the Symfony Messenger transport to publish events to. Required when the outbox worker is active. // Default: null
  * }
  * @psalm-type ConfigType = array{

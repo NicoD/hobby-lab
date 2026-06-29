@@ -43,6 +43,21 @@ services:
     networks:
       - hobbylab
 
+  backend-worker:
+    build: ./apps/backend
+    container_name: hobbylab-backend-worker
+    command: php bin/console outbox:process
+    volumes:
+      - ./apps/backend:/app
+    environment:
+      - DATABASE_URL=postgresql://backend:backend@backend-db:5432/hobby_lab
+    depends_on:
+      backend-db:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - hobbylab
+
   frontend:
     build: ./apps/frontend
     container_name: hobbylab-frontend
