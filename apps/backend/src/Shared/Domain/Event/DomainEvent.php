@@ -6,7 +6,7 @@ namespace App\Shared\Domain\Event;
 
 use App\Shared\Domain\Model\AggregateRootId;
 
-class DomainEvent
+abstract class DomainEvent
 {
     public readonly DomainEventId $eventId;
     public readonly \DateTimeImmutable $occurredAt;
@@ -16,4 +16,9 @@ class DomainEvent
         $this->eventId = new DomainEventId();
         $this->occurredAt = new \DateTimeImmutable();
     }
+
+    abstract public string $type { get; }
+
+    /** @var array<string, scalar|null> */
+    abstract public array $payload { get; }
 }

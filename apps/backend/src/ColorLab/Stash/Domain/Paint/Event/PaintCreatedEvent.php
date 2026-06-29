@@ -19,4 +19,16 @@ final class PaintCreatedEvent extends DomainEvent
     ) {
         parent::__construct($aggregateId);
     }
+
+    public string $type { get => 'colorlab.stash.paint.created'; }
+
+    /** @var array<string, scalar|null> */
+    public array $payload {
+        get => [
+            'paint_id' => (string) $this->aggregateId,
+            'paint_handle' => (string) $this->paintHandle,
+            'owned_by' => (string) $this->ownedBy,
+            'purchased_at' => $this->purchasedAt?->format(\DateTimeInterface::ATOM),
+        ];
+    }
 }

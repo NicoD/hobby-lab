@@ -13,6 +13,7 @@ final readonly class TransactionManager
     public function __construct(
         private TransactionBoundary $transaction,
         private DomainEventDispatcher $domainEventDispatcher,
+        private Outbox $outbox,
         private LoggerInterface $logger,
     ) {
     }
@@ -34,10 +35,13 @@ final readonly class TransactionManager
 
             $events = $this->collectEvents($aggregates);
 
-            // TODO: Outbox — write integration events in this transaction, before commit.
-            // $this->outbox->record(...$this->translator->translate($events));
+            $this->outbox->record(...$events);
 
             $this->transaction->commit();
+
+            if ([] !== $events) {
+                $this->outbox->notify();
+            }
         } catch (\Throwable $e) {
             $this->logger->error('Transaction failed in {class}: {message}', [
                 'class' => self::class,
