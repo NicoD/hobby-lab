@@ -33,7 +33,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Cache node_modules
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: apps/user/node_modules
           key: ${{ github.repository }}-user-node_modules-${{ hashFiles('apps/user/package-lock.json') }}
@@ -60,7 +60,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Cache node_modules
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: apps/user/node_modules
           key: ${{ github.repository }}-user-node_modules-${{ hashFiles('apps/user/package-lock.json') }}
