@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Outbox\Publisher;
 
+use Symfony\Component\Messenger\Bridge\Amqp\Transport\AmqpStamp;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Transport\Sender\SenderInterface;
 
@@ -17,7 +18,6 @@ final readonly class MessengerEventPublisher implements EventPublisher
     #[\Override]
     public function publish(IntegrationEvent $event): void
     {
-        // TODO: add AmqpStamp($event->type) for routing key when symfony/amqp-messenger is installed
-        $this->transport->send(new Envelope($event));
+        $this->transport->send((new Envelope($event))->with(new AmqpStamp($event->type)));
     }
 }
