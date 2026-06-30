@@ -3,3 +3,10 @@ framework:
         default_bus: app.bus
         buses:
             app.bus: ~
+        transports:
+            domain_events:
+                dsn: '%env(RABBITMQ_DSN)%'
+                options:
+                    exchange:
+                        name: domain.events
+                        type: topic

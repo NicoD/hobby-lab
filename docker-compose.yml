@@ -43,6 +43,24 @@ services:
     networks:
       - hobbylab
 
+  rabbitmq:
+    image: rabbitmq:4-management-alpine
+    container_name: hobbylab-rabbitmq
+    ports:
+      - "15672:15672"  # management UI — http://localhost:15672 (guest/guest)
+    environment:
+      RABBITMQ_DEFAULT_USER: hobbylab
+      RABBITMQ_DEFAULT_PASS: hobbylab
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+    networks:
+      - hobbylab
+
   backend-worker:
     build: ./apps/backend
     container_name: hobbylab-backend-worker
@@ -51,8 +69,11 @@ services:
       - ./apps/backend:/app
     environment:
       - DATABASE_URL=postgresql://backend:backend@backend-db:5432/hobby_lab
+      - RABBITMQ_DSN=amqp://hobbylab:hobbylab@rabbitmq:5672/%2f
     depends_on:
       backend-db:
+        condition: service_healthy
+      rabbitmq:
         condition: service_healthy
     restart: unless-stopped
     networks:
@@ -109,6 +130,7 @@ services:
 volumes:
   identity_db_data:
   backend_db_data:
+  rabbitmq_data:
 
 networks:
   hobbylab:
