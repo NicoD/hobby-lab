@@ -210,53 +210,12 @@ This bundle uses PostgreSQL-specific features that have no portable equivalent:
 
 The bundle enforces the requirement at boot with a runtime guard in `OutboxWorker`:
 
-```php
-if (!$this->connection->getDatabasePlatform() instanceof PostgreSQLPlatform) {
-    throw new \RuntimeException('OutboxBundle requires PostgreSQL — LISTEN/NOTIFY and SKIP LOCKED are not portable.');
-}
-```
 
 ### 9. Code organisation — internal Symfony bundle
 
 The outbox pattern is pure technical infrastructure. It does not belong to any bounded context and does not fit the hexagonal organisation enforced inside `apps/backend/src/`.
 
 **Decision: extracted as an internal Symfony bundle under `apps/backend/packages/`.**
-
-```
-apps/backend/
-  packages/
-    outbox-bundle/
-      migrations/
-        Version20260626000000CreateOutboxEvents.php
-        Version20260629000000_OutboxTwoPhase.php   ← renames columns, adds mapped status
-      src/
-        OutboxBundle.php
-        OutboxMessage.php        ← id, domainEventClass, domainPayload, occurredAt
-        OutboxRecorder.php       ← interface consumed by apps/backend
-        Adapter/
-          DoctrineOutboxAdapter.php
-        Publisher/
-          IntegrationEvent.php
-          IntegrationEventResolverInterface.php
-          EventPublisher.php
-          MessengerEventPublisher.php
-        Worker/
-          OutboxWorker.php
-        CLI/
-          ListOutboxEventsCommand.php   ← outbox:events (--status, --type, --limit, --watch)
-          ShowOutboxEventCommand.php    ← outbox:event <uuid>
-          ProcessOutboxCommand.php
-        DependencyInjection/
-          OutboxExtension.php
-  src/
-    Shared/
-      Application/Service/
-        Outbox.php                      ← record(DomainEvent ...$events): void
-        IntegrationEventMapper.php      ← supports() + map()
-        IntegrationEventTranslator.php  ← implements IntegrationEventResolverInterface
-      Infrastructure/Outbox/
-        OutboxAdapter.php               ← implements Outbox, creates OutboxMessage from DomainEvent
-```
 
 `OutboxRecorder` is the **only** public contract the bundle exposes to `apps/backend`. Everything else is internal.
 
