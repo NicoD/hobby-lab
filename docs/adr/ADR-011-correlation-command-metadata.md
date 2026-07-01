@@ -56,9 +56,13 @@ Each service maintains a `CorrelationContext` — a global context populated at 
 | AMQP consumer | AMQP `correlation_id` envelope property |
 | Background worker | correlationId of the item being processed |
 
-### 4. Domain Events stay pure
+### 4. Domain and Application layers stay pure
 
-Domain Events carry no `correlationId`. It is an infrastructure concern injected at the application boundary, not inside the domain.
+`correlationId` is a **pure infrastructure concern**. It is handled exclusively in the Infrastructure layer:
+
+- The Domain layer never sees it.
+- The Application layer (`Command`, `CommandHandler`, `TransactionManager`, `Outbox` interface) never sees it.
+- Infrastructure adapters (`OutboxAdapter`, HTTP listeners, Monolog processors) read and propagate it.
 
 ---
 
@@ -72,26 +76,33 @@ ADR-010 `outbox_events` table is extended with one column:
 |---|---|---|
 | `correlation_id` | `UUID NOT NULL` | Propagated to all Integration Events produced by the same action |
 
-Written during the write phase (inside the DB transaction), alongside `domain_event_class` and `domain_payload`. It flows into the published AMQP message as the native `correlation_id` property during the publish phase.
+Written by `OutboxAdapter` at record time: it reads `CorrelationContext::get()` and passes the value to `OutboxMessage`. If no context is set (e.g. a CLI command without explicit setup), a random UUID is generated as fallback.
+
+The `correlation_id` flows into the published AMQP message as the native `correlation_id` property during the publish phase.
 
 ### CorrelationContext
 
-A global `CorrelationContext` service is set and cleared at each entry point:
+`CorrelationContext` is a singleton Infrastructure service — a simple mutable holder for the current correlationId. It is set and cleared at each entry point:
 
-- **HTTP** → `kernel.request` / `kernel.terminate`
-- **AMQP consumer** → before/after message handling
-- **Outbox worker** → start/end of each iteration
+| Entry point | Behaviour |
+|---|---|
+| HTTP request (`kernel.request`) | reads `X-Correlation-Id` header or generates a UUID; stores it; sets the header if absent |
+| HTTP response (`kernel.response`) | echoes `X-Correlation-Id` back in the response header |
+| HTTP terminate (`kernel.terminate`) | clears the context |
 
-A Monolog processor reads from `CorrelationContext` and injects `correlationId` into every log record.
+A Monolog processor reads from `CorrelationContext` and injects `correlationId` into every log record. It is auto-registered by Symfony's autoconfigure via `ProcessorInterface`.
 
-### Command propagation
+The `OutboxAdapter` (Infrastructure) injects `CorrelationContext` directly — no interface indirection is needed since both reside in the Infrastructure layer.
 
-`correlationId` travels through the call stack explicitly: the Command carries it, the `CommandHandler` passes it to `TransactionManager`, which writes it to the outbox.
+### Outbox worker
+
+The outbox worker reads `correlation_id` from each processed row and passes it to the `IntegrationEvent`. It propagates as the AMQP `correlation_id` message property. The worker does **not** update the global `CorrelationContext` — its logs are not correlated per row.
 
 ## Consequences
 
 - A single user action is traceable across all the events it produces, regardless of which service or domain emitted them.
 - Logs across all services are correlatable without additional tooling — the `correlationId` is sufficient.
-- Domain Events remain free of infrastructure concerns.
+- The Domain and Application layers are completely free of `correlationId` — it is invisible to Commands, CommandHandlers, and domain logic.
 - Services that receive HTTP requests must forward `X-Correlation-Id` on all outbound calls to preserve the chain.
 - Entry points outside HTTP (jobs, CLI) must explicitly generate a `correlationId` at invocation time.
+- The outbox worker logs are not correlated per row; full correlation in the worker context is deferred to a future iteration.

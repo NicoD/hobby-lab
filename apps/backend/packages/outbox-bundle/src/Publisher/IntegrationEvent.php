@@ -11,6 +11,7 @@ final readonly class IntegrationEvent
         public string $id,
         public string $type,
         public array $payload,
+        public string $correlationId,
     ) {
     }
 }

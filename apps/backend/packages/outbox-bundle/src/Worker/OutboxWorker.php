@@ -50,7 +50,7 @@ final readonly class OutboxWorker
 
         try {
             $row = $this->connection->fetchAssociative(
-                "SELECT id, domain_type, domain_payload FROM outbox_events
+                "SELECT id, domain_type, domain_payload, correlation_id FROM outbox_events
                  WHERE status = 'pending' AND (next_retry_at IS NULL OR next_retry_at <= now())
                  ORDER BY created_at
                  FOR UPDATE SKIP LOCKED
@@ -63,7 +63,7 @@ final readonly class OutboxWorker
                 return false;
             }
 
-            /** @var array{id: string, domain_type: string, domain_payload: string} $row */
+            /** @var array{id: string, domain_type: string, domain_payload: string, correlation_id: string} $row */
             $rowId = $row['id'];
 
             /** @var array<string, mixed> $domainPayload */
@@ -115,7 +115,7 @@ final readonly class OutboxWorker
 
         try {
             $row = $this->connection->fetchAssociative(
-                "SELECT id, domain_type, integration_payload FROM outbox_events
+                "SELECT id, domain_type, integration_payload, correlation_id FROM outbox_events
                  WHERE status = 'mapped' AND (next_retry_at IS NULL OR next_retry_at <= now())
                  ORDER BY mapped_at
                  FOR UPDATE SKIP LOCKED
@@ -128,7 +128,7 @@ final readonly class OutboxWorker
                 return false;
             }
 
-            /** @var array{id: string, domain_type: string, integration_payload: string} $row */
+            /** @var array{id: string, domain_type: string, integration_payload: string, correlation_id: string} $row */
             $rowId = $row['id'];
 
             /** @var array<string, mixed> $integrationPayload */
@@ -138,6 +138,7 @@ final readonly class OutboxWorker
                 $rowId,
                 $row['domain_type'],
                 $integrationPayload,
+                $row['correlation_id'],
             ));
 
             $this->connection->executeStatement(

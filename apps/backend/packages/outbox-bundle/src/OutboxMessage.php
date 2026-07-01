@@ -18,6 +18,7 @@ final readonly class OutboxMessage
         public string $domainType,
         public array $domainPayload,
         public \DateTimeImmutable $occurredAt,
+        public string $correlationId,
     ) {
         $this->id = Uuid::fromString($id);
     }
