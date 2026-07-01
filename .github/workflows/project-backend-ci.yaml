@@ -43,7 +43,7 @@ jobs:
         run: docker compose build backend
 
       - name: Install dependencies
-        run: docker compose run --rm -T backend composer install --no-interaction --prefer-dist
+        run: docker compose run --rm -T backend composer install --no-interaction --prefer-dist --no-scripts
 
       - name: PHP-CS-Fixer
         run: docker compose run --rm -T backend vendor/bin/php-cs-fixer check --diff
@@ -79,7 +79,7 @@ jobs:
         run: docker compose up -d --wait backend-db
 
       - name: Install dependencies
-        run: docker compose run --rm -T backend composer install --no-interaction --prefer-dist
+        run: docker compose run --rm -T backend composer install --no-interaction --prefer-dist --no-scripts
 
       - name: Run migrations
         run: docker compose run --rm -T backend bin/console doctrine:migrations:migrate --no-interaction --all-or-nothing

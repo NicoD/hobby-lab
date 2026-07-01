@@ -1,46 +1,70 @@
 # HobbyLab
 
-A miniature paint management application built with **Symfony 8** (PHP 8.4), **React + Vite + TypeScript**, and **NestJS**, fully containerized with Docker.
+A miniature paint management application — **work in progress**, used as a playground to apply production-grade backend practices.
 
-## Requirements
+Built with **Symfony**, **NestJS**, and **React**, containerized and routed through a Traefik gateway.
 
-- [Docker](https://docs.docker.com/get-docker/) with the Compose plugin
+> Developed with [Claude Code](https://claude.com/claude-code) as an AI pair programmer (following sdd workflow).
+> **All** architectural decisions and technical direction are driven and validated by the author.
+> Code might have been generated either by the author or by Claude.
+
+> Architectural decisions are documented incrementally in [`docs/adr/`](docs/adr/)
+
+---
+
+## What this project demonstrates
+
+- **DDD** on the Symfony backend: aggregate roots, value objects, command/query bus, layered architecture enforced by Deptrac
+- **Outbox pattern** as a standalone Symfony bundle, ensuring reliable event delivery without losing events on crash
+- **Bounded context isolation** - identity (NestJS) and business domains (Symfony) are fully decoupled; the backend never processes a JWT
+- **Authentication via gateway** - Traefik ForwardAuth delegates auth to NestJS and injects `X-User-Id` / `X-User-Roles` headers
+- **Integration tests** that validate REST APIs and domain event dispatch
+- **PHPStan at max level** + Rector + Deptrac in CI
+
+---
+
+## Architecture
+
+```
+Browser → Traefik :8000
+            ├─ /           →  React frontend
+            ├─ /api/auth   →  NestJS (identity)
+            └─ /api/*      →  NestJS (ForwardAuth) → Symfony backend
+```
+
+| App | Stack |
+|---|---|
+| `frontend` | React + TypeScript |
+| `backend` | Symfony + PHP |
+| `user` | NestJS |
+| `gateway` | Traefik |
+
+---
 
 ## Getting started
 
+**Requirements:** Docker with the Compose plugin
+
 ```bash
-# 1. Install dependencies
-make install
+# Copy and fill in environment files
+cp apps/user/.env.example apps/user/.env
 
-# 2. Start all containers
-make up
-
-# 3. Create a user account
-make user-account-create
+make install   # install dependencies
+make up        # start all containers
+make user-account-create  # create a user account
 ```
 
-| Service           | URL                    | Note                             |
-|-------------------|------------------------|----------------------------------|
-| App               | http://localhost:8000  | Single entry point — all traffic |
-| Traefik dashboard | http://localhost:8080  | Dev only                         |
-| Backend (direct)  | http://localhost:8001  | Dev only — bypasses gateway      |
-| Frontend (Vite)   | http://localhost:5173  | Dev only — bypasses gateway      |
+| Service | URL | Note |
+|---|---|---|
+| App | http://localhost:8000 | Single entry point |
+| Traefik dashboard | http://localhost:8080 | Dev only |
+| Backend (direct) | http://localhost:8001 | Bypasses gateway |
+| Frontend (Vite) | http://localhost:5173 | Bypasses gateway |
 
-## Commands
+```bash
+make backend-test     # PHP test suite
+make backend-analyse  # PHPStan (level max)
+make backend-lint     # CS Fixer + Rector + Deptrac
+```
 
-Run `make help` for the full list. Key shortcuts:
-
-| Command                       | Description                              |
-|-------------------------------|------------------------------------------|
-| `make install`                | Install all dependencies                 |
-| `make up`                     | Start all containers (detached)          |
-| `make down`                   | Stop and remove containers               |
-| `make shell-backend`          | Open a shell in the backend container    |
-| `make shell-frontend`         | Open a shell in the frontend container   |
-| `make shell-user`             | Open a shell in the user container       |
-| `make composer cmd="<cmd>"`   | Run a Composer command in backend        |
-| `make npm cmd="<cmd>"`        | Run an npm command in frontend           |
-| `make backend-lint`           | PHP CS Fixer + Rector + Deptrac (dry-run)|
-| `make backend-analyse`        | PHPStan static analysis (level max)      |
-| `make user-account-create`            | Create a user account interactively      |
-| `make backend-test`           | Run the PHP test suite                   |
+Run `make help` for the full list of commands.
