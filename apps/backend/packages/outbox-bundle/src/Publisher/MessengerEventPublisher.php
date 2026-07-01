@@ -18,6 +18,8 @@ final readonly class MessengerEventPublisher implements EventPublisher
     #[\Override]
     public function publish(IntegrationEvent $event): void
     {
-        $this->transport->send((new Envelope($event))->with(new AmqpStamp($event->type)));
+        $this->transport->send(
+            new Envelope($event)->with(new AmqpStamp($event->type, \AMQP_NOPARAM, ['correlation_id' => $event->correlationId])),
+        );
     }
 }

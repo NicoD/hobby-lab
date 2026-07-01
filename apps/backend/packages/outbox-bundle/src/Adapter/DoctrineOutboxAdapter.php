@@ -25,6 +25,7 @@ final readonly class DoctrineOutboxAdapter implements OutboxRecorder, OutboxNoti
                 'domain_payload' => json_encode($message->domainPayload, \JSON_THROW_ON_ERROR),
                 'occurred_at' => $message->occurredAt->format('Y-m-d H:i:s.u P'),
                 'created_at' => new \DateTimeImmutable()->format('Y-m-d H:i:s.u P'),
+                'correlation_id' => $message->correlationId,
             ]);
         }
     }

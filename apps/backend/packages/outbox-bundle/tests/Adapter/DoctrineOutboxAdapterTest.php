@@ -30,17 +30,19 @@ final class DoctrineOutboxAdapterTest extends TestCase
     public function it_maps_message_fields_to_outbox_columns(): void
     {
         $id = Uuid::v7();
+        $correlationId = Uuid::v4()->toRfc4122();
         $occurredAt = new \DateTimeImmutable('2026-06-26 12:00:00.000000 +00:00');
 
         $connection = $this->createMock(Connection::class);
         $connection->method('getDatabasePlatform')->willReturn(new PostgreSQLPlatform());
         $connection->expects($this->once())
             ->method('insert')
-            ->with('outbox_events', $this->callback(function (array $row) use ($id, $occurredAt): bool {
+            ->with('outbox_events', $this->callback(function (array $row) use ($id, $occurredAt, $correlationId): bool {
                 return $row['id'] === $id->toRfc4122()
                     && $row['domain_type'] === 'colorlab.brand.created'
                     && $row['domain_payload'] === '{"brand_handle":"test-brand","name":"Vallejo"}'
-                    && $row['occurred_at'] === $occurredAt->format('Y-m-d H:i:s.u P');
+                    && $row['occurred_at'] === $occurredAt->format('Y-m-d H:i:s.u P')
+                    && $row['correlation_id'] === $correlationId;
             }));
 
         $adapter = new DoctrineOutboxAdapter(new PostgresConnection($connection));
@@ -49,6 +51,7 @@ final class DoctrineOutboxAdapterTest extends TestCase
             'colorlab.brand.created',
             ['brand_handle' => 'test-brand', 'name' => 'Vallejo'],
             $occurredAt,
+            $correlationId,
         ));
     }
 
@@ -70,6 +73,7 @@ final class DoctrineOutboxAdapterTest extends TestCase
             'some.domain.event',
             ['key' => 'value'],
             new \DateTimeImmutable(),
+            Uuid::v4()->toRfc4122(),
         );
     }
 }

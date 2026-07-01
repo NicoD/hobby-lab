@@ -76,6 +76,15 @@ All API calls are prefixed with `/api` in the browser. Traefik strips `/api` bef
 | `GET` | `/auth/jwks` | RS256 public key (JWKS format) |
 | `GET` | `/validate` | ForwardAuth endpoint for Traefik |
 
+## Correlation ID
+
+Every HTTP request and AMQP message carries a `correlationId` (UUID) that identifies the chain of reactions it triggers — across services, domains, and async boundaries. It is a **pure infrastructure concern**: the Domain and Application layers are unaffected. See ADR-011.
+
+| Where | How |
+|---|---|
+| HTTP | `X-Correlation-Id` request/response header |
+| AMQP | Native `correlation_id` message property |
+
 ## ADRs
 
 See `docs/adr/` for all architectural decisions.
