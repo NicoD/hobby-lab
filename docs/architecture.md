@@ -85,6 +85,12 @@ Every HTTP request and AMQP message carries a `correlationId` (UUID) that identi
 | HTTP | `X-Correlation-Id` request/response header |
 | AMQP | Native `correlation_id` message property |
 
+## Inter-service security
+
+Internal REST communication between services is secured at the **network level only**. Services are not exposed outside the Docker network. No application-level authentication is implemented between internal services.
+
+This is an explicit, documented assumption — not an oversight. It will be revisited if the threat model changes (e.g., services exposed across trust boundaries).
+
 ## ADRs
 
 See `docs/adr/` for all architectural decisions.
