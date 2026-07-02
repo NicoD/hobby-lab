@@ -27,8 +27,6 @@ services:
   backend-db:
     image: postgres:16-alpine
     container_name: hobbylab-backend-db
-    ports:
-      - "5433:5432"
     environment:
       POSTGRES_USER: backend
       POSTGRES_PASSWORD: backend
@@ -46,8 +44,6 @@ services:
   rabbitmq:
     image: rabbitmq:4-management-alpine
     container_name: hobbylab-rabbitmq
-    ports:
-      - "15672:15672"  # management UI — http://localhost:15672 (guest/guest)
     environment:
       RABBITMQ_DEFAULT_USER: hobbylab
       RABBITMQ_DEFAULT_PASS: hobbylab
@@ -82,8 +78,6 @@ services:
   frontend:
     build: ./apps/frontend
     container_name: hobbylab-frontend
-    ports:
-      - "5173:5173"
     volumes:
       - ./apps/frontend:/app
     networks:
@@ -98,7 +92,6 @@ services:
     environment:
       - PORT=3000
       - DATABASE_URL=postgresql://identity:identity@identity-db:5432/hobby_lab_identity
-      # JWT_PRIVATE_KEY and JWT_PUBLIC_KEY must be set in apps/user/.env (see .env.example)
     env_file:
       - path: ./apps/user/.env
         required: false
@@ -111,8 +104,6 @@ services:
   identity-db:
     image: postgres:16-alpine
     container_name: hobbylab-identity-db
-    ports:
-      - "5432:5432"
     environment:
       POSTGRES_USER: identity
       POSTGRES_PASSWORD: identity
@@ -126,6 +117,23 @@ services:
       retries: 5
     networks:
       - hobbylab
+
+  media:
+    build: ./apps/media-management
+    container_name: hobbylab-media
+    # no ports exposed — only reachable via Traefik on the internal network
+    volumes:
+      - ./apps/media-management:/app
+    environment:
+      - PORT=4000
+    env_file:
+      - path: ./apps/media-management/.env
+        required: false
+    depends_on:
+      identity-db:
+        condition: service_healthy
+    networks:
+      - hobbylab      
 
 volumes:
   identity_db_data:

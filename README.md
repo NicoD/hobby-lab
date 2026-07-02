@@ -37,6 +37,7 @@ Browser → Traefik :8000
 | `frontend` | React + TypeScript |
 | `backend` | Symfony + PHP |
 | `user` | NestJS |
+| `media` | NestJS |
 | `gateway` | Traefik |
 
 ---
@@ -48,6 +49,8 @@ Browser → Traefik :8000
 ```bash
 # Copy and fill in environment files
 cp apps/user/.env.example apps/user/.env
+cp apps/media-management/.env.example apps/media-management/.env
+
 
 make install   # install dependencies
 make up        # start all containers

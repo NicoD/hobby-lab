@@ -1,12 +1,14 @@
 PWD := $(shell pwd)
 
-.PHONY: help install backend-install frontend-install user-install \
+.PHONY: help install backend-install frontend-install user-install media-install \
         up down restart logs \
         shell-backend shell-frontend shell-user composer npm npx-user \
         backend-test backend-test-setup backend-lint backend-lint-fix backend-deptrac backend-analyse backend-refacto backend-watch \
         frontend-test frontend-lint frontend-lint-fix frontend-watch \
         user-test user-lint user-lint-fix user-watch \
         user-account-create user-migrate user-migrate-reset user-prisma \
+		media-test media-lint media-lint-fix media-watch \
+        media-migrate media-migrate-reset media-prisma \
         gateway-logs backend-logs
 
 help:
@@ -22,6 +24,7 @@ help:
 	@echo "  make shell-backend        Open a shell in the backend container"
 	@echo "  make shell-frontend       Open a shell in the frontend container"
 	@echo "  make shell-user           Open a shell in the user container"
+	@echo "  make shell-media          Open a shell in the media container"	
 	@echo ""
 	@echo "── Shortcuts ─────────────────────────────────────────────────────────────────"
 	@echo "  make composer cmd=...     Run a composer command in backend"
@@ -45,7 +48,7 @@ help:
 	@echo "  make frontend-lint-fix    Auto-fix coding style issues"
 	@echo "  make frontend-watch       Re-run tests on every JS file change (Ctrl+C to stop)"
 	@echo ""
-	@echo "── User (NestJS) ─────────────────────────────────────────────────────────────"
+	@echo "── User ───────────────────────────────────────────────────────────────────────"
 	@echo "  make user-test            Run the Jest test suite"
 	@echo "  make user-lint            Check coding style (ESLint, dry-run)"
 	@echo "  make user-lint-fix        Auto-fix coding style issues"
@@ -55,6 +58,15 @@ help:
 	@echo "  make user-migrate-reset   Reset the database and re-run all migrations (destructive)"
 	@echo "  make user-prisma cmd=...  Run any Prisma CLI command (e.g. make user-prisma cmd='studio')"
 	@echo ""
+	@echo "── Media ───────────────────────────────────────────────────────────────────────"
+	@echo "  make media-test            Run the Jest test suite"
+	@echo "  make media-lint            Check coding style (ESLint, dry-run)"
+	@echo "  make media-lint-fix        Auto-fix coding style issues"
+	@echo "  make media-watch           Re-run tests on every TS file change (Ctrl+C to stop)"
+	@echo "  make media-migrate         Run pending Prisma migrations"
+	@echo "  make media-migrate-reset   Reset the database and re-run all migrations (destructive)"
+	@echo "  make media-prisma cmd=...  Run any Prisma CLI command (e.g. make user-prisma cmd='studio')"
+	@echo ""
 	@echo "── Gateway (Traefik) ─────────────────────────────────────────────────────────"
 	@echo "  make gateway-logs         Stream Traefik logs"
 	@echo "  Dashboard:                http://localhost:8080"
@@ -62,7 +74,7 @@ help:
 
 # ── Installation ──────────────────────────────────────────────────────────────
 
-install: backend-install frontend-install user-install
+install: backend-install frontend-install user-install media-install
 
 backend-install:
 	docker compose build backend
@@ -76,6 +88,10 @@ frontend-install:
 user-install:
 	docker compose build user
 	docker compose run --rm user npm install
+
+media-install:
+	docker compose build media
+	docker compose run --rm media npm install
 
 # ── Docker Compose ─────────────────────────────────────────────────────────────
 
@@ -102,6 +118,9 @@ shell-frontend:
 
 shell-user:
 	docker compose exec user sh
+
+shell-media:
+	docker compose exec media sh	
 
 # ── Shortcuts ─────────────────────────────────────────────────────────────────
 
@@ -186,6 +205,32 @@ user-migrate-reset:
 
 user-prisma:
 	docker compose exec user npx prisma $(cmd)
+
+# ── Media QA ────────────────────────────────────────────────────────────────────
+
+media-test:
+	docker compose exec media npm test
+
+media-lint:
+	docker compose exec media npm run lint
+
+media-lint-fix:
+	docker compose exec media npm run lint:fix
+
+media-watch:
+	docker compose exec -it media sh -c "find src -name '*.ts' | entr -c npm test"
+
+
+# ── Media — Prisma ───────────────────────────────────────────────────────────────
+
+media-migrate:
+	docker compose exec media npx prisma migrate dev
+
+media-migrate-reset:
+	docker compose exec media npx prisma migrate reset
+
+media-prisma:
+	docker compose exec media npx prisma $(cmd)
 
 # ── Gateway ────────────────────────────────────────────────────────────────────
 

@@ -40,6 +40,16 @@ services:
       PORT: "3000"
       DATABASE_URL: postgresql://identity:identity@identity-db:5432/hobby_lab_identity_test
 
+
+  media:
+    build:
+      context: ./apps/media-management
+    volumes:
+      - ./apps/media-management:/app
+    environment:
+      CI: "true"
+      PORT: "4000"
+
   identity-db:
     image: postgres:16-alpine
     environment:

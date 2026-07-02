@@ -38,3 +38,4 @@ Never modify CLAUDE.md files or `docs/*.md` unless the user explicitly requests 
 - No direct cross-domain imports — Domain Events only
 - PII stays exclusively in `apps/user`
 - Bounded Contexts are a **strategic concept only** — they are documented, never materialized as folders
+- `docker-compose.yml` (base file) publishes no ports except the `gateway` service — any other port needed for local dev goes in `docker-compose.override.yml`, never the base file

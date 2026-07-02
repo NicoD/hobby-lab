@@ -11,6 +11,17 @@ http:
         - strip-api-prefix
       service: user
 
+    # strip-api-prefix removes /api before forwarding → user sees /media/*
+    media:
+      entryPoints:
+        - web
+      rule: "PathPrefix(`/api/media`)"
+      middlewares:
+        - strip-api-prefix
+        - forward-auth
+      service: media
+
+
     # One router per domain in apps/backend.
     # Traefik routes by prefix; strip-api-prefix removes /api before forwarding.
     # Symfony sees the full domain path (/color-lab/brands) and owns routing internally.
@@ -46,6 +57,11 @@ http:
       loadBalancer:
         servers:
           - url: "http://user:3000"
+
+    media:
+      loadBalancer:
+        servers:
+          - url: "http://media:4000"
 
     backend:
       loadBalancer:
