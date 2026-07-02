@@ -5,8 +5,9 @@
 | URL | Service | Notes |
 |---|---|---|
 | `http://localhost:8000` | Traefik (API gateway) | All normal traffic — ForwardAuth active |
-| `http://localhost:8001` | Symfony direct | Bypass Traefik — set headers manually |
-| `http://localhost:3000` | NestJS direct | Bypass Traefik — identity service |
+| `http://localhost:8001` | Backend Symfony direct | Bypass Traefik — set headers manually |
+| `http://localhost:3000` | User NestJS direct | Bypass Traefik |
+| `http://localhost:4000` | Media NestJS direct | Bypass Traefik |
 | `http://localhost:8080` | Traefik dashboard | Inspect routers, middlewares, services |
 | `http://localhost:5173` | React frontend | Vite dev server |
 | `http://localhost:5432` | PostgreSQL (identity) | `identity / identity` |

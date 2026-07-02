@@ -10,6 +10,18 @@ services:
       sh -c "php bin/console doctrine:migrations:migrate --no-interaction
       && php -S 0.0.0.0:8000 -t public/"
 
+  backend-db:
+    ports:
+      - "5433:5432"
+
+  identity-db:
+    ports:
+      - "5432:5432"
+
+  rabbitmq:
+    ports:
+      - "15672:15672"  # management UI — http://localhost:15672 (guest/guest)
+
   user:
     ports:
       - "3000:3000"
@@ -18,7 +30,17 @@ services:
       && ./node_modules/.bin/prisma migrate deploy
       && npm run start:dev"
 
+  media:
+    ports:
+      - "4000:4000"
+    command: >
+      sh -c "npm install
+      && ./node_modules/.bin/prisma migrate deploy
+      && npm run start:dev"      
+
   frontend:
+    ports:
+      - "5173:5173"
     command: >
       sh -c "npm install
       && npm run dev -- --host 0.0.0.0"

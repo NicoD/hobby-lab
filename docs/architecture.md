@@ -7,21 +7,15 @@ Monorepo with 3 applications and 1 infrastructure configuration.
 ```
 hobby-lab/
 ├── apps/
-│   ├── frontend/      ← React (user interface)
-│   ├── backend/       ← Symfony (business domains)
-│   └── user/          ← NestJS (identity domain)
+│   ├── frontend/          ← React + TypeScript (user interface)
+│   ├── backend/           ← Symfony (business domains)
+│   └── user/              ← NestJS + TypeScript (identity domain)
+│   └── media-management/  ← NestJS + TypeScript (media domain)
 ├── infra/
 │   └── gateway/       ← Traefik configuration
 ├── docs/
 └── docker-compose.yml
 ```
-
-| App | Tech | Role |
-|---|---|---|
-| `frontend` | React + TypeScript | End-user interface |
-| `backend` | Symfony | Business domains (DDD) |
-| `user` | NestJS | Identity domain (auth + profile) |
-| `gateway` | Traefik | Routing, ForwardAuth |
 
 ## Request flow
 
@@ -39,9 +33,13 @@ Traefik :8000 (single entry point)
    │
    ├─ PathPrefix(/api/color-lab) ── strip /api ─→  ForwardAuth → user (/validate)
    └─ PathPrefix(/api/mini-lab)  ── strip /api ─→  ForwardAuth → user (/validate)
-                                                         │ 200 OK + injected headers
-                                                         ▼
-                                                    backend :8000
+   │                                                     │ 200 OK + injected headers
+   │                                                     ▼
+   │                                                backend :8000
+   ├─ PathPrefix(/api/media) ── strip /api ─→  ForwardAuth → user (/validate)
+   │                                                     │ 200 OK + injected headers
+   │                                                     ▼
+   │                                                media :4000
 ```
 
 All API calls are prefixed with `/api` in the browser. Traefik strips `/api` before forwarding.
