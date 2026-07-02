@@ -133,7 +133,7 @@ services:
       identity-db:
         condition: service_healthy
     networks:
-      - hobbylab      
+      - hobbylab
 
 volumes:
   identity_db_data:
