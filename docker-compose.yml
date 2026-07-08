@@ -126,6 +126,7 @@ services:
       - ./apps/media-management:/app
     environment:
       - PORT=4000
+      - DATABASE_URL=postgresql://media:media@media-db:5432/hobby_lab_media
     env_file:
       - path: ./apps/media-management/.env
         required: false
@@ -135,8 +136,27 @@ services:
     networks:
       - hobbylab
 
+
+  media-db:
+    image: postgres:16-alpine
+    container_name: hobbylab-media-db
+    environment:
+      POSTGRES_USER: media
+      POSTGRES_PASSWORD: media
+      POSTGRES_DB: hobby_lab
+    volumes:
+      - media_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U identity -d hobby_lab_media"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - hobbylab
+
 volumes:
   identity_db_data:
+  media_db_data:
   backend_db_data:
   rabbitmq_data:
 

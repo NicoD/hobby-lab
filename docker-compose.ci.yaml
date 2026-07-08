@@ -48,6 +48,7 @@ services:
     environment:
       CI: "true"
       PORT: "4000"
+      DATABASE_URL: postgresql://media:media@media-db:5432/hobby_lab_media_test
 
   identity-db:
     image: postgres:16-alpine
