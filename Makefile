@@ -209,7 +209,7 @@ user-prisma:
 # ── Media QA ────────────────────────────────────────────────────────────────────
 
 media-test:
-	docker compose exec media npm test
+	docker compose exec media sh -c "npm test && npm run test:e2e"
 
 media-lint:
 	docker compose exec media npm run lint
