@@ -18,6 +18,10 @@ services:
     ports:
       - "5432:5432"
 
+  media-db:
+    ports:
+      - "5434:5432"      
+
   rabbitmq:
     ports:
       - "15672:15672"  # management UI — http://localhost:15672 (guest/guest)
@@ -35,10 +39,9 @@ services:
       - "4000:4000"
     command: >
       sh -c "npm install
+      && ./node_modules/.bin/prisma generate
+      && ./node_modules/.bin/prisma migrate deploy
       && npm run start:dev"
-#      sh -c "npm install
-#      && ./node_modules/.bin/prisma migrate deploy
-#      && npm run start:dev"
 
 
   frontend:
