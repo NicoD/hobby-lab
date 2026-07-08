@@ -10,11 +10,11 @@ Three upload approaches were evaluated:
 
 1. **Proxy (synchronous)** — the domain endpoint receives the file, forwards it to the Media service, gets back a `mediaId` synchronously.
 2. **Proxy (asynchronous)** — same as above, but the Media service emits a Domain Event; the consuming domain listens and updates asynchronously.
-3. **Signed Upload URL** — the consuming domain pre-authorizes the upload (constraints, TTL); the client uploads the file directly to the Media service via a single-use signed URL; the Media service emits an event.
+3. **Pre-authorized Upload URL** — the consuming domain pre-authorizes the upload (constraints, TTL); the client uploads the file directly to the Media service via a single-use upload URL; the Media service emits an event.
 
-Option 3 is chosen. The file never transits through the consuming domain's backend. Constraints are encoded upfront in the signed token. Orphaned media is structurally impossible (the upload URL is tied to an entity from the start).
+Option 3 is chosen. The file never transits through the consuming domain's backend. Constraints are encoded upfront when the upload intent is created. Orphaned media is structurally impossible (the upload URL is tied to an entity from the start).
 
-This is not the classical "presigned URL to external storage" (S3 presigned URL) variant: the signed URL points to the `media-management` service itself, not to an external storage provider. This preserves the decoupling benefits of Option 3 while keeping full control over image processing.
+This is not the classical "presigned URL to external storage" (S3 presigned URL) variant: the upload URL points to the `media-management` service itself, not to an external storage provider. This preserves the decoupling benefits of Option 3 while keeping full control over image processing.
 
 ## Decisions
 
@@ -27,14 +27,14 @@ No domain ever touches a file directly. All file operations go through `media-ma
 ### 2. Upload flow
 
 ```
-(1) Consumer domain  →  POST /api/media/generate-upload-url
-                         body: { formats, maxSizeBytes, variants, routingKey }
-                      ←  { uploadUrl: "/api/media/upload/<signed-token>" }
+(1) Consumer domain  →  POST http://media:4000/internal/media/upload-intents  (internal call, not through the gateway)
+                         body: { entityId, entityType, formats, maxSizeBytes, variants, routingKey }
+                      ←  { uploadUrl: "/api/media/upload/<token>" }
 
 (2) Consumer domain  ←  returns { uploadUrl, ... } to the client
 
-(3) Client           →  PUT /api/media/upload/<signed-token>  (binary file)
-                            media-management validates token (constraints, TTL, single-use)
+(3) Client           →  PUT /api/media/upload/<token>  (binary file)
+                            media-management validates the UploadIntent (constraints, TTL, single-use)
                             Sharp generates all requested variants + stores original
                             All files written to MinIO
                             DB record created: { mediaId, storageKeys }
@@ -47,9 +47,22 @@ No domain ever touches a file directly. All file operations go through `media-ma
 (5) Client           ←  React Query sees invalidation, refetches the entity
 ```
 
-The signed token encodes: `{ entityId, entityType, formats, maxSizeBytes, variants, routingKey, expiresAt }`. It is signed with a secret known only to `media-management`. It is single-use: consumed atomically on upload.
+An `UploadIntent` record encodes: `{ entityId, entityType, formats, maxSizeBytes, variants, routingKey, expiresAt, consumedAt }`. See decision 3 for the token format.
 
-### 3. Image transformation at write time
+### 3. Upload token — opaque DB-backed reference, not a self-contained signed token
+
+Two token designs were considered:
+
+- **Self-contained signed token** (JWT or HMAC-signed payload) — the constraints are encoded and signed in the token itself; verification recomputes the signature, no DB read needed.
+- **Opaque reference token** ✓ — the token is an unguessable random value (UUID v4) stored as a field on an `UploadIntent` row; verification is a DB lookup.
+
+The opaque reference token is chosen. Single-use is a hard requirement, and enforcing it requires an atomic, stateful DB check on every upload regardless of token design (`UPDATE upload_intents SET consumed_at = now() WHERE token = ? AND consumed_at IS NULL AND expires_at > now()`, checking the affected row count). Since that DB round-trip is unavoidable, a cryptographic signature adds no additional guarantee: the existence of a valid, unconsumed `UploadIntent` row already proves validity. Self-contained signed tokens earn their cost when verification must be stateless and possibly performed by multiple verifiers without a DB hit — this is why ADR-006 uses a JWT for user authentication, validated by the gateway on every request without a database call. Here, `media-management` is the sole issuer and sole verifier of the upload token, so that property is not needed.
+
+`UploadIntent` fields: internal DB id (not exposed), `token` (UUID v4, used in the public upload URL — never the sequential internal id, to prevent enumeration), `entityId`, `entityType`, `formats`, `maxSizeBytes`, `variants`, `routingKey`, `expiresAt`, `consumedAt` (nullable).
+
+No `userId` is stored on `UploadIntent`: the requester is the consumer domain (`apps/backend`), not the end user directly, and this flow does not need to assert end-user identity into `media-management`'s trust boundary.
+
+### 4. Image transformation at write time
 
 Sharp runs once at upload. It produces:
 - The **original** (stored untouched — permanent source of truth)
@@ -59,20 +72,22 @@ All files are written to MinIO. `media-management` stores no files on its own di
 
 Transformation at read time (on-the-fly proxy) is explicitly rejected: it adds runtime overhead for every request and requires a proxy layer. The original is always available for batch regeneration if new variants are needed later.
 
-### 4. Storage — MinIO (S3-compatible)
+### 5. Storage — MinIO (S3-compatible)
 
 MinIO is used as the physical file store. It is S3-compatible: swapping to AWS S3 in production requires only a configuration change, no code change.
 
 `media-management` stores a **storage key** per file in its database (e.g., `<mediaId>/thumbnail.webp`), never a full URL.
 
-### 5. URL template — consumer assembles URLs
+### 6. URL template — consumer assembles URLs
 
-`media-management` exposes a single endpoint:
+`media-management` exposes a single endpoint, called internally (see `architecture.md` — "Public vs. internal routes"):
 
 ```
-GET /api/media/url-template
-← { template: "http://media-management/api/media/{mediaId}/{variant}.{format}" }
+GET http://media:4000/internal/media/url-template
+← { template: "/api/media/{mediaId}/{variant}.{format}" }
 ```
+
+The template is a gateway-relative public path, not the internal Docker hostname: it ends up embedded in image URLs served to the browser, which cannot resolve service names on the internal network.
 
 Consuming services fetch this template at startup and cache it indefinitely. The template is treated as **immutable**: it can only change as part of a planned infrastructure migration with a coordinated deployment. No invalidation mechanism is implemented.
 
@@ -87,7 +102,7 @@ template
 
 Domains store only the `mediaId` in their entities, never a full URL.
 
-### 6. Event routing — Return Address pattern
+### 7. Event routing — Return Address pattern
 
 `media-management` publishes `MediaUploaded` to the existing `domain.events` Topic Exchange (ADR-007).
 
@@ -97,7 +112,7 @@ This is the **Return Address** pattern (Enterprise Integration Patterns): the re
 
 ```
 Catalog requests intent with routingKey: "colorlab.brand.media-uploaded"
-  → media-management stores routingKey in the signed token
+  → media-management stores routingKey on the UploadIntent
   → on upload complete, publishes MediaUploaded on "colorlab.brand.media-uploaded"
   → only Catalog's queue, bound to "colorlab.brand.media-uploaded", receives it
 ```
@@ -106,7 +121,7 @@ This routing key does not follow the ADR-007 `{domain}.{entity}.{action}` conven
 
 Each consuming domain binds its queue to its own routing key. It never receives uploads intended for other domains.
 
-### 7. WebSocket — client cache invalidation
+### 8. WebSocket — client cache invalidation
 
 WebSocket is not a general replacement for HTTP invalidation. It is used **only when the result of an operation cannot be returned in the HTTP response** — i.e., when the outcome arrives from a separate async channel.
 
@@ -164,7 +179,7 @@ Instance 3  → receives → userId not connected → ignores
 
 Redis Pub/Sub does not persist messages. If a message is published while no instance holds the target connection, it is lost. This is acceptable: the client reconnects and React Query refetches. The source of truth is the database, not the WebSocket channel.
 
-### 8. Upload forms — client-side separation
+### 9. Upload forms — client-side separation
 
 Upload is always a separate concern from the entity form submission. A form that includes an image goes through two independent steps:
 

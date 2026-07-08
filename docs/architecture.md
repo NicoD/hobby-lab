@@ -89,6 +89,12 @@ Internal REST communication between services is secured at the **network level o
 
 This is an explicit, documented assumption — not an oversight. It will be revisited if the threat model changes (e.g., services exposed across trust boundaries).
 
+### Public vs. internal routes
+
+Endpoints prefixed `/internal/<domain>` (e.g. `/internal/media/upload-intents`) are service-to-service only. They must never appear in `infra/gateway/dynamic/routers.yml`. Consumers call them directly via the Docker-internal service name (e.g. `http://media:4000/internal/media/upload-intents`) — never through the gateway, never with the `/api` prefix.
+
+This is enforced by Traefik's allow-list default (nothing is proxied unless a router declares it) and by no service publishing a host port except `gateway` — not by a deny-list middleware or app-level auth. A leaked path grants no access: there is no network route to it from outside the Docker network regardless of disclosure.
+
 ## ADRs
 
 See `docs/adr/` for all architectural decisions.
