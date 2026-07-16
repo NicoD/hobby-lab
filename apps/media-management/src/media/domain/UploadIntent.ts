@@ -1,37 +1,46 @@
 import { randomUUID } from 'crypto';
+import {
+  UploadIntentAlreadyConsumedError,
+  UploadIntentExpiredError,
+  UploadIntentWrongUserError,
+} from './UploadIntentErrors';
 
-export interface UploadConstraints {
-  formats: string[]; // mime types / extensions acceptés
-  maxSizeBytes: number;
-  variants: VariantSpec[];
-}
-
-export interface VariantSpec {
-  name: string; // "thumbnail", "medium", ...
-  format: string; // "webp", "jpeg", ...
-  width?: number;
-  height?: number;
-}
-
-// --- Entité domaine ---
 export class UploadIntent {
   private constructor(
-    readonly id: string,
-    readonly token: string,
-    readonly entityGid: string,
-    readonly userId: string,
-    readonly routingKey: string,
-    readonly constraints: UploadConstraints,
-    readonly expiresAt: Date,
-    readonly consumedAt: Date | null,
-    readonly createdAt: Date,
+    public readonly id: string,
+    public readonly token: string,
+    public readonly entityGid: string,
+    public readonly userId: string,
+    public readonly routingKey: string,
+    public readonly variants: string[], // names — resolved to format/dimensions by VariantFormatCatalog
+    public readonly expiresAt: Date,
+    private consumedAt: Date | null,
+    public readonly createdAt: Date,
   ) {}
+
+  consume(): Date {
+    const consumedAt = new Date();
+    this.consumedAt = consumedAt;
+    return consumedAt;
+  }
+
+  assertConsumable(userId: string): void {
+    if (userId !== this.userId) {
+      throw new UploadIntentWrongUserError();
+    }
+    if (this.consumedAt !== null) {
+      throw new UploadIntentAlreadyConsumedError();
+    }
+    if (this.expiresAt < new Date()) {
+      throw new UploadIntentExpiredError();
+    }
+  }
 
   static create(params: {
     entityGid: string;
     userId: string;
     routingKey: string;
-    constraints: UploadConstraints;
+    variants: string[];
     ttlSeconds: number;
   }): UploadIntent {
     return new UploadIntent(
@@ -40,10 +49,34 @@ export class UploadIntent {
       params.entityGid,
       params.userId,
       params.routingKey,
-      params.constraints,
+      params.variants,
       new Date(Date.now() + params.ttlSeconds * 1000),
       null,
       new Date(),
+    );
+  }
+
+  static reconstitute(params: {
+    id: string;
+    token: string;
+    entityGid: string;
+    userId: string;
+    routingKey: string;
+    variants: string[];
+    expiresAt: Date;
+    consumedAt: Date | null;
+    createdAt: Date;
+  }): UploadIntent {
+    return new UploadIntent(
+      params.id,
+      params.token,
+      params.entityGid,
+      params.userId,
+      params.routingKey,
+      params.variants,
+      params.expiresAt,
+      params.consumedAt,
+      params.createdAt,
     );
   }
 }

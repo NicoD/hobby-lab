@@ -1,0 +1,8 @@
+{
+  "thumbnail": { "width": 150, "height": 150, "format": "webp", "densities": [1, 2] },
+  "avatar": { "width": 128, "height": 128, "format": "webp", "densities": [1, 2] },
+  "card": { "width": 400, "height": 300, "format": "webp", "densities": [1, 2] },
+  "medium": { "width": 800, "height": 600, "format": "webp", "densities": [1, 2] },
+  "hero": { "width": 1200, "height": 600, "format": "webp", "densities": [1, 2] },
+  "og": { "width": 1200, "height": 630, "format": "jpeg", "densities": [1] }
+}
