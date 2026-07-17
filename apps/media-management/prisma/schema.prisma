@@ -14,13 +14,22 @@ datasource db {
 }
 
 model UploadIntent {
-  id          String    @id @default(uuid())
-  token       String    @unique @default(uuid())
-  entityGid    String
-  userId      String
-  routingKey  String
-  constraints Json
-  expiresAt   DateTime
-  consumedAt  DateTime?
-  createdAt   DateTime  @default(now())
+  id         String    @id @default(uuid())
+  token      String    @unique @default(uuid())
+  entityGid  String
+  userId     String
+  routingKey String
+  variants   String[]
+  expiresAt  DateTime
+  consumedAt DateTime?
+  createdAt  DateTime  @default(now())
+}
+
+model Media {
+  id                 String    @id @default(uuid())
+  originalStorageKey String    @unique
+  originalMimeType   String
+  originalSize       Int
+  variants           Json
+  createdAt          DateTime  @default(now())
 }

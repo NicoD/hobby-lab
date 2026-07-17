@@ -1,10 +1,19 @@
-import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  HttpCode,
+  HttpStatus,
+  Post,
+  UseFilters,
+} from '@nestjs/common';
 import {
   CreateUploadIntentCommand,
   CreateUploadIntentHandler,
 } from '../application/commands/CreateUploadIntent';
+import { MediaExceptionFilter } from './MediaExceptionFilter';
 
 @Controller()
+@UseFilters(MediaExceptionFilter)
 export class UploadIntentController {
   constructor(
     private readonly createUploadIntentHandler: CreateUploadIntentHandler,

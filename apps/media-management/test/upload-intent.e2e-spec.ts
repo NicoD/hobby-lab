@@ -16,14 +16,7 @@ describe('UploadIntentController (e2e)', () => {
     entityGid: 'gid://catalog/Brand/123',
     routingKey: 'colorlab.brand.media-uploaded',
     userId: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
-    constraints: {
-      formats: ['webp', 'jpeg'],
-      maxSizeBytes: 5 * 1024 * 1024,
-      variants: [
-        { name: 'thumbnail', format: 'webp', width: 200, height: 200 },
-        { name: 'medium', format: 'webp' },
-      ],
-    },
+    variants: ['thumbnail', 'medium'],
     ttlSeconds: 600,
   });
 
@@ -84,22 +77,17 @@ describe('UploadIntentController (e2e)', () => {
       .expect(400);
   });
 
-  it('rejects an unknown format in constraints', () => {
-    const body = validBody();
+  it('rejects an unknown variant name', () => {
     return request(app.getHttpServer())
       .post('/internal/media/generate-upload-url')
-      .send({
-        ...body,
-        constraints: { ...body.constraints, formats: ['bmp'] },
-      })
+      .send({ ...validBody(), variants: ['not-a-real-variant'] })
       .expect(400);
   });
 
   it('rejects an empty variants array', () => {
-    const body = validBody();
     return request(app.getHttpServer())
       .post('/internal/media/generate-upload-url')
-      .send({ ...body, constraints: { ...body.constraints, variants: [] } })
+      .send({ ...validBody(), variants: [] })
       .expect(400);
   });
 

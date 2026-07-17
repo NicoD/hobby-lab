@@ -28,7 +28,7 @@ No domain ever touches a file directly. All file operations go through `media-ma
 
 ```
 (1) Consumer domain  →  POST http://media:4000/internal/media/upload-intents  (internal call, not through the gateway)
-                         body: { entityId, entityType, formats, maxSizeBytes, variants, routingKey }
+                         body: { entityId, entityType, variants, routingKey }
                       ←  { uploadUrl: "/api/media/upload/<token>" }
 
 (2) Consumer domain  ←  returns { uploadUrl, ... } to the client
@@ -47,7 +47,7 @@ No domain ever touches a file directly. All file operations go through `media-ma
 (5) Client           ←  React Query sees invalidation, refetches the entity
 ```
 
-An `UploadIntent` record encodes: `{ entityId, entityType, formats, maxSizeBytes, variants, routingKey, expiresAt, consumedAt }`. See decision 3 for the token format.
+An `UploadIntent` record encodes: `{ entityId, entityType, variants, routingKey, expiresAt, consumedAt }`. `variants` is a list of variant **names** only (e.g. `["thumbnail", "hero"]`) — see decision 4 for why the consumer domain does not supply formats or dimensions. See decision 3 for the token format.
 
 ### 3. Upload token — opaque DB-backed reference, not a self-contained signed token
 
@@ -58,7 +58,7 @@ Two token designs were considered:
 
 The opaque reference token is chosen. Single-use is a hard requirement, and enforcing it requires an atomic, stateful DB check on every upload regardless of token design (`UPDATE upload_intents SET consumed_at = now() WHERE token = ? AND consumed_at IS NULL AND expires_at > now()`, checking the affected row count). Since that DB round-trip is unavoidable, a cryptographic signature adds no additional guarantee: the existence of a valid, unconsumed `UploadIntent` row already proves validity. Self-contained signed tokens earn their cost when verification must be stateless and possibly performed by multiple verifiers without a DB hit — this is why ADR-006 uses a JWT for user authentication, validated by the gateway on every request without a database call. Here, `media-management` is the sole issuer and sole verifier of the upload token, so that property is not needed.
 
-`UploadIntent` fields: internal DB id (not exposed), `token` (UUID v4, used in the public upload URL — never the sequential internal id, to prevent enumeration), `entityId`, `entityType`, `formats`, `maxSizeBytes`, `variants`, `routingKey`, `expiresAt`, `consumedAt` (nullable).
+`UploadIntent` fields: internal DB id (not exposed), `token` (UUID v4, used in the public upload URL — never the sequential internal id, to prevent enumeration), `entityId`, `entityType`, `variants` (names only), `routingKey`, `expiresAt`, `consumedAt` (nullable).
 
 No `userId` is stored on `UploadIntent`: the requester is the consumer domain (`apps/backend`), not the end user directly, and this flow does not need to assert end-user identity into `media-management`'s trust boundary.
 

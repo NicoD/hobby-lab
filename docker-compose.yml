@@ -127,6 +127,7 @@ services:
     environment:
       - PORT=4000
       - DATABASE_URL=postgresql://media:media@media-db:5432/hobby_lab_media
+      - MEDIA_MAX_UPLOAD_SIZE_BYTES=52428800
     env_file:
       - path: ./apps/media-management/.env
         required: false
